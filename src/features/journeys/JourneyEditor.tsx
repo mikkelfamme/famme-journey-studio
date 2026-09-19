@@ -57,7 +57,7 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
 
   const onNodesChange = useCallback((changes: NodeChange[]) => {
     const setter = changes.every(change => change.type === 'select') ? setDraftTransient : setDraft;
-    setter(d => ({ ...d, nodes: applyNodeChanges(changes, d.nodes) }));
+    setter(d => ({ ...d, nodes: applyNodeChanges(changes, d.nodes) as Journey['nodes'] }));
   }, [setDraft, setDraftTransient]);
   const onEdgesChange = useCallback((changes: EdgeChange[]) => {
     const setter = changes.every(change => change.type === 'select') ? setDraftTransient : setDraft;

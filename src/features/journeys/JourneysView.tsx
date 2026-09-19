@@ -9,13 +9,14 @@ export function JourneysView({ onOpen }: { onOpen: (journey: Journey) => void })
   const { workspace, updateWorkspace } = useWorkspace();
   const [templateId, setTemplateId] = useState(workspace?.templates[0]?.id ?? '');
   if (!workspace) return null;
+  const currentWorkspace = workspace;
 
   function create() {
-    const template = workspace.templates.find(t => t.id === templateId) ?? workspace.templates[0];
+    const template = currentWorkspace.templates.find(t => t.id === templateId) ?? currentWorkspace.templates[0];
     if (!template) return;
     const name = window.prompt('Journey name', `New ${template.name}`);
     if (!name) return;
-    const journey = journeyFromTemplate(template, name, workspace.organization);
+    const journey = journeyFromTemplate(template, name, currentWorkspace.organization);
     updateWorkspace(ws => ({ ...ws, journeys: [...ws.journeys, journey] }));
     onOpen(journey);
   }
@@ -40,13 +41,13 @@ export function JourneysView({ onOpen }: { onOpen: (journey: Journey) => void })
     <section className="content-section">
       <div className="section-toolbar">
         <div><h2>Customer journeys</h2><p>One data model. Multiple views. Build the planned path and measurement logic together.</p></div>
-        <div className="inline-form"><select value={templateId} onChange={e => setTemplateId(e.target.value)}>{workspace.templates.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}</select><button className="button primary" onClick={create}><Plus size={16}/> Create from template</button></div>
+        <div className="inline-form"><select value={templateId} onChange={e => setTemplateId(e.target.value)}>{currentWorkspace.templates.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}</select><button className="button primary" onClick={create}><Plus size={16}/> Create from template</button></div>
       </div>
-      {workspace.journeys.length === 0 ? (
+      {currentWorkspace.journeys.length === 0 ? (
         <div className="empty-state"><GitBranch size={32}/><h3>No journeys yet</h3><p>Start from a generic template. The result is an independent journey you can customize.</p><button className="button primary" onClick={create}>Create first journey</button></div>
       ) : (
         <div className="card-grid">
-          {workspace.journeys.map(j => (
+          {currentWorkspace.journeys.map(j => (
             <article className="journey-card" key={j.id}>
               <div className="card-top"><span className={`status status-${j.status}`}>{j.status}</span><MoreHorizontal size={17}/></div>
               <h3>{j.name}</h3><p>{j.description || 'No description yet.'}</p>
