@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.0-rc.3 — Journey Editor polish
+
+- Redesigned journey nodes with clearer hierarchy, type icons, stage pills and subtler handles.
+- Searchable and grouped component palette.
+- Collapsible component palette and inspector.
+- Refined editor toolbar, saved/unsaved state, edge styling and selection UI.
+- Upgraded node inspector tabs, field layout and empty state.
+
 ## 2.0.0-rc.2 — Polish & updates
 
 - Premium visual refresh across the public PWA and journey editor.

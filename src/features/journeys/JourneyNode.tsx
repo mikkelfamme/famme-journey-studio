@@ -1,36 +1,62 @@
 import { Handle, Position, type NodeProps } from '@xyflow/react';
+import { BarChart3, BellRing, Bot, CheckCircle2, CircleDot, FileText, Flag, GitBranch, Goal, Mail, Megaphone, MousePointerClick, Search, ShieldCheck, Sparkles, StickyNote, Tag, UserRound, Workflow } from 'lucide-react';
 import type { JourneyNode } from '../../types/domain';
 
 const labels: Record<string, string> = {
-  trigger: 'Trigger', need: 'Need', decision: 'Decision', meta: 'Meta', googleAds: 'Google Ads', landingPage: 'Landing page',
+  trigger: 'Trigger', need: 'Need', customerStep: 'Customer step', decision: 'Decision', meta: 'Meta', googleAds: 'Google Ads', landingPage: 'Landing page',
   cta: 'CTA', tracking: 'Tracking', conversion: 'Conversion', lead: 'Lead', booking: 'Booking', exclusion: 'Exclusion', crm: 'CRM / Email', note: 'Note'
 };
 
-const handleStyle = { width: 8, height: 8, background: '#fff', border: '1.5px solid #77818e' };
+const icons = {
+  trigger: BellRing,
+  need: UserRound,
+  customerStep: Workflow,
+  decision: GitBranch,
+  meta: Megaphone,
+  googleAds: Search,
+  landingPage: FileText,
+  cta: MousePointerClick,
+  tracking: BarChart3,
+  conversion: Goal,
+  lead: Tag,
+  booking: CheckCircle2,
+  exclusion: ShieldCheck,
+  crm: Mail,
+  note: StickyNote
+} as const;
+
+const handles = [
+  ['target-left', 'target', Position.Left, { top: '42%' }], ['source-left', 'source', Position.Left, { top: '62%' }],
+  ['target-right', 'target', Position.Right, { top: '42%' }], ['source-right', 'source', Position.Right, { top: '62%' }],
+  ['target-top', 'target', Position.Top, { left: '42%' }], ['source-top', 'source', Position.Top, { left: '62%' }],
+  ['target-bottom', 'target', Position.Bottom, { left: '42%' }], ['source-bottom', 'source', Position.Bottom, { left: '62%' }]
+] as const;
 
 export function JourneyNodeComponent({ data, selected }: NodeProps<JourneyNode>) {
   const openTodos = data.annotations.filter(a => a.kind === 'todo' && !a.done).length;
+  const Icon = icons[data.type as keyof typeof icons] ?? CircleDot;
+  const hasSignals = data.tracking.length > 0 || data.creatives.length > 0 || openTodos > 0 || Boolean(data.componentId);
+
   return (
-    <div className={`journey-node node-${data.type} ${selected ? 'selected' : ''} ${data.componentId ? 'library-linked' : ''}`}>
-      <Handle id="target-left" type="target" position={Position.Left} style={{ ...handleStyle, top: '42%' }} />
-      <Handle id="source-left" type="source" position={Position.Left} style={{ ...handleStyle, top: '62%' }} />
-      <Handle id="target-right" type="target" position={Position.Right} style={{ ...handleStyle, top: '42%' }} />
-      <Handle id="source-right" type="source" position={Position.Right} style={{ ...handleStyle, top: '62%' }} />
-      <Handle id="target-top" type="target" position={Position.Top} style={{ ...handleStyle, left: '42%' }} />
-      <Handle id="source-top" type="source" position={Position.Top} style={{ ...handleStyle, left: '62%' }} />
-      <Handle id="target-bottom" type="target" position={Position.Bottom} style={{ ...handleStyle, left: '42%' }} />
-      <Handle id="source-bottom" type="source" position={Position.Bottom} style={{ ...handleStyle, left: '62%' }} />
-      <div className="node-kicker">{labels[data.type] ?? data.type} · {data.stage}</div>
-      <div className="node-title">{data.label}</div>
+    <div className={`journey-node node-${data.type} stage-${data.stage} ${selected ? 'selected' : ''} ${data.componentId ? 'library-linked' : ''}`}>
+      {handles.map(([id, type, position, style]) => <Handle key={id} id={id} type={type} position={position} className={`journey-handle ${type}`} style={style}/>) }
+      <div className="node-head">
+        <div className="node-icon"><Icon size={15}/></div>
+        <div className="node-head-copy">
+          <div className="node-kicker">{labels[data.type] ?? data.type}</div>
+          <div className="node-title">{data.label}</div>
+        </div>
+        <span className={`node-stage stage-pill-${data.stage}`}>{data.stage}</span>
+      </div>
       {data.description && <div className="node-desc">{data.description}</div>}
       {data.runtimePerformance && <div className={`node-performance quality-${data.runtimePerformance.quality}`}><div><strong>{data.runtimePerformance.quality}</strong><span>{data.runtimePerformance.source}</span></div>{data.runtimePerformance.metrics.map(metric => <div className="node-kpi" key={metric.key}><span>{metric.label}</span><b>{metric.formatted}</b></div>)}</div>}
-      {data.runtimeActualCount ? <div className="node-actual-badge">ACTUAL · {data.runtimeActualCount} path occurrence{data.runtimeActualCount === 1 ? '' : 's'}</div> : null}
-      <div className="node-meta">
-        {data.tracking.length > 0 && <span>{data.tracking.length} tracking</span>}
-        {data.creatives.length > 0 && <span>{data.creatives.length} creative</span>}
-        {openTodos > 0 && <span>{openTodos} todo</span>}
-        {data.componentId && <span>library</span>}
-      </div>
+      {data.runtimeActualCount ? <div className="node-actual-badge"><Sparkles size={10}/> Actual · {data.runtimeActualCount} occurrence{data.runtimeActualCount === 1 ? '' : 's'}</div> : null}
+      {hasSignals && <div className="node-signals">
+        {data.tracking.length > 0 && <span><BarChart3 size={9}/>{data.tracking.length} tracking</span>}
+        {data.creatives.length > 0 && <span><Bot size={9}/>{data.creatives.length} creative</span>}
+        {openTodos > 0 && <span><Flag size={9}/>{openTodos} todo</span>}
+        {data.componentId && <span><Sparkles size={9}/>library</span>}
+      </div>}
     </div>
   );
 }

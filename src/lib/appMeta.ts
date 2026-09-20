@@ -1,10 +1,20 @@
 export const APP_NAME = 'Famme Journey Studio';
-export const APP_VERSION = '2.0.0-rc.2';
+export const APP_VERSION = '2.0.0-rc.3';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'FAMME · DIGITAL';
 export const APP_RELEASE_DATE = '2026-09-20';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.3',
+    title: 'Journey Editor polish',
+    items: [
+      'Redesigned journey nodes with stronger hierarchy, type icons and quieter connection handles.',
+      'Searchable, grouped component palette for faster journey construction.',
+      'Collapsible palette and inspector to create more canvas space when needed.',
+      'Refined node inspector, toolbar, selection states and editor ergonomics.'
+    ]
+  },
   {
     version: '2.0.0-rc.2',
     title: 'Polish & updates',

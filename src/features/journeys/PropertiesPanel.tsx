@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Check, Link2, Plus, RefreshCw, Save, Trash2, Unlink } from 'lucide-react';
+import { Activity, Check, Image, Link2, Plus, RefreshCw, Save, Settings2, StickyNote, Trash2, Unlink } from 'lucide-react';
 import type { AnnotationKind, ComponentDefinition, CrossJourneyLink, CreativeDefinition, FunnelStage, Journey, JourneyNodeData, JourneyNodeType, TrackingDefinition } from '../../types/domain';
 import { makeId } from '../../lib/ids';
 
@@ -24,15 +24,17 @@ interface Props {
   onRemoveCrossLink: (id: string) => void;
 }
 
+type InspectorTab = 'general' | 'tracking' | 'creative' | 'notes' | 'links';
+
 export function PropertiesPanel(props: Props) {
   const { data, nodeId, currentJourneyId, journeys, components, crossLinks, onChange, onDelete, onSaveComponent, onUpdateComponent, onSyncComponent, onUnlinkComponent, onAddCrossLink, onRemoveCrossLink } = props;
-  const [tab, setTab] = useState<'general' | 'tracking' | 'creative' | 'notes' | 'links'>('general');
+  const [tab, setTab] = useState<InspectorTab>('general');
   const [targetJourneyId, setTargetJourneyId] = useState('');
   const [targetNodeId, setTargetNodeId] = useState('');
   const [linkLabel, setLinkLabel] = useState('Continue to journey');
 
   const targetJourney = useMemo(() => journeys.find(j => j.id === targetJourneyId), [journeys, targetJourneyId]);
-  if (!data) return <aside className="editor-panel properties-panel empty-panel"><div><strong>Select a node</strong><p>Edit properties, tracking, creatives, notes and cross-journey logic here.</p></div></aside>;
+  if (!data) return <aside className="editor-panel properties-panel empty-panel"><div className="empty-inspector"><div className="empty-inspector-icon"><Settings2 size={18}/></div><strong>Select a node</strong><p>Edit content, tracking, creatives, notes and cross-journey logic here.</p><div className="shortcut-hint"><kbd>Shift</kbd><span>multi-select nodes</span></div></div></aside>;
 
   function updateTracking(id: string, patch: Partial<TrackingDefinition>) {
     onChange({ ...data!, tracking: data!.tracking.map(t => t.id === id ? { ...t, ...patch } : t) });
@@ -60,20 +62,33 @@ export function PropertiesPanel(props: Props) {
   }
   const ownLinks = crossLinks.filter(link => link.sourceNodeId === nodeId);
   const component = data.componentId ? components.find(c => c.id === data.componentId) : undefined;
+  const openTodos = data.annotations.filter(annotation => annotation.kind === 'todo' && !annotation.done).length;
+  const tabs: Array<{ id: InspectorTab; label: string; icon: typeof Settings2; count?: number }> = [
+    { id: 'general', label: 'General', icon: Settings2 },
+    { id: 'tracking', label: 'Tracking', icon: Activity, count: data.tracking.length },
+    { id: 'creative', label: 'Creative', icon: Image, count: data.creatives.length },
+    { id: 'notes', label: 'Notes', icon: StickyNote, count: openTodos || data.annotations.length },
+    { id: 'links', label: 'Links', icon: Link2, count: ownLinks.length }
+  ];
 
   return (
     <aside className="editor-panel properties-panel">
-      <div className="panel-heading">Node inspector</div>
+      <div className="inspector-node-header">
+        <div className={`inspector-type-mark node-${data.type}`} />
+        <div><span className="panel-heading">Node inspector</span><strong>{data.label || 'Untitled node'}</strong><small>{data.type} · {data.stage}</small></div>
+      </div>
       <div className="inspector-tabs">
-        {(['general','tracking','creative','notes','links'] as const).map(id => <button key={id} className={tab === id ? 'active' : ''} onClick={() => setTab(id)}>{id}</button>)}
+        {tabs.map(item => { const Icon = item.icon; return <button key={item.id} className={tab === item.id ? 'active' : ''} onClick={() => setTab(item.id)} title={item.label}><Icon size={13}/><span>{item.label}</span>{item.count ? <b>{item.count}</b> : null}</button>; })}
       </div>
 
       {tab === 'general' && <>
         <label>Label<input value={data.label} onChange={e => onChange({ ...data, label: e.target.value })} /></label>
-        <label>Type<select value={data.type} onChange={e => onChange({ ...data, type: e.target.value as JourneyNodeType })}>
-          {['trigger','need','customerStep','decision','meta','googleAds','landingPage','cta','tracking','conversion','lead','booking','exclusion','crm','note'].map(x => <option key={x} value={x}>{x}</option>)}
-        </select></label>
-        <label>Funnel stage<select value={data.stage} onChange={e => onChange({ ...data, stage: e.target.value as FunnelStage })}>{['top','middle','bottom','lifecycle'].map(x => <option key={x}>{x}</option>)}</select></label>
+        <div className="property-two-col">
+          <label>Type<select value={data.type} onChange={e => onChange({ ...data, type: e.target.value as JourneyNodeType })}>
+            {['trigger','need','customerStep','decision','meta','googleAds','landingPage','cta','tracking','conversion','lead','booking','exclusion','crm','note'].map(x => <option key={x} value={x}>{x}</option>)}
+          </select></label>
+          <label>Stage<select value={data.stage} onChange={e => onChange({ ...data, stage: e.target.value as FunnelStage })}>{['top','middle','bottom','lifecycle'].map(x => <option key={x}>{x}</option>)}</select></label>
+        </div>
         <label>Description<textarea rows={4} value={data.description ?? ''} onChange={e => onChange({ ...data, description: e.target.value })} /></label>
         <label>Customer need<textarea rows={2} value={data.customerNeed ?? ''} onChange={e => onChange({ ...data, customerNeed: e.target.value })} /></label>
         <label>Communication task<textarea rows={2} value={data.communicationTask ?? ''} onChange={e => onChange({ ...data, communicationTask: e.target.value })} /></label>
@@ -93,7 +108,7 @@ export function PropertiesPanel(props: Props) {
         <button className="button full" onClick={addTracking}><Plus size={14}/> Add tracking definition</button>
         {data.tracking.length === 0 && <p className="muted-small">No tracking definitions attached.</p>}
         {data.tracking.map(item => <div className="definition-card" key={item.id}>
-          <div className="definition-card-head"><strong>Tracking</strong><button className="mini-icon danger-icon" onClick={() => removeTracking(item.id)}><Trash2 size={13}/></button></div>
+          <div className="definition-card-head"><div><strong>{item.event || 'Tracking signal'}</strong><small>{item.platform}</small></div><button className="mini-icon danger-icon" onClick={() => removeTracking(item.id)}><Trash2 size={13}/></button></div>
           <label>Platform<select value={item.platform} onChange={e => updateTracking(item.id, { platform: e.target.value })}>{platforms.map(p => <option key={p}>{p}</option>)}</select></label>
           <label>Event / signal<input value={item.event} onChange={e => updateTracking(item.id, { event: e.target.value })}/></label>
           <label>Status<select value={item.status} onChange={e => updateTracking(item.id, { status: e.target.value as TrackingDefinition['status'] })}>{trackingStatuses.map(s => <option key={s}>{s}</option>)}</select></label>
@@ -105,7 +120,7 @@ export function PropertiesPanel(props: Props) {
         <button className="button full" onClick={addCreative}><Plus size={14}/> Add creative</button>
         {data.creatives.length === 0 && <p className="muted-small">No creative definitions attached.</p>}
         {data.creatives.map(item => <div className="definition-card" key={item.id}>
-          <div className="definition-card-head"><strong>{item.name || 'Creative'}</strong><button className="mini-icon danger-icon" onClick={() => removeCreative(item.id)}><Trash2 size={13}/></button></div>
+          <div className="definition-card-head"><div><strong>{item.name || 'Creative'}</strong><small>{item.format} · {item.status ?? 'draft'}</small></div><button className="mini-icon danger-icon" onClick={() => removeCreative(item.id)}><Trash2 size={13}/></button></div>
           <label>Name<input value={item.name} onChange={e => updateCreative(item.id, { name: e.target.value })}/></label>
           <label>Format<input value={item.format} onChange={e => updateCreative(item.id, { format: e.target.value })}/></label>
           <label>Message<textarea rows={2} value={item.message ?? ''} onChange={e => updateCreative(item.id, { message: e.target.value })}/></label>

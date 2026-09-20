@@ -15,7 +15,7 @@ import {
   type OnSelectionChangeParams
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { AlignHorizontalJustifyStart, ArrowLeft, BarChart3, Copy, FileText, GitCompareArrows, HeartPulse, Layers3, Redo2, Save, Shapes, Trash2, Undo2, Waypoints } from 'lucide-react';
+import { AlignHorizontalJustifyStart, ArrowLeft, BarChart3, CheckCircle2, Copy, FileText, GitCompareArrows, HeartPulse, Layers3, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Redo2, Save, Shapes, Trash2, Undo2, Waypoints } from 'lucide-react';
 import type { ComponentDefinition, CrossJourneyLink, FunnelStage, Journey, JourneyNodeData, JourneyNodeType, JourneyVersion } from '../../types/domain';
 import { makeId } from '../../lib/ids';
 import { generateJourneyPlan } from '../../lib/plan';
@@ -46,6 +46,8 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
   const [inspectorMode, setInspectorMode] = useState<InspectorMode>('properties');
   const [showPerformance, setShowPerformance] = useState(Boolean(workspace?.settings.showPerformanceOverlay));
+  const [paletteOpen, setPaletteOpen] = useState(true);
+  const [inspectorOpen, setInspectorOpen] = useState(true);
   const selected = selectedIds.length === 1 ? draft.nodes.find(n => n.id === selectedIds[0]) ?? null : null;
   const selectedEdge = selectedEdgeId ? draft.edges.find(e => e.id === selectedEdgeId) ?? null : null;
 
@@ -77,6 +79,7 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
     setSelectedIds([id]);
     setSelectedEdgeId(null);
     setInspectorMode('properties');
+    setInspectorOpen(true);
   }
 
   function addComponent(component: ComponentDefinition) {
@@ -86,6 +89,7 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
     setSelectedIds([id]);
     setSelectedEdgeId(null);
     setInspectorMode('properties');
+    setInspectorOpen(true);
   }
 
   function updateSelected(data: JourneyNodeData) {
@@ -260,6 +264,7 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
     setSelectedEdgeId(null);
     setDraftTransient(d => ({ ...d, nodes: d.nodes.map(n => ({ ...n, selected: n.id === nodeId })) }));
     setInspectorMode('properties');
+    setInspectorOpen(true);
   }
 
   function closeEditor() {
@@ -270,22 +275,31 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
   return (
     <div className="editor-screen">
       <div className="editor-topbar">
-        <button className="icon-button" onClick={closeEditor} title="Back"><ArrowLeft size={18} /></button>
-        <div className="editor-title"><strong>{draft.name}</strong><span>{draft.status} · {draft.scope} · {selectedIds.length ? `${selectedIds.length} selected` : 'no selection'} {draftHistory.canUndo ? '· unsaved changes' : '· saved'}</span></div>
+        <div className="editor-topbar-left">
+          <button className="icon-button" onClick={closeEditor} title="Back"><ArrowLeft size={18} /></button>
+          <button className="icon-button panel-toggle" onClick={() => setPaletteOpen(value => !value)} title={paletteOpen ? 'Hide component palette' : 'Show component palette'}>{paletteOpen ? <PanelLeftClose size={16}/> : <PanelLeftOpen size={16}/>}</button>
+          <div className="editor-title"><strong>{draft.name}</strong><span>{draft.status} · {draft.scope} · {draft.nodes.length} nodes · {draft.edges.length} connections</span></div>
+          <span className={`editor-save-state ${draftHistory.canUndo ? 'dirty' : 'clean'}`}>{draftHistory.canUndo ? 'Unsaved' : <><CheckCircle2 size={12}/> Saved</>}</span>
+        </div>
         <div className="editor-actions">
-          <button className="icon-button" onClick={draftHistory.undo} disabled={!draftHistory.canUndo} title="Undo (Ctrl/⌘ Z)" aria-label="Undo"><Undo2 size={16}/></button>
-          <button className="icon-button" onClick={draftHistory.redo} disabled={!draftHistory.canRedo} title="Redo (Ctrl/⌘ Y)" aria-label="Redo"><Redo2 size={16}/></button>
-          <button className={`button ${inspectorMode === 'plan' ? 'active-button' : ''}`} onClick={() => setInspectorMode('plan')}><FileText size={16} /> Plan</button>
-          <button className={`button ${inspectorMode === 'health' ? 'active-button' : ''}`} onClick={() => setInspectorMode('health')}><HeartPulse size={16} /> Health</button>
-          <button className={`button ${inspectorMode === 'versions' ? 'active-button' : ''}`} onClick={() => setInspectorMode('versions')}><Layers3 size={16} /> Versions</button>
-          <button className={`button ${inspectorMode === 'actual' ? 'active-button' : ''}`} onClick={() => setInspectorMode('actual')}><GitCompareArrows size={16} /> Plan vs Actual</button>
-          <button className={`button ${showPerformance ? 'active-button' : ''}`} onClick={() => { const next=!showPerformance; setShowPerformance(next); updateWorkspace(ws=>({...ws,settings:{...ws.settings,showPerformanceOverlay:next}})); }}><BarChart3 size={16} /> Performance</button>
-          <button className="button" onClick={saveAsTemplate}><Shapes size={16} /> Template</button>
-          <button className="button primary" onClick={save}><Save size={16} /> Save</button>
+          <div className="editor-action-group history-actions">
+            <button className="icon-button" onClick={draftHistory.undo} disabled={!draftHistory.canUndo} title="Undo (Ctrl/⌘ Z)" aria-label="Undo"><Undo2 size={16}/></button>
+            <button className="icon-button" onClick={draftHistory.redo} disabled={!draftHistory.canRedo} title="Redo (Ctrl/⌘ Y)" aria-label="Redo"><Redo2 size={16}/></button>
+          </div>
+          <div className="editor-action-group review-actions">
+            <button className={`button ${inspectorMode === 'plan' ? 'active-button' : ''}`} onClick={() => { setInspectorMode('plan'); setInspectorOpen(true); }}><FileText size={15} /> Plan</button>
+            <button className={`button ${inspectorMode === 'health' ? 'active-button' : ''}`} onClick={() => { setInspectorMode('health'); setInspectorOpen(true); }}><HeartPulse size={15} /> Health</button>
+            <button className={`button ${inspectorMode === 'versions' ? 'active-button' : ''}`} onClick={() => { setInspectorMode('versions'); setInspectorOpen(true); }}><Layers3 size={15} /> Versions</button>
+            <button className={`button ${inspectorMode === 'actual' ? 'active-button' : ''}`} onClick={() => { setInspectorMode('actual'); setInspectorOpen(true); }}><GitCompareArrows size={15} /> Actual</button>
+          </div>
+          <button className={`button ${showPerformance ? 'active-button' : ''}`} onClick={() => { const next=!showPerformance; setShowPerformance(next); updateWorkspace(ws=>({...ws,settings:{...ws.settings,showPerformanceOverlay:next}})); }}><BarChart3 size={15} /> Performance</button>
+          <button className="button template-button" onClick={saveAsTemplate}><Shapes size={15} /> Template</button>
+          <button className="button primary" onClick={save}><Save size={15} /> Save</button>
+          <button className="icon-button panel-toggle" onClick={() => setInspectorOpen(value => !value)} title={inspectorOpen ? 'Hide inspector' : 'Show inspector'}>{inspectorOpen ? <PanelRightClose size={16}/> : <PanelRightOpen size={16}/>}</button>
         </div>
       </div>
-      <div className="editor-layout">
-        <NodePalette onAdd={addNode} components={workspace?.components ?? []} onAddComponent={addComponent} />
+      <div className={`editor-layout ${paletteOpen ? '' : 'palette-collapsed'} ${inspectorOpen ? '' : 'inspector-collapsed'}`}>
+        {paletteOpen && <NodePalette onAdd={addNode} components={workspace?.components ?? []} onAddComponent={addComponent} />}
         <div className="canvas-wrap">
           <ReactFlow
             nodes={flowNodes}
@@ -296,8 +310,8 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
             onConnect={onConnect}
             onReconnect={onReconnect}
             onSelectionChange={onSelectionChange}
-            onNodeClick={() => { setSelectedEdgeId(null); setInspectorMode('properties'); }}
-            onEdgeClick={(_, edge) => { setSelectedIds([]); setSelectedEdgeId(edge.id); setInspectorMode('properties'); }}
+            onNodeClick={() => { setSelectedEdgeId(null); setInspectorMode('properties'); setInspectorOpen(true); }}
+            onEdgeClick={(_, edge) => { setSelectedIds([]); setSelectedEdgeId(edge.id); setInspectorMode('properties'); setInspectorOpen(true); }}
             onPaneClick={clearSelection}
             fitView
             snapToGrid={workspace?.settings.snapToGrid}
@@ -320,7 +334,7 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
             <button className="mini-action danger-icon" onClick={deleteSelection}><Trash2 size={14}/> Delete</button>
           </div>}
         </div>
-        {inspectorMode === 'plan' ? (
+        {inspectorOpen && (inspectorMode === 'plan' ? (
           <aside className="editor-panel plan-panel"><div className="panel-heading">Generated journey plan</div><pre>{plan}</pre></aside>
         ) : inspectorMode === 'health' ? (
           <HealthPanel journey={draft} onSelectNode={selectHealthNode}/>
@@ -347,7 +361,7 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
             onAddCrossLink={addCrossLink}
             onRemoveCrossLink={removeCrossLink}
           />
-        )}
+        ))}
       </div>
     </div>
   );
