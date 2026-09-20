@@ -1,7 +1,8 @@
 import type { Journey, JourneyEdge, JourneyNode, FunnelStage } from '../types/domain';
+import { STAGE_NODE_X, STAGE_ORDER } from './stageGeometry';
 
-const STAGES: FunnelStage[] = ['top', 'middle', 'bottom', 'lifecycle'];
-const STAGE_X: Record<FunnelStage, number> = { top: 80, middle: 380, bottom: 680, lifecycle: 980 };
+const STAGES: FunnelStage[] = STAGE_ORDER;
+const STAGE_X = STAGE_NODE_X;
 const ROW_GAP = 136;
 const TOP_OFFSET = 110;
 

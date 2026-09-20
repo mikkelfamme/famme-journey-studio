@@ -1,10 +1,19 @@
 export const APP_NAME = 'Famme Journey Studio';
-export const APP_VERSION = '2.0.0-rc.8';
+export const APP_VERSION = '2.0.0-rc.9';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'FAMME · DIGITAL';
 export const APP_RELEASE_DATE = '2026-09-20';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.9',
+    title: 'Zoom-aligned stage backdrop',
+    items: [
+      'Funnel stage backgrounds now track the same horizontal viewport transform as journey nodes, so zooming and panning no longer misaligns Top, Middle, Bottom and Lifecycle.',
+      'Stage separators and labels remain readable while following the journey coordinate system.',
+      'Creative and TODO signal badges use darker text and stronger contrast for easier scanning.'
+    ]
+  },
   {
     version: '2.0.0-rc.8',
     title: 'Print fidelity',

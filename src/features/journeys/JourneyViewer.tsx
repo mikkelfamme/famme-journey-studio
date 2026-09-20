@@ -5,6 +5,8 @@ import { ArrowLeft, ExternalLink, Pencil, Printer, X } from 'lucide-react';
 import type { Journey, JourneyNode } from '../../types/domain';
 import { JourneyNodeComponent } from './JourneyNode';
 import { JourneyPrintSheet } from './JourneyPrintSheet';
+import { StageBackdrop } from './StageBackdrop';
+import type { CanvasViewport } from '../../lib/stageGeometry';
 import { useI18n } from '../../i18n';
 
 const nodeTypes = { journey: JourneyNodeComponent };
@@ -12,6 +14,7 @@ const nodeTypes = { journey: JourneyNodeComponent };
 export function JourneyViewer({ journey, onClose, onEdit }: { journey: Journey; onClose: () => void; onEdit: () => void }) {
   const { t, status } = useI18n();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [canvasViewport, setCanvasViewport] = useState<CanvasViewport>({ x: 0, y: 0, zoom: 1 });
   const selected = useMemo(() => journey.nodes.find(node => node.id === selectedId) ?? null, [journey.nodes, selectedId]);
   const nodes = useMemo(() => journey.nodes.map(node => ({
     ...node,
@@ -52,15 +55,12 @@ export function JourneyViewer({ journey, onClose, onEdit }: { journey: Journey; 
     </header>
     <div className={`viewer-layout ${selected ? 'details-open' : ''}`}>
       <div className="viewer-canvas canvas-wrap no-print">
-        <div className="stage-zones" aria-hidden="true">
-          <div className="stage-zone stage-zone-top"><span>{t('stage.topLong')}</span></div>
-          <div className="stage-zone stage-zone-middle"><span>{t('stage.middleLong')}</span></div>
-          <div className="stage-zone stage-zone-bottom"><span>{t('stage.bottomLong')}</span></div>
-          <div className="stage-zone stage-zone-lifecycle"><span>{t('stage.lifecycleLong')}</span></div>
-        </div>
+        <StageBackdrop viewport={canvasViewport}/>
         <ReactFlow
           nodes={nodes}
           edges={edges}
+          onInit={instance => setCanvasViewport(instance.getViewport())}
+          onMove={(_, viewport) => setCanvasViewport(viewport)}
           nodeTypes={nodeTypes}
           onNodeClick={onNodeClick}
           onPaneClick={() => setSelectedId(null)}

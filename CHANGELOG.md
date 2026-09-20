@@ -1,3 +1,10 @@
+## 2.0.0-rc.9 — Zoom-aligned stage backdrop
+
+- Funnel stage colors now follow the same horizontal pan/zoom transform as journey nodes.
+- Stage boundaries stay aligned with Top, Middle, Bottom and Lifecycle while zooming.
+- Stage labels remain screen-readable while their horizontal position follows the canvas.
+- Creative and TODO badges use darker, higher-contrast text.
+
 ## 2.0.0-rc.8 — Print fidelity
 
 - Print/PDF preserves the saved journey layout instead of applying a separate compact layout.

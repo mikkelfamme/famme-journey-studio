@@ -36,6 +36,8 @@ import { useHistoryState } from '../../lib/useHistory';
 import { compactStageLayout, traceConnectedPath } from '../../lib/layout';
 import { useI18n } from '../../i18n';
 import { JourneyPrintSheet } from './JourneyPrintSheet';
+import { StageBackdrop } from './StageBackdrop';
+import type { CanvasViewport } from '../../lib/stageGeometry';
 
 const nodeTypes = { journey: JourneyNodeComponent };
 type InspectorMode = 'properties' | 'plan' | 'health' | 'versions' | 'actual';
@@ -55,6 +57,7 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
   const [inspectorOpen, setInspectorOpen] = useState(false);
   const [reviewMenuOpen, setReviewMenuOpen] = useState(false);
   const [flowInstance, setFlowInstance] = useState<ReactFlowInstance<JourneyNode, JourneyEdge> | null>(null);
+  const [canvasViewport, setCanvasViewport] = useState<CanvasViewport>({ x: 0, y: 0, zoom: 1 });
   const selected = selectedIds.length === 1 ? draft.nodes.find(n => n.id === selectedIds[0]) ?? null : null;
   const selectedEdge = selectedEdgeId ? draft.edges.find(e => e.id === selectedEdgeId) ?? null : null;
 
@@ -371,7 +374,8 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
             nodes={flowNodes}
             edges={flowEdges}
             nodeTypes={nodeTypes}
-            onInit={setFlowInstance}
+            onInit={instance => { setFlowInstance(instance); setCanvasViewport(instance.getViewport()); }}
+            onMove={(_, viewport) => setCanvasViewport(viewport)}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
@@ -394,7 +398,7 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
             <Controls />
             {workspace?.settings.showMiniMap && draft.nodes.length >= 10 && <MiniMap pannable zoomable />}
           </ReactFlow>
-          <div className="stage-zones" aria-hidden="true"><div className="stage-zone stage-zone-top"><span>{t('stage.topLong')}</span></div><div className="stage-zone stage-zone-middle"><span>{t('stage.middleLong')}</span></div><div className="stage-zone stage-zone-bottom"><span>{t('stage.bottomLong')}</span></div><div className="stage-zone stage-zone-lifecycle"><span>{t('stage.lifecycleLong')}</span></div></div>
+          <StageBackdrop viewport={canvasViewport}/>
           <div className="canvas-pan-hint no-print">{t('editor.panHint')}</div>
           {selectedIds.length > 1 && <div className="bulk-toolbar">
             <strong>{selectedIds.length} {t('editor.selected')}</strong>
