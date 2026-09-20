@@ -165,3 +165,47 @@ input,select,textarea{border-color:#d8dee7;border-radius:10px;background:#fff;mi
 .viewer-screen .react-flow__node.dragging{cursor:pointer!important}
 .viewer-screen .viewer-details{pointer-events:auto}
 @media(max-width:760px){.viewer-details{left:12px;right:12px;top:auto;bottom:12px;width:auto;max-height:46vh}}
+
+/* RC9 — viewport-synchronised stage backdrop */
+.stage-backdrop{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;transition:background .08s linear}
+.stage-backdrop-separator{position:absolute;top:0;bottom:0;width:1px;background:rgba(100,112,128,.19);transform:translateX(-.5px)}
+.stage-backdrop-label{position:absolute;top:14px;z-index:1;font-size:8px;font-weight:850;letter-spacing:.105em;background:rgba(248,250,252,.92);border:1px solid rgba(218,224,231,.9);border-radius:999px;padding:5px 7px;box-shadow:0 3px 10px rgba(16,24,40,.045);white-space:nowrap;transform:translateX(0);transition:left .05s linear}
+.stage-backdrop-label-top{color:#5365c4}.stage-backdrop-label-middle{color:#516f81}.stage-backdrop-label-bottom{color:#34745e}.stage-backdrop-label-lifecycle{color:#87621f}
+.node-signals span{color:#43505e!important;font-weight:700!important;background:#e9edf2!important;border:1px solid rgba(108,122,138,.08)}
+.viewer-screen .node-signals span{color:#43505e!important;font-weight:700!important;background:#e9edf2!important}
+
+
+/* RC10 — restore visible zoom-synchronised stage backdrop */
+.canvas-wrap > .react-flow,
+.viewer-canvas > .react-flow {
+  background: transparent !important;
+  --xy-background-color-default: transparent;
+}
+.canvas-wrap .react-flow__renderer,
+.viewer-canvas .react-flow__renderer {
+  background: transparent !important;
+}
+.stage-backdrop {
+  z-index: 0 !important;
+  background-color: #f6f8fb;
+}
+.canvas-wrap > .react-flow,
+.viewer-canvas > .react-flow {
+  z-index: 2 !important;
+}
+.canvas-wrap .react-flow__background,
+.viewer-canvas .react-flow__background {
+  opacity: .34 !important;
+}
+.node-signals span {
+  color: #46515f !important;
+  font-weight: 760 !important;
+  background: #eef2f5 !important;
+  border: 1px solid #e1e6eb;
+}
+
+.stage-backdrop-fill{position:absolute;top:0;bottom:0;display:block}
+.stage-backdrop-fill-top{background:rgba(78,99,210,.105)}
+.stage-backdrop-fill-middle{background:rgba(70,125,153,.095)}
+.stage-backdrop-fill-bottom{background:rgba(48,137,104,.095)}
+.stage-backdrop-fill-lifecycle{background:rgba(177,128,38,.105)}

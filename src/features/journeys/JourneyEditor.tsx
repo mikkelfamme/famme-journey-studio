@@ -56,7 +56,8 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
   const [paletteOpen, setPaletteOpen] = useState(true);
   const [inspectorOpen, setInspectorOpen] = useState(false);
   const [reviewMenuOpen, setReviewMenuOpen] = useState(false);
-  const [flowInstance, setFlowInstance] = useState<ReactFlowInstance<JourneyNode, JourneyEdge> | null>(null);
+  type FlowController = Pick<ReactFlowInstance, 'fitView' | 'getViewport'>;
+  const [flowInstance, setFlowInstance] = useState<FlowController | null>(null);
   const [canvasViewport, setCanvasViewport] = useState<CanvasViewport>({ x: 0, y: 0, zoom: 1 });
   const selected = selectedIds.length === 1 ? draft.nodes.find(n => n.id === selectedIds[0]) ?? null : null;
   const selectedEdge = selectedEdgeId ? draft.edges.find(e => e.id === selectedEdgeId) ?? null : null;
@@ -374,7 +375,7 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
             nodes={flowNodes}
             edges={flowEdges}
             nodeTypes={nodeTypes}
-            onInit={instance => { setFlowInstance(instance as ReactFlowInstance<JourneyNode, JourneyEdge>); setCanvasViewport(instance.getViewport()); }}
+            onInit={instance => { setFlowInstance(instance); setCanvasViewport(instance.getViewport()); }}
             onMove={(_, viewport) => setCanvasViewport(viewport)}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}

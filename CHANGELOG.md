@@ -1,3 +1,11 @@
+## 2.0.0-rc.10 — Stage backdrop visibility hotfix
+
+- Restores visible Top / Middle / Bottom / Lifecycle stage colours in both Editor and View.
+- Keeps the stage backdrop synchronised with the React Flow viewport while zooming and panning.
+- Makes React Flow canvas layers transparent so the stage backdrop remains visible behind nodes and edges.
+- Darkens creative/TODO/count badges for better readability.
+- Fixes the React Flow instance TypeScript build regression introduced in RC9.
+
 ## 2.0.0-rc.9 — Zoom-aligned stage backdrop
 
 - Funnel stage colors now follow the same horizontal pan/zoom transform as journey nodes.

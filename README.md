@@ -3,7 +3,7 @@
 **Visual customer journey architecture, channel planning, measurement design and observed-path analysis.**  
 Designed & developed by **Mikkel Famme**.
 
-> Current release: `2.0.0-rc.9`
+> Current release: `2.0.0-rc.10`
 
 Famme Journey Studio is a local-first application for modelling customer journeys as structured data rather than static diagrams. The public core is company-neutral: customer-specific journeys, campaign names, analytics and internal notes live in portable workspace/snapshot files rather than in the repository.
 
