@@ -1,10 +1,20 @@
 export const APP_NAME = 'Famme Journey Studio';
-export const APP_VERSION = '2.0.0-rc.5';
+export const APP_VERSION = '2.0.0-rc.6';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'FAMME · DIGITAL';
 export const APP_RELEASE_DATE = '2026-09-20';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.6',
+    title: 'Presentation & read-only view',
+    items: [
+      'View mode is now strictly read-only: nodes cannot be moved, connected or edited.',
+      'Journey connections use stronger arrows and optional edge labels in View mode.',
+      'Print / Save PDF now uses a dedicated page-optimized journey rendering instead of the live editor viewport.',
+      'Printed output includes journey details, URLs, tracking definitions and creative references.'
+    ]
+  },
   {
     version: '2.0.0-rc.5',
     title: 'View mode, media & localization',
@@ -16,7 +26,7 @@ export const APP_RELEASE_NOTES = [
     ]
   },
   {
-    version: '2.0.0-rc.5',
+    version: '2.0.0-rc.4',
     title: 'Editor UX & compact flow',
     items: [
       'Compact stage-aware layout and one-click Fit/Tidy controls.',

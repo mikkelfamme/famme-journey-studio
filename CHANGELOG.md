@@ -1,3 +1,11 @@
+## 2.0.0-rc.6 — Presentation & read-only view
+
+- Rebuilt Print / Save PDF around a dedicated, page-optimized journey rendering.
+- Print output now includes stage zones, arrows, edge labels and a compact details appendix.
+- View mode is strictly read-only and no longer allows node movement or selection-box behavior.
+- View connections now show stronger arrowheads and optional labels/conditions/signals.
+- View node cards retain tracking/creative badges while the detail panel exposes full definitions and active URLs.
+
 ## 2.0.0-rc.5 — View mode, media & localization
 
 - Canvas drag pans by default; Shift is reserved for multi-select.

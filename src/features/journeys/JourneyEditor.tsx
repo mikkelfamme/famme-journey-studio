@@ -35,6 +35,7 @@ import { activePerformanceSnapshot, mappingQuality, preferredMetrics, recordsFor
 import { useHistoryState } from '../../lib/useHistory';
 import { compactStageLayout, traceConnectedPath } from '../../lib/layout';
 import { useI18n } from '../../i18n';
+import { JourneyPrintSheet } from './JourneyPrintSheet';
 
 const nodeTypes = { journey: JourneyNodeComponent };
 type InspectorMode = 'properties' | 'plan' | 'health' | 'versions' | 'actual';
@@ -365,7 +366,7 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
       </div>
       <div className={`editor-layout ${paletteOpen ? '' : 'palette-collapsed'} ${inspectorOpen ? '' : 'inspector-collapsed'}`}>
         {paletteOpen && <NodePalette onAdd={addNode} components={workspace?.components ?? []} onAddComponent={addComponent} />}
-        <div className="canvas-wrap">
+        <div className="canvas-wrap no-print">
           <ReactFlow
             nodes={flowNodes}
             edges={flowEdges}
@@ -433,6 +434,7 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
           />
         ))}
       </div>
+      <JourneyPrintSheet journey={draft}/>
     </div>
   );
 }

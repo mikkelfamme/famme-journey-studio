@@ -155,3 +155,11 @@ MIT © 2026 Mikkel Famme
 - **Print / Save as PDF** from journey presentation.
 - English/Danish interface selection in Settings.
 - Translation dictionaries are plain JSON under `src/i18n/locales/` so wording can be improved through GitHub contributions.
+
+
+## RC6 presentation additions
+
+- Strict read-only journey View mode with visible connection arrows and edge labels.
+- Click nodes in View mode to inspect active URLs, tracking definitions and creative thumbnails without editing the journey.
+- Print / Save PDF uses a dedicated page-optimized renderer instead of printing the live React Flow viewport.
+- PDF output includes a compact journey diagram plus URL, tracking and creative details.

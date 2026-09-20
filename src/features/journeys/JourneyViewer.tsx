@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
-import { Background, Controls, MiniMap, ReactFlow, type NodeMouseHandler } from '@xyflow/react';
+import { Background, Controls, MarkerType, MiniMap, ReactFlow, type NodeMouseHandler } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { ArrowLeft, ExternalLink, Pencil, Printer, X } from 'lucide-react';
 import type { Journey, JourneyNode } from '../../types/domain';
 import { JourneyNodeComponent } from './JourneyNode';
+import { JourneyPrintSheet } from './JourneyPrintSheet';
 import { useWorkspace } from '../../store/WorkspaceContext';
 import { useI18n } from '../../i18n';
 
@@ -16,9 +17,27 @@ export function JourneyViewer({ journey, onClose, onEdit }: { journey: Journey; 
   const selected = useMemo(() => journey.nodes.find(node => node.id === selectedId) ?? null, [journey.nodes, selectedId]);
   const nodes = useMemo(() => journey.nodes.map(node => ({
     ...node,
+    draggable: false,
+    selectable: false,
+    focusable: false,
     selected: node.id === selectedId,
     data: { ...node.data, runtimeActions: undefined }
   })), [journey.nodes, selectedId]);
+  const edges = useMemo(() => journey.edges.map(edge => {
+    const label = edge.data?.label || edge.data?.signal || edge.data?.condition || undefined;
+    return {
+      ...edge,
+      selectable: false,
+      focusable: false,
+      label,
+      markerEnd: { type: MarkerType.ArrowClosed, width: 18, height: 18, color: '#7f8b98' },
+      style: { ...(edge.style ?? {}), stroke: '#7f8b98', strokeWidth: 1.7 },
+      labelStyle: { fill: '#5f6b78', fontSize: 10, fontWeight: 700 },
+      labelBgStyle: { fill: '#ffffff', fillOpacity: 0.94, stroke: '#dfe5ea', strokeWidth: 1 },
+      labelBgPadding: [6, 4] as [number, number],
+      labelBgBorderRadius: 7
+    };
+  }), [journey.edges]);
   const onNodeClick: NodeMouseHandler<JourneyNode> = (_, node) => setSelectedId(node.id);
   const nodeUrl = selected?.data.url || (selected?.data.type === 'landingPage' ? selected.data.landingPage : undefined);
 
@@ -34,7 +53,7 @@ export function JourneyViewer({ journey, onClose, onEdit }: { journey: Journey; 
       </div>
     </header>
     <div className={`viewer-layout ${selected ? 'details-open' : ''}`}>
-      <div className="viewer-canvas canvas-wrap print-canvas">
+      <div className="viewer-canvas canvas-wrap no-print">
         <div className="stage-zones" aria-hidden="true">
           <div className="stage-zone stage-zone-top"><span>{t('stage.topLong')}</span></div>
           <div className="stage-zone stage-zone-middle"><span>{t('stage.middleLong')}</span></div>
@@ -43,15 +62,20 @@ export function JourneyViewer({ journey, onClose, onEdit }: { journey: Journey; 
         </div>
         <ReactFlow
           nodes={nodes}
-          edges={journey.edges}
+          edges={edges}
           nodeTypes={nodeTypes}
           onNodeClick={onNodeClick}
           onPaneClick={() => setSelectedId(null)}
           nodesDraggable={false}
           nodesConnectable={false}
           edgesReconnectable={false}
-          elementsSelectable
-          panOnDrag={[0]}
+          elementsSelectable={false}
+          nodesFocusable={false}
+          edgesFocusable={false}
+          deleteKeyCode={null}
+          selectionKeyCode={null}
+          multiSelectionKeyCode={null}
+          panOnDrag
           selectionOnDrag={false}
           fitView
           fitViewOptions={{ padding: 0.18, minZoom: 0.45, maxZoom: 1.05 }}
@@ -81,6 +105,6 @@ export function JourneyViewer({ journey, onClose, onEdit }: { journey: Journey; 
         </section>
       </aside>}
     </div>
-    <div className="print-only print-heading"><h1>{journey.name}</h1><p>{status(journey.status)} · {journey.scope} · {journey.nodes.length} {t('journeys.nodes')} · {journey.edges.length} {t('journeys.connections')}</p></div>
+    <JourneyPrintSheet journey={journey}/>
   </div>;
 }
