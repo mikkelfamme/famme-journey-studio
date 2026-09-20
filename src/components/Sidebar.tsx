@@ -1,20 +1,22 @@
 import { BarChart3, Boxes, FileText, GitBranch, LayoutDashboard, Settings, Share2, Sparkles, Waypoints } from 'lucide-react';
 import { APP_VERSION } from '../lib/appMeta';
+import { useI18n } from '../i18n';
 
 export type AppView = 'journeys' | 'master' | 'insights' | 'templates' | 'components' | 'share' | 'settings' | 'about';
 
-const items: Array<{ id: AppView; label: string; icon: typeof GitBranch }> = [
-  { id: 'journeys', label: 'Journeys', icon: GitBranch },
-  { id: 'master', label: 'Master View', icon: LayoutDashboard },
-  { id: 'insights', label: 'Insights & Data', icon: BarChart3 },
-  { id: 'templates', label: 'Templates', icon: Waypoints },
-  { id: 'components', label: 'Components', icon: Boxes },
-  { id: 'share', label: 'Share & Portfolio', icon: Share2 },
-  { id: 'settings', label: 'Settings', icon: Settings },
-  { id: 'about', label: 'About & Updates', icon: FileText }
+const items: Array<{ id: AppView; key: string; icon: typeof GitBranch }> = [
+  { id: 'journeys', key: 'nav.journeys', icon: GitBranch },
+  { id: 'master', key: 'nav.master', icon: LayoutDashboard },
+  { id: 'insights', key: 'nav.insights', icon: BarChart3 },
+  { id: 'templates', key: 'nav.templates', icon: Waypoints },
+  { id: 'components', key: 'nav.components', icon: Boxes },
+  { id: 'share', key: 'nav.share', icon: Share2 },
+  { id: 'settings', key: 'nav.settings', icon: Settings },
+  { id: 'about', key: 'nav.about', icon: FileText }
 ];
 
 export function Sidebar({ view, onView }: { view: AppView; onView: (view: AppView) => void }) {
+  const { t } = useI18n();
   return (
     <aside className="sidebar">
       <div className="brand">
@@ -30,7 +32,7 @@ export function Sidebar({ view, onView }: { view: AppView; onView: (view: AppVie
           return (
             <button key={item.id} className={`nav-item ${view === item.id ? 'active' : ''}`} aria-current={view === item.id ? 'page' : undefined} onClick={() => onView(item.id)}>
               <Icon size={18} />
-              <span>{item.label}</span>
+              <span>{t(item.key)}</span>
             </button>
           );
         })}

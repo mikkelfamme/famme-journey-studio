@@ -38,6 +38,8 @@ export interface CreativeDefinition {
   id: string;
   format: string;
   name: string;
+  imageUrl?: string;
+  imageDataUrl?: string;
   message?: string;
   headline?: string;
   description?: string;
@@ -71,6 +73,7 @@ export interface JourneyNodeData extends Record<string, unknown> {
   channel?: string;
   primaryCta?: string;
   landingPage?: string;
+  url?: string;
   tracking: TrackingDefinition[];
   creatives: CreativeDefinition[];
   annotations: Annotation[];
@@ -258,6 +261,8 @@ export interface ActualPathSnapshot {
   journeyPaths: JourneyActualPaths[];
 }
 
+export type AppLanguage = 'en' | 'da';
+
 export interface WorkspaceSettings {
   defaultView: 'journeys' | 'master' | 'templates';
   showMiniMap: boolean;
@@ -270,6 +275,7 @@ export interface WorkspaceSettings {
   freshnessThresholdHours: number;
   onboardingComplete: boolean;
   demoWorkspace: boolean;
+  language: AppLanguage;
 }
 
 export interface Workspace {

@@ -1,3 +1,16 @@
+## 2.0.0-rc.5 — View mode, media & localization
+
+- Canvas drag pans by default; Shift is reserved for multi-select.
+- Larger journey nodes, tracking forms and creative cards.
+- Stronger funnel-stage backgrounds for Top, Middle, Bottom and Lifecycle.
+- Journey cards now support View, Edit, Rename, status changes, Duplicate and Delete.
+- Dedicated read-only View mode with clickable node URLs and creative previews.
+- Print / Save as PDF restored for journey viewing and editor output.
+- Landing-page and paid-media nodes can store clickable URLs.
+- Creative definitions support image URL or locally resized thumbnail uploads.
+- English remains the default UI language; Danish is selectable in Settings.
+- Locale JSON files live under `src/i18n/locales` for community editing on GitHub.
+
 # Changelog
 
 ## 2.0.0-rc.3 — Journey Editor polish

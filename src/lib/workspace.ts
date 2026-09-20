@@ -26,7 +26,7 @@ export function createWorkspace(input: { name: string; organization: string; sco
     metricDictionary: defaultMetricDictionary(),
     mappingOverrides: [],
     actualPathSnapshots: [],
-    settings: { defaultView: 'journeys', showMiniMap: true, snapToGrid: true, keyboardShortcuts: true, showPerformanceOverlay: true, freshnessThresholdHours: 48, onboardingComplete: false, demoWorkspace: false }
+    settings: { defaultView: 'journeys', showMiniMap: true, snapToGrid: true, keyboardShortcuts: true, showPerformanceOverlay: true, freshnessThresholdHours: 48, onboardingComplete: false, demoWorkspace: false, language: 'en' }
   });
 }
 

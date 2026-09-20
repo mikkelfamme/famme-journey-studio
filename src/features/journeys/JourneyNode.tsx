@@ -1,11 +1,7 @@
 import { Handle, NodeToolbar, Position, type NodeProps } from '@xyflow/react';
 import { BarChart3, BellRing, Bot, CheckCircle2, CircleDot, Copy, FileText, Flag, GitBranch, Goal, Mail, Megaphone, MousePointerClick, Search, ShieldCheck, Sparkles, StickyNote, Tag, Trash2, UserRound, Workflow } from 'lucide-react';
 import type { JourneyNode } from '../../types/domain';
-
-const labels: Record<string, string> = {
-  trigger: 'Trigger', need: 'Need', customerStep: 'Customer step', decision: 'Decision', meta: 'Meta', googleAds: 'Google Ads', landingPage: 'Landing page',
-  cta: 'CTA', tracking: 'Tracking', conversion: 'Conversion', lead: 'Lead', booking: 'Booking', exclusion: 'Exclusion', crm: 'CRM / Email', note: 'Note'
-};
+import { useI18n } from '../../i18n';
 
 const icons = {
   trigger: BellRing,
@@ -33,6 +29,7 @@ const handles = [
 ] as const;
 
 export function JourneyNodeComponent({ data, selected }: NodeProps<JourneyNode>) {
+  const { nodeType, stage } = useI18n();
   const openTodos = data.annotations.filter(a => a.kind === 'todo' && !a.done).length;
   const Icon = icons[data.type as keyof typeof icons] ?? CircleDot;
   const hasSignals = data.tracking.length > 0 || data.creatives.length > 0 || openTodos > 0 || Boolean(data.componentId);
@@ -47,10 +44,10 @@ export function JourneyNodeComponent({ data, selected }: NodeProps<JourneyNode>)
       <div className="node-head">
         <div className="node-icon"><Icon size={16}/></div>
         <div className="node-head-copy">
-          <div className="node-kicker">{labels[data.type] ?? data.type}</div>
+          <div className="node-kicker">{nodeType(data.type)}</div>
           <div className="node-title">{data.label}</div>
         </div>
-        <span className={`node-stage stage-pill-${data.stage}`}>{data.stage}</span>
+        <span className={`node-stage stage-pill-${data.stage}`}>{stage(data.stage)}</span>
       </div>
       {data.description && <div className="node-desc">{data.description}</div>}
       {data.runtimePerformance && <div className={`node-performance quality-${data.runtimePerformance.quality}`}><div><strong>{data.runtimePerformance.quality}</strong><span>{data.runtimePerformance.source}</span></div>{data.runtimePerformance.metrics.map(metric => <div className="node-kpi" key={metric.key}><span>{metric.label}</span><b>{metric.formatted}</b></div>)}</div>}

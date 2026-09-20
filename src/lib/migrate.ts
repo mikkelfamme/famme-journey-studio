@@ -67,7 +67,8 @@ export function normalizeWorkspace(workspace: Workspace): Workspace {
       activeActualPathSnapshotId: workspace.settings?.activeActualPathSnapshotId,
       freshnessThresholdHours: workspace.settings?.freshnessThresholdHours ?? 48,
       onboardingComplete: workspace.settings?.onboardingComplete ?? true,
-      demoWorkspace: workspace.settings?.demoWorkspace ?? false
+      demoWorkspace: workspace.settings?.demoWorkspace ?? false,
+      language: workspace.settings?.language ?? 'en'
     }
   };
 }

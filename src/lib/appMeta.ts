@@ -1,12 +1,22 @@
 export const APP_NAME = 'Famme Journey Studio';
-export const APP_VERSION = '2.0.0-rc.4';
+export const APP_VERSION = '2.0.0-rc.5';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'FAMME · DIGITAL';
 export const APP_RELEASE_DATE = '2026-09-20';
 
 export const APP_RELEASE_NOTES = [
   {
-    version: '2.0.0-rc.4',
+    version: '2.0.0-rc.5',
+    title: 'View mode, media & localization',
+    items: [
+      'Canvas drag now pans by default instead of moving multi-selected journey nodes.',
+      'Dedicated View mode with clickable URLs, creative thumbnails and Print / Save as PDF.',
+      'Journey cards now support View, Edit, Rename and real status controls.',
+      'English/Danish UI language switch backed by editable locale JSON files.'
+    ]
+  },
+  {
+    version: '2.0.0-rc.5',
     title: 'Editor UX & compact flow',
     items: [
       'Compact stage-aware layout and one-click Fit/Tidy controls.',

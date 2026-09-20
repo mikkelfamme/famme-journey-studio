@@ -147,3 +147,11 @@ Do not upload confidential workspaces, credentials or company-sensitive data to 
 ## License
 
 MIT © 2026 Mikkel Famme
+
+## RC5 usability additions
+
+- Separate **View** and **Edit** modes for journeys.
+- Clickable journey/creative URLs and lightweight creative thumbnails in View mode.
+- **Print / Save as PDF** from journey presentation.
+- English/Danish interface selection in Settings.
+- Translation dictionaries are plain JSON under `src/i18n/locales/` so wording can be improved through GitHub contributions.

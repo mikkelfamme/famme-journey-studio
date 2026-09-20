@@ -16,8 +16,8 @@ import {
   type ReactFlowInstance
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { AlignHorizontalJustifyStart, ArrowLeft, BarChart3, CheckCircle2, ChevronDown, Copy, FileText, GitCompareArrows, HeartPulse, Layers3, LayoutGrid, Maximize2, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Redo2, Save, Shapes, Trash2, Undo2, Waypoints } from 'lucide-react';
-import type { ComponentDefinition, CrossJourneyLink, FunnelStage, Journey, JourneyEdge, JourneyNode, JourneyNodeData, JourneyNodeType, JourneyVersion } from '../../types/domain';
+import { AlignHorizontalJustifyStart, ArrowLeft, BarChart3, CheckCircle2, ChevronDown, Copy, FileText, GitCompareArrows, HeartPulse, Layers3, LayoutGrid, Maximize2, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Printer, Redo2, Save, Shapes, Trash2, Undo2, Waypoints } from 'lucide-react';
+import type { ComponentDefinition, CrossJourneyLink, FunnelStage, Journey, JourneyEdge, JourneyNode, JourneyNodeData, JourneyNodeType, JourneyStatus, JourneyVersion } from '../../types/domain';
 import { makeId } from '../../lib/ids';
 import { generateJourneyPlan } from '../../lib/plan';
 import { createJourneyVersion, restoreVersion } from '../../lib/versions';
@@ -34,12 +34,14 @@ import { activeActualSnapshot, pathsForJourney } from '../../lib/actual';
 import { activePerformanceSnapshot, mappingQuality, preferredMetrics, recordsForNode } from '../../lib/performance';
 import { useHistoryState } from '../../lib/useHistory';
 import { compactStageLayout, traceConnectedPath } from '../../lib/layout';
+import { useI18n } from '../../i18n';
 
 const nodeTypes = { journey: JourneyNodeComponent };
 type InspectorMode = 'properties' | 'plan' | 'health' | 'versions' | 'actual';
 
 export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose: () => void }) {
   const { workspace, updateJourney, updateWorkspace } = useWorkspace();
+  const { t, status, stage } = useI18n();
   const draftHistory = useHistoryState<Journey>(structuredClone(journey));
   const draft = draftHistory.value;
   const setDraft = draftHistory.set;
@@ -196,6 +198,8 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
 
   function save() { updateJourney(draft); draftHistory.reset(structuredClone(draft)); }
 
+  function setJourneyStatus(next: JourneyStatus) { setDraft(current => ({ ...current, status: next })); }
+
   function saveAsTemplate() {
     if (!workspace) return;
     const name = window.prompt('Template name', draft.name);
@@ -330,8 +334,9 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
         <div className="editor-topbar-left">
           <button className="icon-button" onClick={closeEditor} title="Back"><ArrowLeft size={18} /></button>
           <button className="icon-button panel-toggle" onClick={() => setPaletteOpen(value => !value)} title={paletteOpen ? 'Hide component palette' : 'Show component palette'}>{paletteOpen ? <PanelLeftClose size={16}/> : <PanelLeftOpen size={16}/>}</button>
-          <div className="editor-title"><strong>{draft.name}</strong><span>{draft.status} · {draft.scope} · {draft.nodes.length} nodes · {draft.edges.length} connections</span></div>
-          <span className={`editor-save-state ${draftHistory.canUndo ? 'dirty' : 'clean'}`}>{draftHistory.canUndo ? 'Unsaved' : <><CheckCircle2 size={12}/> Saved</>}</span>
+          <div className="editor-title"><strong>{draft.name}</strong><span>{status(draft.status)} · {draft.scope} · {draft.nodes.length} {t('journeys.nodes')} · {draft.edges.length} {t('journeys.connections')}</span></div>
+          <label className="editor-status-control" title={t('editor.status')}><select value={draft.status} onChange={event => setJourneyStatus(event.target.value as JourneyStatus)}>{(['draft','active','paused','archived'] as JourneyStatus[]).map(value => <option key={value} value={value}>{status(value)}</option>)}</select></label>
+          <span className={`editor-save-state ${draftHistory.canUndo ? 'dirty' : 'clean'}`}>{draftHistory.canUndo ? t('editor.unsaved') : <><CheckCircle2 size={12}/> {t('editor.savedLocally')}</>}</span>
         </div>
         <div className="editor-actions">
           <div className="editor-action-group history-actions">
@@ -339,21 +344,22 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
             <button className="icon-button" onClick={draftHistory.redo} disabled={!draftHistory.canRedo} title="Redo (Ctrl/⌘ Y)" aria-label="Redo"><Redo2 size={16}/></button>
           </div>
           <div className="editor-action-group canvas-actions">
-            <button className="button" onClick={fitJourney} title="Fit the whole journey in view"><Maximize2 size={15}/> Fit</button>
-            <button className="button" onClick={tidyLayout} title="Compact nodes into funnel stages"><LayoutGrid size={15}/> Tidy</button>
+            <button className="button" onClick={fitJourney} title="Fit the whole journey in view"><Maximize2 size={15}/> {t('editor.fit')}</button>
+            <button className="button" onClick={tidyLayout} title="Compact nodes into funnel stages"><LayoutGrid size={15}/> {t('editor.tidy')}</button>
           </div>
           <div className="review-menu-wrap">
-            <button className={`button review-button ${inspectorMode !== 'properties' || showPerformance ? 'active-button' : ''}`} onClick={() => setReviewMenuOpen(value => !value)}><HeartPulse size={15}/> Review <ChevronDown size={13}/></button>
+            <button className={`button review-button ${inspectorMode !== 'properties' || showPerformance ? 'active-button' : ''}`} onClick={() => setReviewMenuOpen(value => !value)}><HeartPulse size={15}/> {t('editor.review')} <ChevronDown size={13}/></button>
             {reviewMenuOpen && <div className="review-menu">
-              <button onClick={() => { setInspectorMode('plan'); setInspectorOpen(true); setReviewMenuOpen(false); }}><FileText size={15}/><span><strong>Plan</strong><small>Generated journey brief</small></span></button>
-              <button onClick={() => { setInspectorMode('health'); setInspectorOpen(true); setReviewMenuOpen(false); }}><HeartPulse size={15}/><span><strong>Health</strong><small>Validation and gaps</small></span></button>
-              <button onClick={() => { setInspectorMode('versions'); setInspectorOpen(true); setReviewMenuOpen(false); }}><Layers3 size={15}/><span><strong>Versions</strong><small>History and restore</small></span></button>
-              <button onClick={() => { setInspectorMode('actual'); setInspectorOpen(true); setReviewMenuOpen(false); }}><GitCompareArrows size={15}/><span><strong>Actual</strong><small>Planned vs observed</small></span></button>
-              <button className={showPerformance ? 'selected' : ''} onClick={() => { const next=!showPerformance; setShowPerformance(next); updateWorkspace(ws=>({...ws,settings:{...ws.settings,showPerformanceOverlay:next}})); setReviewMenuOpen(false); }}><BarChart3 size={15}/><span><strong>Performance</strong><small>{showPerformance ? 'Hide metrics overlay' : 'Show metrics on nodes'}</small></span></button>
+              <button onClick={() => { setInspectorMode('plan'); setInspectorOpen(true); setReviewMenuOpen(false); }}><FileText size={15}/><span><strong>{t('editor.plan')}</strong><small>{t('editor.planDesc')}</small></span></button>
+              <button onClick={() => { setInspectorMode('health'); setInspectorOpen(true); setReviewMenuOpen(false); }}><HeartPulse size={15}/><span><strong>{t('editor.health')}</strong><small>{t('editor.healthDesc')}</small></span></button>
+              <button onClick={() => { setInspectorMode('versions'); setInspectorOpen(true); setReviewMenuOpen(false); }}><Layers3 size={15}/><span><strong>{t('editor.versions')}</strong><small>{t('editor.versionsDesc')}</small></span></button>
+              <button onClick={() => { setInspectorMode('actual'); setInspectorOpen(true); setReviewMenuOpen(false); }}><GitCompareArrows size={15}/><span><strong>{t('editor.actual')}</strong><small>{t('editor.actualDesc')}</small></span></button>
+              <button className={showPerformance ? 'selected' : ''} onClick={() => { const next=!showPerformance; setShowPerformance(next); updateWorkspace(ws=>({...ws,settings:{...ws.settings,showPerformanceOverlay:next}})); setReviewMenuOpen(false); }}><BarChart3 size={15}/><span><strong>{t('editor.performance')}</strong><small>{showPerformance ? 'Hide metrics overlay' : 'Show metrics on nodes'}</small></span></button>
             </div>}
           </div>
-          <button className="button template-button" onClick={saveAsTemplate}><Shapes size={15} /> Template</button>
-          <button className="button primary" onClick={save}><Save size={15} /> Save</button>
+          <button className="button" onClick={() => window.print()}><Printer size={15}/>{t('editor.print')}</button>
+          <button className="button template-button" onClick={saveAsTemplate}><Shapes size={15} /> {t('editor.template')}</button>
+          <button className="button primary" onClick={save}><Save size={15} /> {t('editor.save')}</button>
           <button className="icon-button panel-toggle" onClick={() => setInspectorOpen(value => !value)} title={inspectorOpen ? 'Hide inspector' : 'Show inspector'}>{inspectorOpen ? <PanelRightClose size={16}/> : <PanelRightOpen size={16}/>}</button>
         </div>
       </div>
@@ -377,7 +383,9 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
             fitViewOptions={{ padding: 0.16, minZoom: 0.45, maxZoom: 1.08 }}
             snapToGrid={workspace?.settings.snapToGrid}
             snapGrid={[20, 20]}
-            selectionOnDrag
+            selectionOnDrag={false}
+            panOnDrag={[0]}
+            selectionKeyCode="Shift"
             multiSelectionKeyCode="Shift"
             edgesReconnectable
           >
@@ -385,12 +393,13 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
             <Controls />
             {workspace?.settings.showMiniMap && draft.nodes.length >= 10 && <MiniMap pannable zoomable />}
           </ReactFlow>
-          <div className="stage-zones" aria-hidden="true"><div className="stage-zone stage-zone-top"><span>TOP · DISCOVERY</span></div><div className="stage-zone stage-zone-middle"><span>MIDDLE · CONSIDERATION</span></div><div className="stage-zone stage-zone-bottom"><span>BOTTOM · ACTION</span></div><div className="stage-zone stage-zone-lifecycle"><span>LIFECYCLE</span></div></div>
+          <div className="stage-zones" aria-hidden="true"><div className="stage-zone stage-zone-top"><span>{t('stage.topLong')}</span></div><div className="stage-zone stage-zone-middle"><span>{t('stage.middleLong')}</span></div><div className="stage-zone stage-zone-bottom"><span>{t('stage.bottomLong')}</span></div><div className="stage-zone stage-zone-lifecycle"><span>{t('stage.lifecycleLong')}</span></div></div>
+          <div className="canvas-pan-hint no-print">{t('editor.panHint')}</div>
           {selectedIds.length > 1 && <div className="bulk-toolbar">
-            <strong>{selectedIds.length} selected</strong>
-            <button className="mini-action" onClick={alignSelectionLeft}><AlignHorizontalJustifyStart size={14}/> Align left</button>
-            <button className="mini-action" onClick={distributeSelection}><Waypoints size={14}/> Distribute</button>
-            <select defaultValue="" onChange={e => { if (e.target.value) setSelectionStage(e.target.value as FunnelStage); e.target.value = ''; }}><option value="">Set stage…</option>{['top','middle','bottom','lifecycle'].map(s => <option key={s} value={s}>{s}</option>)}</select>
+            <strong>{selectedIds.length} {t('editor.selected')}</strong>
+            <button className="mini-action" onClick={alignSelectionLeft}><AlignHorizontalJustifyStart size={14}/> {t('editor.alignLeft')}</button>
+            <button className="mini-action" onClick={distributeSelection}><Waypoints size={14}/> {t('editor.distribute')}</button>
+            <select defaultValue="" onChange={e => { if (e.target.value) setSelectionStage(e.target.value as FunnelStage); e.target.value = ''; }}><option value="">{t('editor.setStage')}</option>{(['top','middle','bottom','lifecycle'] as FunnelStage[]).map(value => <option key={value} value={value}>{stage(value)}</option>)}</select>
             <button className="mini-action" onClick={duplicateSelection}><Copy size={14}/> Duplicate</button>
             <button className="mini-action danger-icon" onClick={deleteSelection}><Trash2 size={14}/> Delete</button>
           </div>}
