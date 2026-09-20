@@ -1,3 +1,9 @@
+## 2.0.0-rc.12.1 — Blank templates & JS shortcut icon
+
+- All new custom templates start completely empty: 0 nodes and 0 connections.
+- Journey Editor template creation no longer copies the current journey into a template.
+- PWA manifest and HTML now reference new JS-branded icon filenames to bypass stale F icon caches.
+
 ## 2.0.0-rc.12 — Template Studio, sharing & presentation
 
 - New custom templates start completely blank and are designed in a dedicated Template Editor.

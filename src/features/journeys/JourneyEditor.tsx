@@ -212,7 +212,22 @@ export function JourneyEditor({ journey, initialNodeId, onClose }: { journey: Jo
     if (!workspace) return;
     const name = window.prompt('Template name', draft.name);
     if (!name) return;
-    updateWorkspace(ws => ({ ...ws, templates: [...ws.templates, { id: makeId('template'), name, description: draft.description, category: 'Custom', scope: draft.scope, system: false, version: '1.0.0', tags: [], author: ws.organization || 'Local author', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), nodes: structuredClone(draft.nodes.map(n => ({ ...n, selected: false }))), edges: structuredClone(draft.edges.map(e => ({ ...e, selected: false }))), planInputs: structuredClone(draft.planInputs) }] }));
+    updateWorkspace(ws => ({ ...ws, templates: [...ws.templates, {
+      id: makeId('template'),
+      name,
+      description: '',
+      category: 'Custom',
+      scope: draft.scope,
+      system: false,
+      version: '1.0.0',
+      tags: [],
+      author: ws.organization || 'Local author',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      nodes: [],
+      edges: [],
+      planInputs: {}
+    }] }));
   }
 
   function saveSelectedAsComponent() {

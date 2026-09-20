@@ -1,11 +1,20 @@
 export const APP_NAME = 'Journey Studio by Famme';
 export const APP_SHORT_NAME = 'Journey Studio';
-export const APP_VERSION = '2.0.0-rc.12';
+export const APP_VERSION = '2.0.0-rc.12.1';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'BY FAMME';
 export const APP_RELEASE_DATE = '2026-09-20';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.12.1',
+    title: 'Blank templates & JS shortcut icon',
+    items: [
+      'Every new custom template now starts with zero nodes and zero connections, including template creation from Journey Editor.',
+      'PWA icon assets use new Journey Studio JS filenames so browsers do not reuse the old F icon asset cache.',
+      'The installed application name remains Journey Studio while in-app branding remains Journey Studio by Famme.'
+    ]
+  },
   {
     version: '2.0.0-rc.12',
     title: 'Template Studio, sharing & presentation',
