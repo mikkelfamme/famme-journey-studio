@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import { Database, Download, FileDown, FileUp, GraduationCap, RotateCcw, ShieldCheck, Trash2 } from 'lucide-react';
+import { Database, Download, FileDown, FileUp, GraduationCap, MonitorDown, MonitorUp, RotateCcw, ShieldCheck, Trash2 } from 'lucide-react';
 import { downloadActualPathMap, downloadPerformanceMap, downloadWorkspace, importPreview, parseStudioDataFile, type StudioImport, type StudioImportPreview } from '../../lib/files';
 import { clearRecoverySnapshots, listRecoverySnapshots, restoreRecoverySnapshot, type RecoverySnapshot } from '../../lib/db';
 import { ensureMetricDictionary } from '../../lib/performance';
 import { ImportPreviewDialog } from '../../components/ImportPreviewDialog';
 import { useWorkspace } from '../../store/WorkspaceContext';
 import { useI18n } from '../../i18n';
+import { usePwaInstall } from '../../lib/usePwaInstall';
+import { saveDesktopShortcut } from '../../lib/desktopShortcut';
+import { APP_SHORT_NAME } from '../../lib/appMeta';
 import type { AppLanguage } from '../../types/domain';
 
 interface PendingImport { imported: StudioImport; preview: StudioImportPreview }
@@ -13,9 +16,11 @@ interface PendingImport { imported: StudioImport; preview: StudioImportPreview }
 export function SettingsView() {
   const { workspace, saveState, lastSavedAt, saveError, setWorkspace, updateWorkspace, resetWorkspace, saveNow } = useWorkspace();
   const { t } = useI18n();
+  const { canInstall, installed, install } = usePwaInstall();
   const inputRef = useRef<HTMLInputElement>(null);
   const [pendingImport, setPendingImport] = useState<PendingImport | null>(null);
   const [recoveries, setRecoveries] = useState<RecoverySnapshot[]>([]);
+  const [shortcutMessage, setShortcutMessage] = useState('');
   useEffect(() => { void listRecoverySnapshots().then(setRecoveries); }, [workspace?.updatedAt]);
   if (!workspace) return null;
 
@@ -48,12 +53,19 @@ export function SettingsView() {
     await clearRecoverySnapshots();
     setRecoveries([]);
   }
+  async function createShortcut() {
+    const result = await saveDesktopShortcut();
+    if (result === 'saved') setShortcutMessage(t('settings.shortcutSaved'));
+    else if (result === 'downloaded') setShortcutMessage(t('settings.shortcutDownloaded'));
+    else setShortcutMessage('');
+  }
 
   return <section className="content-section settings-page">
     <div className="section-toolbar"><div><h2>{t('settings.title')}</h2><p>{t('settings.subtitle')}</p></div></div>
     <div className="settings-grid">
       <div className="settings-card"><h3>{t('settings.languageTitle')}</h3><p>{t('settings.languageText')}</p><label>{t('settings.language')}<select value={workspace.settings.language} onChange={e=>updateWorkspace(ws=>({...ws,settings:{...ws.settings,language:e.target.value as AppLanguage}}))}><option value="en">{t('settings.english')}</option><option value="da">{t('settings.danish')}</option></select></label></div>
       <div className="settings-card"><h3>{t('settings.workspace')}</h3><label>Name<input value={workspace.name} onChange={e=>updateWorkspace(ws=>({...ws,name:e.target.value}))}/></label><label>Organization<input value={workspace.organization} onChange={e=>updateWorkspace(ws=>({...ws,organization:e.target.value}))}/></label><label>Primary product<input value={workspace.product} onChange={e=>updateWorkspace(ws=>({...ws,product:e.target.value}))}/></label></div>
+      <div className="settings-card"><h3>{t('settings.desktopTitle')}</h3><p>{t('settings.desktopText')}</p><div className="stack-actions">{canInstall&&<button className="button" onClick={()=>void install()}><MonitorDown size={16}/> {t('settings.installApp').replace('{app}',APP_SHORT_NAME)}</button>}<button className="button" onClick={()=>void createShortcut()}><MonitorUp size={16}/> {t('settings.createShortcut')}</button></div><p className="muted-small">{installed?t('settings.installedStatus'):t('settings.shortcutNote')}</p>{shortcutMessage&&<div className="save-detail save-saved"><ShieldCheck size={17}/><div><strong>{shortcutMessage}</strong></div></div>}</div>
       <div className="settings-card"><h3>{t('settings.autosave')}</h3><div className={`save-detail save-${saveState}`}><ShieldCheck size={17}/><div><strong>{saveState === 'saving' ? 'Saving locally…' : saveState === 'error' ? 'Autosave error' : 'Local autosave active'}</strong><span>{saveError || (lastSavedAt ? `Last saved ${new Date(lastSavedAt).toLocaleString()}` : 'Changes are saved to IndexedDB in this browser.')}</span></div></div><button className="button" onClick={()=>void saveNow()}>{t('settings.saveNow')}</button></div>
       <div className="settings-card"><h3>{t('settings.editor')}</h3><label className="toggle-row"><span>{t('settings.showMinimap')}</span><input type="checkbox" checked={workspace.settings.showMiniMap} onChange={e=>updateWorkspace(ws=>({...ws,settings:{...ws.settings,showMiniMap:e.target.checked}}))}/></label><label className="toggle-row"><span>{t('settings.snapGrid')}</span><input type="checkbox" checked={workspace.settings.snapToGrid} onChange={e=>updateWorkspace(ws=>({...ws,settings:{...ws.settings,snapToGrid:e.target.checked}}))}/></label><label className="toggle-row"><span>{t('settings.keyboard')}</span><input type="checkbox" checked={workspace.settings.keyboardShortcuts} onChange={e=>updateWorkspace(ws=>({...ws,settings:{...ws.settings,keyboardShortcuts:e.target.checked}}))}/></label><label className="toggle-row"><span>{t('settings.performance')}</span><input type="checkbox" checked={workspace.settings.showPerformanceOverlay} onChange={e=>updateWorkspace(ws=>({...ws,settings:{...ws.settings,showPerformanceOverlay:e.target.checked}}))}/></label><label>Freshness threshold (hours)<input type="number" min={1} max={720} value={workspace.settings.freshnessThresholdHours} onChange={e=>updateWorkspace(ws=>({...ws,settings:{...ws.settings,freshnessThresholdHours:Math.max(1,Number(e.target.value)||48)}}))}/></label><p className="muted-small"><strong>Ctrl/⌘ K</strong> command palette · <strong>Ctrl/⌘ Z/Y</strong> undo/redo · <strong>Delete</strong> remove · <strong>?</strong> help</p></div>
       <div className="settings-card"><h3>Portable workspace & data</h3><p>One importer recognizes current workspaces, legacy V1.x backups, performance snapshots and actual-path snapshots. Every import is previewed before it changes local data.</p><div className="stack-actions"><button className="button" onClick={()=>downloadWorkspace(workspace)}><Download size={16}/> Export .fjs</button><button className="button" onClick={()=>inputRef.current?.click()}><FileUp size={16}/> Preview & import data</button><input hidden ref={inputRef} type="file" accept=".fjs,.json,application/json" onChange={e=>{void readImport(e.target.files?.[0]); e.currentTarget.value='';}}/></div></div>

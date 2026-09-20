@@ -20,7 +20,7 @@ import { ImportPreviewDialog } from './components/ImportPreviewDialog';
 import { UpdateToast } from './components/UpdateToast';
 import { useWorkspace } from './store/WorkspaceContext';
 import { downloadWorkspace, importPreview, parseStudioDataFile, type StudioImport, type StudioImportPreview } from './lib/files';
-import { journeyFromTemplate } from './lib/workspace';
+import { createBlankJourney } from './lib/workspace';
 import { ensureMetricDictionary } from './lib/performance';
 import type { Journey, JourneyTemplate } from './types/domain';
 import { useI18n } from './i18n';
@@ -72,11 +72,9 @@ export default function App() {
 
   function newJourney() {
     if (!workspace) return;
-    const template = workspace.templates[0];
-    if (!template) return;
-    const name = window.prompt('Journey name', 'New customer journey');
+    const name = window.prompt(t('journeys.namePrompt'), t('journeys.blankName'));
     if (!name) return;
-    const journey = journeyFromTemplate(template, name, workspace.organization);
+    const journey = createBlankJourney({ name, scope: workspace.scope, organization: workspace.organization });
     updateWorkspace(ws => ({ ...ws, journeys: [...ws.journeys, journey] }));
     setOpenJourney({ journey, mode: 'edit' });
   }

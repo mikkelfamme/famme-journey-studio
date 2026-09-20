@@ -1,11 +1,20 @@
 export const APP_NAME = 'Journey Studio by Famme';
 export const APP_SHORT_NAME = 'Journey Studio';
-export const APP_VERSION = '2.0.0-rc.12.1';
+export const APP_VERSION = '2.0.0-rc.12.2';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'BY FAMME';
 export const APP_RELEASE_DATE = '2026-09-20';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.12.2',
+    title: 'Blank first journeys & desktop shortcut helper',
+    items: [
+      'New journey now opens completely blank with zero nodes and zero connections by default.',
+      'The journey template picker defaults to Blank journey while existing reusable templates remain available by choice.',
+      'Settings now includes install and desktop-shortcut controls; Chromium can save a Journey Studio.url shortcut directly to a user-selected Desktop folder.'
+    ]
+  },
   {
     version: '2.0.0-rc.12.1',
     title: 'Blank templates & JS shortcut icon',

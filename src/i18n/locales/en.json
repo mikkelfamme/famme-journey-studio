@@ -19,7 +19,7 @@
   "journeys.subtitle": "One data model. Multiple views. Build the planned path and measurement logic together.",
   "journeys.createTemplate": "Create from template",
   "journeys.emptyTitle": "No journeys yet",
-  "journeys.emptyText": "Start from a generic template. The result is an independent journey you can customize.",
+  "journeys.emptyText": "Start with a completely blank journey, or choose a reusable template when you want a predefined structure.",
   "journeys.createFirst": "Create first journey",
   "journeys.view": "View",
   "journeys.edit": "Edit",
@@ -287,5 +287,15 @@
   "templates.confirmImport": "Import template",
   "viewer.previous": "Previous",
   "viewer.next": "Next",
-  "viewer.presentationHint": "Click a node to inspect details. Use Previous and Next to move through the journey."
+  "viewer.presentationHint": "Click a node to inspect details. Use Previous and Next to move through the journey.",
+  "journeys.blankOption": "Blank journey",
+  "journeys.blankName": "New customer journey",
+  "settings.desktopTitle": "Desktop app & shortcut",
+  "settings.desktopText": "Install Journey Studio as a PWA and create a Windows desktop shortcut to the app.",
+  "settings.installApp": "Install {app}",
+  "settings.createShortcut": "Create desktop shortcut",
+  "settings.shortcutNote": "Browser security prevents a PWA from silently writing a Windows .lnk file. The shortcut button opens Save As when supported so you can choose Desktop; otherwise it downloads Journey Studio.url.",
+  "settings.installedStatus": "Journey Studio is currently running as an installed app. You can still create a desktop shortcut below.",
+  "settings.shortcutSaved": "Shortcut saved. If you selected Desktop, it is ready there now.",
+  "settings.shortcutDownloaded": "Shortcut downloaded. Move Journey Studio.url to your Desktop if your browser did not ask where to save it."
 }

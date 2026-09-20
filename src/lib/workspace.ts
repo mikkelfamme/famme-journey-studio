@@ -30,6 +30,29 @@ export function createWorkspace(input: { name: string; organization: string; sco
   });
 }
 
+export function createBlankJourney(input: { name: string; scope: WorkspaceScope; organization?: string }): Journey {
+  const timestamp = now();
+  return {
+    id: makeId('journey'),
+    name: input.name,
+    description: '',
+    audience: '',
+    product: '',
+    scope: input.scope,
+    status: 'draft',
+    primaryConversion: 'Purchase / primary conversion',
+    owner: '',
+    createdAt: timestamp,
+    updatedAt: timestamp,
+    nodes: [],
+    edges: [],
+    planInputs: input.organization ? { objective: `Create a coherent journey for ${input.organization}.` } : {},
+    crossJourneyLinks: [],
+    annotations: [],
+    versions: []
+  };
+}
+
 export function journeyFromTemplate(t: JourneyTemplate, name: string, organization = ''): Journey {
   const timestamp = now();
   const idMap = new Map<string, string>();
