@@ -93,10 +93,10 @@ export function createPortfolioWorkspace(workspace: Workspace, options: Portfoli
 
 export function downloadShareWorkspace(workspace: Workspace) {
   const payload = JSON.stringify({ ...workspace, updatedAt: new Date().toISOString() }, null, 2);
-  downloadBlob(payload, `Famme-Journey-Studio-${safeName(workspace.organization || workspace.name)}-share.fjs`);
+  downloadBlob(payload, `Journey-Studio-${safeName(workspace.organization || workspace.name)}-share.fjs`);
 }
 
 export function downloadPortfolioWorkspace(workspace: Workspace, options: PortfolioOptions) {
   const portfolio = createPortfolioWorkspace(workspace, options);
-  downloadBlob(JSON.stringify(portfolio, null, 2), `Famme-Journey-Studio-${safeName(workspace.organization || workspace.name)}-portfolio.fjs`);
+  downloadBlob(JSON.stringify(portfolio, null, 2), `Journey-Studio-${safeName(workspace.organization || workspace.name)}-portfolio.fjs`);
 }

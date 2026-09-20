@@ -48,7 +48,7 @@ export function compareObservedPath(journey: Journey, path: ObservedPath) {
 }
 
 export function normalizeActualPathSnapshot(raw: Partial<ActualPathSnapshot>): ActualPathSnapshot {
-  if (raw.schema !== 'famme-journey-actual-paths-v1' || !Array.isArray(raw.journeyPaths)) throw new Error('Not a valid Famme Journey Studio actual-path snapshot.');
+  if (raw.schema !== 'famme-journey-actual-paths-v1' || !Array.isArray(raw.journeyPaths)) throw new Error('Not a valid Journey Studio by Famme actual-path snapshot.');
   return {
     schema: 'famme-journey-actual-paths-v1',
     id: raw.id || makeId('actual'),

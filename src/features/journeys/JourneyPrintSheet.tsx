@@ -142,7 +142,7 @@ export function JourneyPrintSheet({ journey }: { journey: Journey }) {
   return <section className="journey-print-sheet print-only">
     <header className="print-report-head">
       <div>
-        <div className="print-brand">Famme Journey Studio</div>
+        <div className="print-brand">Journey Studio by Famme</div>
         <h1>{journey.name}</h1>
         <p>{status(journey.status)} · {journey.scope} · {journey.nodes.length} {t('journeys.nodes')} · {journey.edges.length} {t('journeys.connections')}</p>
       </div>
@@ -232,6 +232,6 @@ export function JourneyPrintSheet({ journey }: { journey: Journey }) {
       </div>
     </section>}
 
-    <footer className="print-report-footer"><span>Famme Journey Studio · Designed &amp; developed by Mikkel Famme</span><span>{journey.name}</span></footer>
+    <footer className="print-report-footer"><span>Journey Studio by Famme · Designed &amp; developed by Mikkel Famme</span><span>{journey.name}</span></footer>
   </section>;
 }

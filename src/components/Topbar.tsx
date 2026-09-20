@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import type { SaveState } from '../store/WorkspaceContext';
 import { usePwaInstall } from '../lib/usePwaInstall';
 import { useI18n } from '../i18n';
+import { APP_SHORT_NAME } from '../lib/appMeta';
 
 function SaveIndicator({ state, lastSavedAt, error }: { state: SaveState; lastSavedAt?: string; error?: string }) {
   const { t } = useI18n();
@@ -32,7 +33,7 @@ export function Topbar({ title, subtitle, onNew, onExport, onImport, onCommand, 
         {!online && <div className="save-indicator offline" title="The app is offline. Local work remains available."><WifiOff size={13}/><span>Offline</span></div>}
       </div>
       <div className="topbar-actions">
-        {canInstall && <button className="button install-button" onClick={()=>void install()} title="Install Famme Journey Studio as an app"><MonitorDown size={16}/> {t('topbar.install')}</button>}
+        {canInstall && <button className="button install-button" onClick={()=>void install()} title={`Install ${APP_SHORT_NAME} as an app`}><MonitorDown size={16}/> {t('topbar.install')}</button>}
         <button className="icon-button topbar-tool" onClick={onCommand} title="Command palette (Ctrl/⌘ K)" aria-label="Open command palette"><Search size={16}/></button>
         <button className="icon-button topbar-tool" onClick={onHelp} title="Context help (?)" aria-label="Open contextual help"><CircleHelp size={16}/></button>
         {onNew && <button className="button primary" onClick={onNew}><Plus size={16} /> {t('topbar.newJourney')}</button>}

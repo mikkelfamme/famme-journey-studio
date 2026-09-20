@@ -1,0 +1,16 @@
+Journey Studio by Famme — RC11 update
+
+1. Open the famme-journey-studio repository on GitHub.
+2. Code -> Add file -> Upload files.
+3. Upload the CONTENTS of this folder, preserving folders such as src/ and public/.
+4. Commit message suggestion: Update Journey Studio branding and templates in RC11
+5. Wait for Deploy PWA to GitHub Pages to turn green under Actions.
+6. Open the web app once, then update the installed PWA when prompted.
+
+RC11 includes:
+- Product name: Journey Studio by Famme
+- Installed shortcut/PWA name: Journey Studio
+- JS icon
+- Create custom templates from existing journeys
+- Share one template as .jstemplate
+- Import one .jstemplate into another workspace

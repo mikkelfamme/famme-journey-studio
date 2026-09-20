@@ -20,10 +20,10 @@ export function Sidebar({ view, onView }: { view: AppView; onView: (view: AppVie
   return (
     <aside className="sidebar">
       <div className="brand">
-        <div className="brand-mark">F</div>
+        <div className="brand-mark">JS</div>
         <div>
-          <div className="brand-title">Famme</div>
-          <div className="brand-subtitle">Journey Studio</div>
+          <div className="brand-title">Journey Studio</div>
+          <div className="brand-subtitle">by Famme</div>
         </div>
       </div>
       <nav className="nav-list">

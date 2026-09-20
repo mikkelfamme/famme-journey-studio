@@ -151,7 +151,7 @@ export function freshnessLabel(hours: number | null, threshold: number): { label
 }
 
 export function normalizePerformanceSnapshot(raw: Partial<PerformanceSnapshot> & { nodeMetrics?: Array<Partial<NodePerformanceRecord>> }): PerformanceSnapshot {
-  if (raw.schema !== 'famme-journey-performance-v1' || !Array.isArray(raw.nodeMetrics)) throw new Error('Not a valid Famme Journey Studio performance snapshot.');
+  if (raw.schema !== 'famme-journey-performance-v1' || !Array.isArray(raw.nodeMetrics)) throw new Error('Not a valid Journey Studio by Famme performance snapshot.');
   return {
     schema: 'famme-journey-performance-v1',
     id: raw.id || makeId('performance'),

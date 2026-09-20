@@ -1,3 +1,11 @@
+## 2.0.0-rc.11 — Journey Studio identity & portable templates
+
+- Renames the product to **Journey Studio by Famme** while the installed PWA/shortcut is simply **Journey Studio**.
+- Replaces the F app mark with a JS mark across the product and PWA icon assets.
+- Adds custom templates created from any existing journey.
+- Adds single-template export/share as `.jstemplate` and single-template import into another workspace.
+- Keeps template sharing independent from full workspace sharing.
+
 ## 2.0.0-rc.10 — Stage backdrop visibility hotfix
 
 - Restores visible Top / Middle / Bottom / Lifecycle stage colours in both Editor and View.

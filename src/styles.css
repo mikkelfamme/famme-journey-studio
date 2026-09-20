@@ -209,3 +209,17 @@ input,select,textarea{border-color:#d8dee7;border-radius:10px;background:#fff;mi
 .stage-backdrop-fill-middle{background:rgba(70,125,153,.095)}
 .stage-backdrop-fill-bottom{background:rgba(48,137,104,.095)}
 .stage-backdrop-fill-lifecycle{background:rgba(177,128,38,.105)}
+
+/* RC11 — Journey Studio identity and portable custom templates */
+.brand-mark{font-size:13px!important;letter-spacing:-.06em;font-weight:850!important}
+.template-toolbar-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.template-card-actions{align-items:center}
+.template-feedback{margin:-6px 0 18px;border-radius:10px;padding:10px 12px;font-size:11px;font-weight:650;border:1px solid}
+.template-feedback.success{background:#f1f8f5;color:#24624f;border-color:#cce3da}
+.template-feedback.error{background:#fff6f5;color:#9d3329;border-color:#efd1cd}
+.template-create-modal{width:min(700px,100%)}
+.template-create-form{margin:20px 0 8px}
+.template-source-field,.template-description-field{grid-column:1/-1}
+.template-portable-note{display:flex;gap:9px;align-items:flex-start;margin-top:10px;border:1px solid #dfe5ea;background:#f7f9fb;border-radius:10px;padding:10px 12px;color:#5d6976;font-size:10px;line-height:1.5}
+.template-portable-note svg{flex:0 0 auto;margin-top:1px;color:#4c5fbc}
+@media(max-width:680px){.template-toolbar-actions{width:100%}.template-toolbar-actions .button{flex:1}.template-create-form{grid-template-columns:1fr}.template-source-field,.template-description-field{grid-column:auto}}

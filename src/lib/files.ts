@@ -57,7 +57,7 @@ export async function parseStudioDataFile(file: File): Promise<StudioImport> {
   if ((schema === 'famme-journey-actual-paths-v1' || /-journey-actual-paths-v1$/i.test(schema)) && Array.isArray(data.journeyPaths)) {
     return { kind: 'actual', snapshot: normalizeActualPathSnapshot({ ...(data as unknown as Partial<ActualPathSnapshot>), schema: 'famme-journey-actual-paths-v1' }) };
   }
-  throw new Error('Unknown Famme Journey Studio file type. Expected a current or legacy workspace, performance snapshot or actual-path snapshot.');
+  throw new Error('Unknown Journey Studio by Famme file type. Expected a current or legacy workspace, performance snapshot or actual-path snapshot.');
 }
 
 export function importPreview(imported: StudioImport): StudioImportPreview {
@@ -125,7 +125,7 @@ export function downloadPerformanceMap(workspace: Workspace) {
       nodes: journey.nodes.map(node => ({ nodeId: node.id, label: node.data.label, type: node.data.type, tracking: node.data.tracking.map(t => ({ platform: t.platform, event: t.event })) }))
     }))
   };
-  downloadText(JSON.stringify(payload, null, 2), 'Famme-Journey-Studio-performance-map.json');
+  downloadText(JSON.stringify(payload, null, 2), 'Journey-Studio-performance-map.json');
 }
 
 export function downloadActualPathMap(workspace: Workspace) {
@@ -140,5 +140,5 @@ export function downloadActualPathMap(workspace: Workspace) {
       edges: journey.edges.map(edge => ({ source: edge.source, target: edge.target, label: edge.data?.label || '' }))
     }))
   };
-  downloadText(JSON.stringify(payload, null, 2), 'Famme-Journey-Studio-actual-path-map.json');
+  downloadText(JSON.stringify(payload, null, 2), 'Journey-Studio-actual-path-map.json');
 }

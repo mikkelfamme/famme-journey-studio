@@ -10,7 +10,7 @@ export function AboutView() {
         <p>Map the customer journey, channel architecture, tracking and observed behavior in one calm, local-first workspace.</p>
         <div className="about-meta-row"><span><Sparkles size={13}/> {APP_VERSION}</span><span><ShieldCheck size={13}/> Local-first</span><span><CloudOff size={13}/> Offline capable</span></div>
       </div>
-      <div className="about-version-orb"><span>FJS</span><strong>2.0</strong></div>
+      <div className="about-version-orb"><span>JS</span><strong>2.0</strong></div>
     </div>
 
     <div className="about-feature-grid">

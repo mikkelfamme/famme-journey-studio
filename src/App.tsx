@@ -112,7 +112,7 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [openJourney, saveNow]);
 
-  if (loading) return <div className="loading-screen">Loading Famme Journey Studio…</div>;
+  if (loading) return <div className="loading-screen">Loading Journey Studio…</div>;
   if (!workspace) return <><Onboarding/><UpdateToast/></>;
 
   const hiddenInput = <input ref={inputRef} hidden type="file" accept=".fjs,.json,application/json" onChange={event => { void readImport(event.target.files?.[0]); event.currentTarget.value=''; }}/>;

@@ -53,7 +53,7 @@ export function journeyFromTemplate(t: JourneyTemplate, name: string, organizati
     updatedAt: timestamp,
     nodes,
     edges,
-    planInputs: { objective: organization ? `Create a coherent journey for ${organization}.` : '' },
+    planInputs: t.planInputs ? structuredClone(t.planInputs) : { objective: organization ? `Create a coherent journey for ${organization}.` : '' },
     crossJourneyLinks: [],
     annotations: [],
     versions: []

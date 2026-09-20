@@ -1,11 +1,11 @@
-# Famme Journey Studio
+# Journey Studio by Famme
 
 **Visual customer journey architecture, channel planning, measurement design and observed-path analysis.**  
 Designed & developed by **Mikkel Famme**.
 
-> Current release: `2.0.0-rc.10`
+> Current release: `2.0.0-rc.11`
 
-Famme Journey Studio is a local-first application for modelling customer journeys as structured data rather than static diagrams. The public core is company-neutral: customer-specific journeys, campaign names, analytics and internal notes live in portable workspace/snapshot files rather than in the repository.
+Journey Studio by Famme is a local-first application for modelling customer journeys as structured data rather than static diagrams. The public core is company-neutral: customer-specific journeys, campaign names, analytics and internal notes live in portable workspace/snapshot files rather than in the repository.
 
 ## Release Candidate 1
 
@@ -91,7 +91,7 @@ See [`docs/PUBLISHING.md`](docs/PUBLISHING.md). The repository uses relative Vit
 
 ## Install as an app
 
-After a successful production deployment, supported browsers may offer Famme Journey Studio as an installable PWA. When available, the app surfaces an **Install app** button in the top bar. See [`docs/INSTALLATION.md`](docs/INSTALLATION.md).
+After a successful production deployment, supported browsers may offer Journey Studio by Famme as an installable PWA. When available, the app surfaces an **Install app** button in the top bar. See [`docs/INSTALLATION.md`](docs/INSTALLATION.md).
 
 Installation can still be restricted by browser, operating-system or organization policy. Browser use remains the baseline distribution method.
 
@@ -138,7 +138,7 @@ The journey architecture remains canonical. Imported performance and observed be
 
 ## Privacy
 
-The public core has no backend, account system or telemetry. The active workspace is stored in the browser's IndexedDB. Nothing is uploaded by Famme Journey Studio itself. Sharing happens only when the user explicitly exports or sends a workspace/data file. See [`PRIVACY.md`](PRIVACY.md).
+The public core has no backend, account system or telemetry. The active workspace is stored in the browser's IndexedDB. Nothing is uploaded by Journey Studio by Famme itself. Sharing happens only when the user explicitly exports or sends a workspace/data file. See [`PRIVACY.md`](PRIVACY.md).
 
 ## Security
 

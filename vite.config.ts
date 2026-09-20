@@ -10,7 +10,7 @@ export default defineConfig({
       includeAssets: ['icon.svg', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'],
       manifest: {
         id: './',
-        name: 'Famme Journey Studio',
+        name: 'Journey Studio',
         short_name: 'Journey Studio',
         description: 'Visual customer journey architecture, tracking and performance mapping.',
         theme_color: '#111827',

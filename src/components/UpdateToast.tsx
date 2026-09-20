@@ -11,7 +11,7 @@ export function UpdateToast() {
       <div className="update-toast-icon"><DownloadCloud size={18}/></div>
       <div className="update-toast-copy">
         <strong>New version ready</strong>
-        <span>Your local workspaces stay on this device. Update Famme Journey Studio when you are ready.</span>
+        <span>Your local workspaces stay on this device. Update Journey Studio by Famme when you are ready.</span>
       </div>
       <button className="button primary compact" onClick={()=>void applyUpdate()} disabled={updating}>
         {updating ? <><Loader2 size={14}/> Updating…</> : 'Update now'}

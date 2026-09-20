@@ -6,6 +6,7 @@ import { createDemoWorkspace } from '../../lib/demo';
 import { useWorkspace } from '../../store/WorkspaceContext';
 import { usePwaInstall } from '../../lib/usePwaInstall';
 import type { WorkspaceScope } from '../../types/domain';
+import { APP_NAME, APP_SHORT_NAME } from '../../lib/appMeta';
 
 export function Onboarding() {
   const { setWorkspace } = useWorkspace();
@@ -31,10 +32,10 @@ export function Onboarding() {
   return (
     <main className="onboarding-shell">
       <section className="onboarding-card">
-        <div className="eyebrow"><Sparkles size={15} /> FAMME · DIGITAL</div>
-        <h1>Famme Journey Studio</h1>
+        <div className="eyebrow"><Sparkles size={15} /> BY FAMME</div>
+        <h1>{APP_NAME}</h1>
         <p className="lead">Create customer journey architecture, channel plans, measurement logic and observed behavior in one visual workspace.</p>
-        {canInstall && <button className="button install-button onboarding-install" onClick={()=>void install()}><MonitorDown size={16}/> Install Famme Journey Studio</button>}
+        {canInstall && <button className="button install-button onboarding-install" onClick={()=>void install()}><MonitorDown size={16}/> Install {APP_SHORT_NAME}</button>}
         <div className="onboarding-choice-grid">
           <div className="onboarding-choice primary-choice">
             <h2>Create a workspace</h2>
@@ -64,7 +65,7 @@ export function Onboarding() {
             </div>
           </div>
         </div>
-        <div className="privacy-note"><strong>Local-first.</strong> Famme Journey Studio stores workspaces in IndexedDB in your browser. No account or server is required. Workspace files stay under your control unless you choose to share them.</div>
+        <div className="privacy-note"><strong>Local-first.</strong> {APP_NAME} stores workspaces in IndexedDB in your browser. No account or server is required. Workspace files stay under your control unless you choose to share them.</div>
         <footer>Designed &amp; developed by Mikkel Famme</footer>
       </section>
     </main>
