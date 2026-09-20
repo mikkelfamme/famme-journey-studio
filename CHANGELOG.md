@@ -1,3 +1,11 @@
+## 2.0.0-rc.7 — Locked read-only viewer
+
+- View mode is now fully locked: no node dragging, viewport panning, zoom gestures, reconnecting or selection dragging.
+- Funnel stage backgrounds remain fixed and nodes can no longer be visually moved between stages in View.
+- Read-only connection handles stay in the DOM but are invisible, so arrows render correctly without edit affordances.
+- Node details open as an overlay and no longer resize the journey canvas.
+- The stray selection/interaction artifact is suppressed in View mode.
+
 ## 2.0.0-rc.6 — Presentation & read-only view
 
 - Rebuilt Print / Save PDF around a dedicated, page-optimized journey rendering.

@@ -1,17 +1,15 @@
 import { useMemo, useState } from 'react';
-import { Background, Controls, MarkerType, MiniMap, ReactFlow, type NodeMouseHandler } from '@xyflow/react';
+import { Background, MarkerType, ReactFlow, type NodeMouseHandler } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { ArrowLeft, ExternalLink, Pencil, Printer, X } from 'lucide-react';
 import type { Journey, JourneyNode } from '../../types/domain';
 import { JourneyNodeComponent } from './JourneyNode';
 import { JourneyPrintSheet } from './JourneyPrintSheet';
-import { useWorkspace } from '../../store/WorkspaceContext';
 import { useI18n } from '../../i18n';
 
 const nodeTypes = { journey: JourneyNodeComponent };
 
 export function JourneyViewer({ journey, onClose, onEdit }: { journey: Journey; onClose: () => void; onEdit: () => void }) {
-  const { workspace } = useWorkspace();
   const { t, status } = useI18n();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = useMemo(() => journey.nodes.find(node => node.id === selectedId) ?? null, [journey.nodes, selectedId]);
@@ -75,14 +73,16 @@ export function JourneyViewer({ journey, onClose, onEdit }: { journey: Journey; 
           deleteKeyCode={null}
           selectionKeyCode={null}
           multiSelectionKeyCode={null}
-          panOnDrag
+          panOnDrag={false}
+          panOnScroll={false}
+          zoomOnScroll={false}
+          zoomOnPinch={false}
+          zoomOnDoubleClick={false}
           selectionOnDrag={false}
           fitView
           fitViewOptions={{ padding: 0.18, minZoom: 0.45, maxZoom: 1.05 }}
         >
           <Background gap={20} size={1}/>
-          <Controls showInteractive={false}/>
-          {workspace?.settings.showMiniMap && journey.nodes.length >= 10 && <MiniMap pannable zoomable/>}
         </ReactFlow>
       </div>
       {selected && <aside className="viewer-details no-print">

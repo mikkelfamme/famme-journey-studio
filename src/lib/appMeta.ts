@@ -1,10 +1,20 @@
 export const APP_NAME = 'Famme Journey Studio';
-export const APP_VERSION = '2.0.0-rc.6';
+export const APP_VERSION = '2.0.0-rc.7';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'FAMME · DIGITAL';
 export const APP_RELEASE_DATE = '2026-09-20';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.7',
+    title: 'Locked read-only viewer',
+    items: [
+      'View mode now has a fixed viewport: nodes, connections and the journey canvas cannot be dragged or repositioned.',
+      'Stage zones stay visually aligned with their nodes because panning and zoom gestures are disabled in View mode.',
+      'Connection handles remain available to the renderer but are visually hidden, restoring arrows without exposing edit affordances.',
+      'The details inspector opens as an overlay so selecting a node no longer resizes or shifts the journey.'
+    ]
+  },
   {
     version: '2.0.0-rc.6',
     title: 'Presentation & read-only view',

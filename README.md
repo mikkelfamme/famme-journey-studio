@@ -157,6 +157,10 @@ MIT © 2026 Mikkel Famme
 - Translation dictionaries are plain JSON under `src/i18n/locales/` so wording can be improved through GitHub contributions.
 
 
+## RC7 viewer lock
+
+View mode is now fully presentation-safe: the viewport and nodes are locked, while nodes remain clickable for read-only URL, tracking and creative inspection.
+
 ## RC6 presentation additions
 
 - Strict read-only journey View mode with visible connection arrows and edge labels.
