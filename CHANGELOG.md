@@ -1,6 +1,15 @@
 # Changelog
 
-## 2.0.0-rc.1
+## 2.0.0-rc.2 — Polish & updates
+
+- Premium visual refresh across the public PWA and journey editor.
+- In-app PWA update prompt with explicit **Update now** action.
+- Offline-ready confirmation.
+- About & Updates release timeline.
+- GitHub tag release workflow and update/rollback documentation.
+
+
+## 2.0.0-rc.2
 
 ### Added
 - in-product PWA install prompt when supported by the browser
@@ -14,11 +23,11 @@
 
 ### Changed
 - GitHub Pages actions aligned with current official workflow versions
-- release metadata and About page now identify RC1
+- release metadata and About page now identify RC2
 - public distribution documentation consolidated around GitHub Pages/PWA
 
 ### Validation note
-RC1 still requires a clean online GitHub Actions run before it should be treated as a production release.
+RC2 still requires a clean online GitHub Actions run before it should be treated as a production release.
 
 ## 2.0.0-beta.2
 

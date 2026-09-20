@@ -1,4 +1,4 @@
-# Release manifest — 2.0.0-rc.1
+# Release manifest — 2.0.0-rc.2
 
 ## Release goal
 Prepare the source tree for its first public GitHub Pages / installable PWA deployment.

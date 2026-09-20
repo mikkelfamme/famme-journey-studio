@@ -1,17 +1,35 @@
-import { APP_AUTHOR, APP_BRAND, APP_NAME, APP_VERSION } from '../lib/appMeta';
+import { CheckCircle2, CloudOff, DownloadCloud, Github, Layers3, ShieldCheck, Sparkles } from 'lucide-react';
+import { APP_AUTHOR, APP_BRAND, APP_NAME, APP_RELEASE_DATE, APP_RELEASE_NOTES, APP_VERSION } from '../lib/appMeta';
 
 export function AboutView() {
   return <section className="content-section about-page">
-    <div className="about-hero"><div className="eyebrow">{APP_BRAND}</div><h2>{APP_NAME}</h2><p>Visual customer journey architecture, channel planning, reusable components, measurement governance and observed behavior in one local-first workspace.</p></div>
-    <div className="about-grid">
-      <div><h3>Why it exists</h3><p>Customer journeys often end up split across presentations, ad platforms, analytics, tracking plans and disconnected diagrams. Journey Studio treats the journey itself as the shared data model.</p></div>
-      <div><h3>Release Candidate architecture</h3><p>React + TypeScript + Vite + XYFlow + IndexedDB + PWA. The Release Candidate combines the visual editor, intelligence layer, sharing, recovery, migration and public distribution foundation.</p></div>
-      <div><h3>Installable and portable</h3><p>Use it directly in a modern browser or install it as a PWA when the browser and device policy allow it. Workspaces remain portable as <code>.fjs</code> files, so the app does not require an account or hosted database.</p></div>
-      <div><h3>Privacy model</h3><p>The public app has no backend or telemetry. Workspace data is stored locally in IndexedDB unless the user explicitly exports or shares a file.</p></div>
-      <div><h3>Public distribution</h3><p>The repository is prepared for GitHub Pages. A push to <code>main</code> runs typecheck, tests and a production build before the Pages artifact is deployed.</p></div>
-      <div><h3>Product identity</h3><p><strong>Designed &amp; developed by {APP_AUTHOR}.</strong><br/>MIT licensed for the public codebase.</p></div>
+    <div className="about-hero about-hero-polished">
+      <div className="about-hero-copy">
+        <div className="eyebrow">{APP_BRAND}</div>
+        <h2>{APP_NAME}</h2>
+        <p>Map the customer journey, channel architecture, tracking and observed behavior in one calm, local-first workspace.</p>
+        <div className="about-meta-row"><span><Sparkles size={13}/> {APP_VERSION}</span><span><ShieldCheck size={13}/> Local-first</span><span><CloudOff size={13}/> Offline capable</span></div>
+      </div>
+      <div className="about-version-orb"><span>FJS</span><strong>2.0</strong></div>
     </div>
-    <div className="install-note"><strong>Install as an app</strong><span>When your browser offers installation, use the “Install app” control in the top bar. If installation is unavailable, the browser version remains fully usable.</span></div>
-    <div className="version-box"><strong>{APP_NAME} {APP_VERSION}</strong><span>Public-safe core · no company-specific data bundled</span></div>
+
+    <div className="about-feature-grid">
+      <article><div className="about-feature-icon"><Layers3 size={18}/></div><h3>One journey model</h3><p>Design customer flows, reusable components, measurement logic and cross-journey handoffs without splitting the architecture across separate tools.</p></article>
+      <article><div className="about-feature-icon"><ShieldCheck size={18}/></div><h3>Local by default</h3><p>Workspace data stays in IndexedDB on the device unless the user explicitly exports or shares a portable <code>.fjs</code> file.</p></article>
+      <article><div className="about-feature-icon"><DownloadCloud size={18}/></div><h3>Installable PWA</h3><p>Use the browser version or install the app when device policy allows it. Updates are delivered through the same public GitHub Pages release.</p></article>
+      <article><div className="about-feature-icon"><Github size={18}/></div><h3>Public core</h3><p>The application code is designed for public distribution. Company-specific work belongs in portable workspaces, not in the product core.</p></article>
+    </div>
+
+    <div className="release-panel">
+      <div className="release-panel-head"><div><span className="eyebrow-small">Product updates</span><h3>What changed</h3></div><div className="release-current"><CheckCircle2 size={15}/><span>Current · {APP_VERSION}</span></div></div>
+      <div className="release-timeline">
+        {APP_RELEASE_NOTES.map((release, index) => <article className="release-entry" key={release.version}>
+          <div className={`release-dot ${index === 0 ? 'current' : ''}`}/>
+          <div className="release-entry-body"><div className="release-entry-title"><strong>{release.version}</strong><span>{release.title}</span></div><ul>{release.items.map(item=><li key={item}>{item}</li>)}</ul></div>
+        </article>)}
+      </div>
+    </div>
+
+    <div className="about-footer-line"><span>Designed &amp; developed by <strong>{APP_AUTHOR}</strong></span><span>Release {APP_RELEASE_DATE} · MIT licensed public codebase</span></div>
   </section>;
 }

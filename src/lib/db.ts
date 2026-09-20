@@ -5,6 +5,7 @@ import { normalizeWorkspace } from './migrate';
 const DB_NAME = 'famme-journey-studio';
 const WORKSPACE_STORE = 'workspace';
 const RECOVERY_STORE = 'recovery';
+const MIGRATION_STORE = 'migration-backup';
 const KEY = 'active';
 const RECOVERY_LIMIT = 5;
 
@@ -14,16 +15,23 @@ export interface RecoverySnapshot {
   workspace: Workspace;
 }
 
-const dbPromise = openDB(DB_NAME, 2, {
+const dbPromise = openDB(DB_NAME, 3, {
   upgrade(db) {
     if (!db.objectStoreNames.contains(WORKSPACE_STORE)) db.createObjectStore(WORKSPACE_STORE);
     if (!db.objectStoreNames.contains(RECOVERY_STORE)) db.createObjectStore(RECOVERY_STORE);
+    if (!db.objectStoreNames.contains(MIGRATION_STORE)) db.createObjectStore(MIGRATION_STORE);
   }
 });
 
 export async function loadWorkspace(): Promise<Workspace | null> {
-  const workspace = (await (await dbPromise).get(WORKSPACE_STORE, KEY)) as Workspace | undefined;
-  return workspace ? normalizeWorkspace(workspace) : null;
+  const db = await dbPromise;
+  const raw = (await db.get(WORKSPACE_STORE, KEY)) as Workspace | undefined;
+  if (!raw) return null;
+  if (raw.schema !== 'famme-journey-studio-workspace-v2' || raw.version !== '2.0') {
+    const backupKey = `${Date.now()}-${raw.id || 'workspace'}`;
+    await db.put(MIGRATION_STORE, { createdAt: new Date().toISOString(), workspace: structuredClone(raw) }, backupKey);
+  }
+  return normalizeWorkspace(raw);
 }
 
 async function addRecoverySnapshot(workspace: Workspace): Promise<void> {

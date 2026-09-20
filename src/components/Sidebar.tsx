@@ -1,4 +1,5 @@
 import { BarChart3, Boxes, FileText, GitBranch, LayoutDashboard, Settings, Share2, Sparkles, Waypoints } from 'lucide-react';
+import { APP_VERSION } from '../lib/appMeta';
 
 export type AppView = 'journeys' | 'master' | 'insights' | 'templates' | 'components' | 'share' | 'settings' | 'about';
 
@@ -10,7 +11,7 @@ const items: Array<{ id: AppView; label: string; icon: typeof GitBranch }> = [
   { id: 'components', label: 'Components', icon: Boxes },
   { id: 'share', label: 'Share & Portfolio', icon: Share2 },
   { id: 'settings', label: 'Settings', icon: Settings },
-  { id: 'about', label: 'About', icon: FileText }
+  { id: 'about', label: 'About & Updates', icon: FileText }
 ];
 
 export function Sidebar({ view, onView }: { view: AppView; onView: (view: AppView) => void }) {
@@ -36,7 +37,7 @@ export function Sidebar({ view, onView }: { view: AppView; onView: (view: AppVie
       </nav>
       <div className="sidebar-foot">
         <Sparkles size={14} />
-        <span>RC1 · 2.0</span>
+        <span>{APP_VERSION}</span>
       </div>
     </aside>
   );

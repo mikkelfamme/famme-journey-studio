@@ -15,6 +15,7 @@ import { WelcomeTour } from './components/WelcomeTour';
 import { CommandPalette, type CommandAction } from './components/CommandPalette';
 import { HelpDrawer } from './components/HelpDrawer';
 import { ImportPreviewDialog } from './components/ImportPreviewDialog';
+import { UpdateToast } from './components/UpdateToast';
 import { useWorkspace } from './store/WorkspaceContext';
 import { downloadWorkspace, importPreview, parseStudioDataFile, type StudioImport, type StudioImportPreview } from './lib/files';
 import { journeyFromTemplate } from './lib/workspace';
@@ -75,7 +76,7 @@ export default function App() {
 
   const commands = useMemo<CommandAction[]>(() => {
     if (!workspace) return [];
-    const viewLabels: Array<[AppView, string]> = [['journeys','Journeys'],['master','Master View'],['insights','Insights & Data'],['templates','Templates'],['components','Component Library'],['share','Share & Portfolio'],['settings','Settings'],['about','About']];
+    const viewLabels: Array<[AppView, string]> = [['journeys','Journeys'],['master','Master View'],['insights','Insights & Data'],['templates','Templates'],['components','Component Library'],['share','Share & Portfolio'],['settings','Settings'],['about','About & Updates']];
     const actions: CommandAction[] = viewLabels.map(([id,label]) => ({ id:`view-${id}`, label:`Go to ${label}`, group:'Navigation', keywords:id, run:()=>{setOpenJourney(null);setView(id);} }));
     actions.unshift({ id:'new-journey', label:'Create new journey', group:'Create', run:newJourney });
     actions.push({ id:'import', label:'Import workspace or data', group:'Workspace', run:()=>inputRef.current?.click() });
@@ -101,13 +102,13 @@ export default function App() {
   }, [openJourney, saveNow]);
 
   if (loading) return <div className="loading-screen">Loading Famme Journey Studio…</div>;
-  if (!workspace) return <Onboarding />;
+  if (!workspace) return <><Onboarding/><UpdateToast/></>;
 
   const hiddenInput = <input ref={inputRef} hidden type="file" accept=".fjs,.json,application/json" onChange={event => { void readImport(event.target.files?.[0]); event.currentTarget.value=''; }}/>;
   const overlays = <>{hiddenInput}<CommandPalette open={commandOpen} actions={commands} onClose={()=>setCommandOpen(false)}/>{pendingImport && <ImportPreviewDialog imported={pendingImport.imported} preview={pendingImport.preview} onCancel={()=>setPendingImport(null)} onConfirm={applyImport}/>}</>;
 
-  if (openJourney) return <><JourneyEditor journey={workspace.journeys.find(journey => journey.id === openJourney.id) ?? openJourney} onClose={()=>setOpenJourney(null)}/><HelpDrawer view="journeys" open={helpOpen} onClose={()=>setHelpOpen(false)}/>{overlays}</>;
+  if (openJourney) return <><JourneyEditor journey={workspace.journeys.find(journey => journey.id === openJourney.id) ?? openJourney} onClose={()=>setOpenJourney(null)}/><HelpDrawer view="journeys" open={helpOpen} onClose={()=>setHelpOpen(false)}/><UpdateToast/>{overlays}</>;
 
-  const titleMap: Record<AppView,string> = { journeys:'Journeys', master:'Master View', insights:'Insights & Data', templates:'Templates', components:'Component Library', share:'Share & Portfolio', settings:'Settings', about:'About' };
-  return <div className="app-shell"><Sidebar view={view} onView={setView}/><main className="main-shell"><Topbar title={titleMap[view]} subtitle={`${workspace.organization} · ${workspace.name}`} onNew={view==='journeys'?newJourney:undefined} onExport={()=>downloadWorkspace(workspace)} onImport={()=>inputRef.current?.click()} onCommand={()=>setCommandOpen(true)} onHelp={()=>setHelpOpen(value=>!value)} saveState={saveState} lastSavedAt={lastSavedAt} saveError={saveError}/><div className="main-content">{view==='journeys'&&<JourneysView onOpen={setOpenJourney}/>} {view==='master'&&<MasterView/>} {view==='insights'&&<InsightsView/>} {view==='templates'&&<TemplatesView onOpen={setOpenJourney}/>} {view==='components'&&<ComponentsView/>} {view==='share'&&<ShareView/>} {view==='settings'&&<SettingsView/>} {view==='about'&&<AboutView/>}</div></main><WelcomeTour/><HelpDrawer view={view} open={helpOpen} onClose={()=>setHelpOpen(false)}/>{overlays}</div>;
+  const titleMap: Record<AppView,string> = { journeys:'Journeys', master:'Master View', insights:'Insights & Data', templates:'Templates', components:'Component Library', share:'Share & Portfolio', settings:'Settings', about:'About & Updates' };
+  return <div className="app-shell"><Sidebar view={view} onView={setView}/><main className="main-shell"><Topbar title={titleMap[view]} subtitle={`${workspace.organization} · ${workspace.name}`} onNew={view==='journeys'?newJourney:undefined} onExport={()=>downloadWorkspace(workspace)} onImport={()=>inputRef.current?.click()} onCommand={()=>setCommandOpen(true)} onHelp={()=>setHelpOpen(value=>!value)} saveState={saveState} lastSavedAt={lastSavedAt} saveError={saveError}/><div className="main-content">{view==='journeys'&&<JourneysView onOpen={setOpenJourney}/>} {view==='master'&&<MasterView/>} {view==='insights'&&<InsightsView/>} {view==='templates'&&<TemplatesView onOpen={setOpenJourney}/>} {view==='components'&&<ComponentsView/>} {view==='share'&&<ShareView/>} {view==='settings'&&<SettingsView/>} {view==='about'&&<AboutView/>}</div></main><WelcomeTour/><HelpDrawer view={view} open={helpOpen} onClose={()=>setHelpOpen(false)}/><UpdateToast/>{overlays}</div>;
 }
