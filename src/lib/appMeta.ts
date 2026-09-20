@@ -1,10 +1,20 @@
 export const APP_NAME = 'Famme Journey Studio';
-export const APP_VERSION = '2.0.0-rc.7';
+export const APP_VERSION = '2.0.0-rc.8';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'FAMME · DIGITAL';
 export const APP_RELEASE_DATE = '2026-09-20';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.8',
+    title: 'Print fidelity',
+    items: [
+      "Print / PDF now preserves the journey's saved node positions instead of recalculating a separate layout.",
+      'Printed connections use orthogonal routing based on the same source/target handle direction used by the editor.',
+      'Stage bands remain visible while the journey is scaled as one diagram to fit the printed page.',
+      'Selection toolbars, handles and editor state remain excluded from the exported presentation.'
+    ]
+  },
   {
     version: '2.0.0-rc.7',
     title: 'Locked read-only viewer',

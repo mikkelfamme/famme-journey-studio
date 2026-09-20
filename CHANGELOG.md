@@ -1,3 +1,10 @@
+## 2.0.0-rc.8 — Print fidelity
+
+- Print/PDF preserves the saved journey layout instead of applying a separate compact layout.
+- Orthogonal print connections respect saved source/target handles and use subtle arrowheads.
+- Stage zones, node positions and relative spacing stay visually faithful to Edit/View.
+- Editor-only controls remain excluded from print output.
+
 ## 2.0.0-rc.7 — Locked read-only viewer
 
 - View mode is now fully locked: no node dragging, viewport panning, zoom gestures, reconnecting or selection dragging.
