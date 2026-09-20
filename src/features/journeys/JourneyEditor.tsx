@@ -12,8 +12,7 @@ import {
   type Edge,
   type EdgeChange,
   type NodeChange,
-  type OnSelectionChangeParams,
-  type ReactFlowInstance
+  type OnSelectionChangeParams
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { AlignHorizontalJustifyStart, ArrowLeft, BarChart3, CheckCircle2, ChevronDown, Copy, FileText, GitCompareArrows, HeartPulse, Layers3, LayoutGrid, Maximize2, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Printer, Redo2, Save, Shapes, Trash2, Undo2, Waypoints } from 'lucide-react';
@@ -56,7 +55,9 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
   const [paletteOpen, setPaletteOpen] = useState(true);
   const [inspectorOpen, setInspectorOpen] = useState(false);
   const [reviewMenuOpen, setReviewMenuOpen] = useState(false);
-  type FlowController = Pick<ReactFlowInstance, 'fitView' | 'getViewport'>;
+  type FlowController = {
+    fitView: (options: { padding: number; duration: number; minZoom: number; maxZoom: number }) => void;
+  };
   const [flowInstance, setFlowInstance] = useState<FlowController | null>(null);
   const [canvasViewport, setCanvasViewport] = useState<CanvasViewport>({ x: 0, y: 0, zoom: 1 });
   const selected = selectedIds.length === 1 ? draft.nodes.find(n => n.id === selectedIds[0]) ?? null : null;
@@ -375,7 +376,10 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
             nodes={flowNodes}
             edges={flowEdges}
             nodeTypes={nodeTypes}
-            onInit={instance => { setFlowInstance(instance); setCanvasViewport(instance.getViewport()); }}
+            onInit={instance => {
+              setFlowInstance({ fitView: options => { void instance.fitView(options); } });
+              setCanvasViewport(instance.getViewport());
+            }}
             onMove={(_, viewport) => setCanvasViewport(viewport)}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
