@@ -1,5 +1,5 @@
-import { Handle, Position, type NodeProps } from '@xyflow/react';
-import { BarChart3, BellRing, Bot, CheckCircle2, CircleDot, FileText, Flag, GitBranch, Goal, Mail, Megaphone, MousePointerClick, Search, ShieldCheck, Sparkles, StickyNote, Tag, UserRound, Workflow } from 'lucide-react';
+import { Handle, NodeToolbar, Position, type NodeProps } from '@xyflow/react';
+import { BarChart3, BellRing, Bot, CheckCircle2, CircleDot, Copy, FileText, Flag, GitBranch, Goal, Mail, Megaphone, MousePointerClick, Search, ShieldCheck, Sparkles, StickyNote, Tag, Trash2, UserRound, Workflow } from 'lucide-react';
 import type { JourneyNode } from '../../types/domain';
 
 const labels: Record<string, string> = {
@@ -39,9 +39,13 @@ export function JourneyNodeComponent({ data, selected }: NodeProps<JourneyNode>)
 
   return (
     <div className={`journey-node node-${data.type} stage-${data.stage} ${selected ? 'selected' : ''} ${data.componentId ? 'library-linked' : ''}`}>
+      <NodeToolbar isVisible={selected} position={Position.Top} offset={10} className="node-quick-toolbar">
+        <button type="button" title="Duplicate node" onClick={event => { event.stopPropagation(); data.runtimeActions?.duplicate?.(); }}><Copy size={13}/><span>Duplicate</span></button>
+        <button type="button" className="danger" title="Delete node" onClick={event => { event.stopPropagation(); data.runtimeActions?.delete?.(); }}><Trash2 size={13}/><span>Delete</span></button>
+      </NodeToolbar>
       {handles.map(([id, type, position, style]) => <Handle key={id} id={id} type={type} position={position} className={`journey-handle ${type}`} style={style}/>) }
       <div className="node-head">
-        <div className="node-icon"><Icon size={15}/></div>
+        <div className="node-icon"><Icon size={16}/></div>
         <div className="node-head-copy">
           <div className="node-kicker">{labels[data.type] ?? data.type}</div>
           <div className="node-title">{data.label}</div>

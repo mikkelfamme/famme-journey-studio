@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Boxes, Flag, Layers3, LifeBuoy, Megaphone, Search, ShoppingCart, UserRound } from 'lucide-react';
+import { Boxes, ChevronDown, ChevronRight, Flag, Layers3, LifeBuoy, Megaphone, Search, ShoppingCart, UserRound } from 'lucide-react';
 import type { ComponentDefinition, FunnelStage, JourneyNodeType } from '../../types/domain';
 
 type PaletteGroup = 'customer' | 'channels' | 'experience' | 'outcomes' | 'lifecycle';
@@ -34,9 +34,16 @@ const groups: Array<{ id: PaletteGroup; label: string; icon: typeof UserRound }>
 
 export function NodePalette({ onAdd, components, onAddComponent }: { onAdd: (type: JourneyNodeType, label: string, stage: FunnelStage) => void; components: ComponentDefinition[]; onAddComponent: (component: ComponentDefinition) => void }) {
   const [query, setQuery] = useState('');
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const needle = query.trim().toLowerCase();
   const filteredItems = useMemo(() => needle ? items.filter(item => `${item.label} ${item.type} ${item.stage}`.toLowerCase().includes(needle)) : items, [needle]);
   const filteredComponents = useMemo(() => needle ? components.filter(component => `${component.name} ${component.description} ${component.nodeData.type}`.toLowerCase().includes(needle)) : components, [components, needle]);
+
+  const toggle = (id: string) => setCollapsed(current => {
+    const next = new Set(current);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
 
   return (
     <aside className="editor-panel palette-panel">
@@ -54,23 +61,28 @@ export function NodePalette({ onAdd, components, onAddComponent }: { onAdd: (typ
           const groupItems = filteredItems.filter(item => item.group === group.id);
           if (groupItems.length === 0) return null;
           const Icon = group.icon;
-          return <section className="palette-group" key={group.id}>
-            <div className="palette-group-title"><Icon size={13}/><span>{group.label}</span></div>
-            <div className="palette-list">
+          const isCollapsed = !needle && collapsed.has(group.id);
+          return <section className={`palette-group ${isCollapsed ? 'collapsed' : ''}`} key={group.id}>
+            <button type="button" className="palette-group-title" onClick={() => toggle(group.id)} aria-expanded={!isCollapsed}>
+              <Icon size={13}/><span>{group.label}</span><small>{groupItems.length}</small>{isCollapsed ? <ChevronRight size={12}/> : <ChevronDown size={12}/>} 
+            </button>
+            {!isCollapsed && <div className="palette-list">
               {groupItems.map(item => <button key={item.type} onClick={() => onAdd(item.type, item.label, item.stage)}>
                 <span>{item.label}</span><small>{item.stage}</small>
               </button>)}
-            </div>
+            </div>}
           </section>;
         })}
       </div>
 
-      {components.length > 0 && <section className="palette-group palette-library">
-        <div className="palette-group-title"><Boxes size={13}/><span>Library</span></div>
-        <div className="palette-list library-palette">
+      {components.length > 0 && <section className={`palette-group palette-library ${collapsed.has('library') && !needle ? 'collapsed' : ''}`}>
+        <button type="button" className="palette-group-title" onClick={() => toggle('library')} aria-expanded={!collapsed.has('library')}>
+          <Boxes size={13}/><span>Library</span><small>{filteredComponents.length}</small>{collapsed.has('library') && !needle ? <ChevronRight size={12}/> : <ChevronDown size={12}/>} 
+        </button>
+        {(!collapsed.has('library') || needle) && <div className="palette-list library-palette">
           {filteredComponents.map(component => <button key={component.id} onClick={() => onAddComponent(component)}><span>{component.name}</span><small>{component.nodeData.type}</small></button>)}
           {filteredComponents.length === 0 && <div className="palette-empty"><Flag size={14}/><span>No library matches</span></div>}
-        </div>
+        </div>}
       </section>}
     </aside>
   );

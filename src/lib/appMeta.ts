@@ -1,10 +1,20 @@
 export const APP_NAME = 'Famme Journey Studio';
-export const APP_VERSION = '2.0.0-rc.3';
+export const APP_VERSION = '2.0.0-rc.4';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'FAMME · DIGITAL';
 export const APP_RELEASE_DATE = '2026-09-20';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.4',
+    title: 'Editor UX & compact flow',
+    items: [
+      'Compact stage-aware layout and one-click Fit/Tidy controls.',
+      'Subtle funnel stage zones that make the journey easier to scan.',
+      'Automatic path highlighting from the selected node and quieter unrelated branches.',
+      'Auto-collapsing inspector, simplified Review menu and faster node quick actions.'
+    ]
+  },
   {
     version: '2.0.0-rc.3',
     title: 'Journey Editor polish',

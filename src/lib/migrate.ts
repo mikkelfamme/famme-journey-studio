@@ -4,7 +4,7 @@ import { defaultMetricDictionary, ensureMetricDictionary } from './performance';
 const now = () => new Date().toISOString();
 
 function normalizeNodeData(data: JourneyNodeData): JourneyNodeData {
-  const { runtimePerformance: _runtimePerformance, runtimeActualCount: _runtimeActualCount, ...persisted } = data as JourneyNodeData;
+  const { runtimePerformance: _runtimePerformance, runtimeActualCount: _runtimeActualCount, runtimeActions: _runtimeActions, ...persisted } = data as JourneyNodeData;
   return {
     ...persisted,
     tracking: Array.isArray(data.tracking) ? data.tracking : [],

@@ -68,3 +68,14 @@ A dependency-backed `npm install` could not complete in the build environment be
 - guided onboarding
 - share and portfolio exports
 - initial automated tests and CI workflow
+
+## 2.0.0-rc.4 — Editor UX & compact flow
+
+- Added compact stage-aware Tidy Layout and Fit Journey controls.
+- Added subtle funnel stage zones across the canvas.
+- Added selected-node path highlighting with muted unrelated nodes and connections.
+- Auto-collapses the properties inspector when nothing is selected.
+- Simplified the top toolbar by grouping Plan, Health, Versions, Actual and Performance under Review.
+- Enlarged and strengthened node typography while reducing canvas/grid noise.
+- Added selected-node quick actions for duplicate and delete.
+- Minimap now appears only on larger journeys.

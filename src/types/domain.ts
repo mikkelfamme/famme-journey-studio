@@ -78,6 +78,7 @@ export interface JourneyNodeData extends Record<string, unknown> {
   componentSyncedAt?: string;
   runtimePerformance?: RuntimePerformanceSummary;
   runtimeActualCount?: number;
+  runtimeActions?: { duplicate?: () => void; delete?: () => void };
 }
 
 export type JourneyNode = Node<JourneyNodeData, 'journey'>;
