@@ -1,5 +1,5 @@
 import { Handle, NodeToolbar, Position, type NodeProps } from '@xyflow/react';
-import { BarChart3, BellRing, Bot, CheckCircle2, CircleDot, Copy, FileText, Flag, GitBranch, Goal, Mail, Megaphone, MousePointerClick, Search, ShieldCheck, Sparkles, StickyNote, Tag, Trash2, UserRound, Workflow } from 'lucide-react';
+import { AlertTriangle, BarChart3, BellRing, Bot, CheckCircle2, CircleDot, Copy, FileText, Flag, GitBranch, Goal, Mail, Megaphone, MousePointerClick, Search, ShieldCheck, Sparkles, StickyNote, Tag, Trash2, UserRound, Workflow } from 'lucide-react';
 import type { JourneyNode } from '../../types/domain';
 import { useI18n } from '../../i18n';
 
@@ -51,7 +51,7 @@ export function JourneyNodeComponent({ data, selected }: NodeProps<JourneyNode>)
       </div>
       {data.description && <div className="node-desc">{data.description}</div>}
       {data.runtimePerformance && <div className={`node-performance quality-${data.runtimePerformance.quality}`}><div><strong>{data.runtimePerformance.quality}</strong><span>{data.runtimePerformance.source}</span></div>{data.runtimePerformance.metrics.map(metric => <div className="node-kpi" key={metric.key}><span>{metric.label}</span><b>{metric.formatted}</b></div>)}</div>}
-      {data.runtimeActualCount ? <div className="node-actual-badge"><Sparkles size={10}/> Actual · {data.runtimeActualCount} occurrence{data.runtimeActualCount === 1 ? '' : 's'}</div> : null}
+      {data.runtimeActualCount ? <div className="node-actual-badge"><Sparkles size={10}/> Actual · {data.runtimeActualCount} occurrence{data.runtimeActualCount === 1 ? '' : 's'}</div> : null}{data.runtimeStageMismatch ? <div className="node-stage-warning" title="This node is visually outside its assigned funnel stage."><AlertTriangle size={10}/> Stage mismatch</div> : null}
       {hasSignals && <div className="node-signals">
         {data.tracking.length > 0 && <span><BarChart3 size={9}/>{data.tracking.length} tracking</span>}
         {data.creatives.length > 0 && <span><Bot size={9}/>{data.creatives.length} creative</span>}

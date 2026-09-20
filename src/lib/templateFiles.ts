@@ -36,6 +36,11 @@ export function templateFromJourney(
     category: input.category.trim() || 'Custom',
     scope: input.scope,
     system: false,
+    version: '1.0.0',
+    tags: [],
+    author: 'Local author',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     nodes: structuredClone(journey.nodes).map(node => ({ ...node, selected: false })),
     edges: structuredClone(journey.edges).map(edge => ({ ...edge, selected: false })),
     planInputs: structuredClone(journey.planInputs)
@@ -85,6 +90,11 @@ export function parseJourneyTemplateData(raw: unknown): JourneyTemplate {
     ...structuredClone(template),
     id: makeId('template'),
     system: false,
+    version: template.version || '1.0.0',
+    tags: Array.isArray(template.tags) ? template.tags : [],
+    author: template.author || 'Imported author',
+    createdAt: template.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     nodes: structuredClone(template.nodes).map(node => ({ ...node, selected: false })),
     edges: structuredClone(template.edges).map(edge => ({ ...edge, selected: false }))
   };

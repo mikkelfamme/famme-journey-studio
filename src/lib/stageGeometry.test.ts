@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { STAGE_WORLD_BOUNDARIES, stageScreenBoundaries } from './stageGeometry';
+import { STAGE_NODE_X, STAGE_WORLD_BOUNDARIES, isStageMismatch, stageForWorldX, stageScreenBoundaries } from './stageGeometry';
 
 describe('stage backdrop geometry', () => {
   it('tracks horizontal pan and zoom in the same coordinate system as journey nodes', () => {
@@ -12,5 +12,11 @@ describe('stage backdrop geometry', () => {
     const [topMiddle, middleBottom, bottomLifecycle] = stageScreenBoundaries({ x: -240, y: 0, zoom: 0.5 });
     expect(topMiddle).toBeLessThan(middleBottom);
     expect(middleBottom).toBeLessThan(bottomLifecycle);
+  });
+
+  it('detects a node that is visually placed in the wrong stage', () => {
+    expect(isStageMismatch('top', STAGE_NODE_X.top)).toBe(false);
+    expect(isStageMismatch('top', STAGE_NODE_X.bottom)).toBe(true);
+    expect(stageForWorldX(STAGE_NODE_X.lifecycle + 126)).toBe('lifecycle');
   });
 });

@@ -1,14 +1,16 @@
-import { Download, FileArchive, LockKeyhole, Share2 } from 'lucide-react';
+import { Download, FileArchive, LockKeyhole, Share2, Waypoints } from 'lucide-react';
 import { downloadWorkspace } from '../../lib/files';
 import { defaultPortfolioOptions, downloadPortfolioWorkspace, downloadShareWorkspace, type PortfolioOptions } from '../../lib/share';
 import { useWorkspace } from '../../store/WorkspaceContext';
 import { useState } from 'react';
 import { useI18n } from '../../i18n';
+import { downloadJourney } from '../../lib/journeyFiles';
 
 export function ShareView() {
   const { workspace } = useWorkspace();
   const { t } = useI18n();
   const [options, setOptions] = useState<PortfolioOptions>(defaultPortfolioOptions);
+  const [journeyId, setJourneyId] = useState(workspace?.journeys[0]?.id ?? '');
   if (!workspace) return null;
   const toggle = (key: keyof PortfolioOptions) => setOptions(current => ({ ...current, [key]: !current[key] }));
 
@@ -32,6 +34,14 @@ export function ShareView() {
           <label className="toggle-row"><span>Remove internal notes, TODOs & versions</span><input type="checkbox" checked={options.removeInternalNotes} onChange={()=>toggle('removeInternalNotes')}/></label>
         </div>
         <button className="button primary" onClick={()=>downloadPortfolioWorkspace(workspace,options)}><FileArchive size={16}/> Export portfolio workspace</button>
+      </article>
+
+      <article className="share-card">
+        <div className="share-icon"><Waypoints size={20}/></div>
+        <h3>{t('share.singleJourney')}</h3>
+        <p>{t('share.singleJourneyText')}</p>
+        <select value={journeyId} onChange={event=>setJourneyId(event.target.value)}><option value="">{t('share.chooseJourney')}</option>{workspace.journeys.map(journey=><option key={journey.id} value={journey.id}>{journey.name}</option>)}</select>
+        <button className="button primary" disabled={!journeyId} onClick={()=>{const journey=workspace.journeys.find(item=>item.id===journeyId);if(journey)downloadJourney(journey);}}><Share2 size={16}/> {t('share.exportJourney')}</button>
       </article>
       <article className="share-card">
         <div className="share-icon"><Download size={20}/></div>

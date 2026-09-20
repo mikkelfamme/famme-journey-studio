@@ -1,6 +1,6 @@
 # Data formats
 
-Famme Journey Studio keeps the visual architecture and imported measurement data separate. External analytics processes can use exported mapping files to obtain stable journey and node IDs.
+Journey Studio by Famme keeps the visual architecture and imported measurement data separate. External analytics processes can use exported mapping files to obtain stable journey and node IDs.
 
 ## Performance snapshot
 
@@ -73,3 +73,25 @@ Settings can export:
 - `famme-journey-actual-path-map-v1`
 
 These are read-only mapping manifests for external data preparation. They are not imported back as snapshots.
+
+## Portable single journey — `.jsjourney`
+
+Schema: `journey-studio-journey-v1`.
+
+A `.jsjourney` contains one journey only. Import assigns a new journey id and new node/edge ids, resets status to Draft, and deliberately drops cross-journey links and saved versions so the imported journey is independent of its source workspace.
+
+## Portable template — `.jstemplate`
+
+Schema: `journey-studio-template-v1`.
+
+Template metadata includes:
+
+- name and description;
+- category and scope;
+- semantic template version;
+- tags;
+- author;
+- created/updated timestamps;
+- reusable nodes, connections and plan inputs.
+
+Templates may be empty. This is the default for user-created templates: metadata is created first, then the journey architecture is built in the Template Editor.

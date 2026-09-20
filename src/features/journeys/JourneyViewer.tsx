@@ -1,21 +1,25 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Background, MarkerType, ReactFlow, type NodeMouseHandler } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { ArrowLeft, ExternalLink, Pencil, Printer, X } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, ExternalLink, FileImage, Maximize, Minimize, Pencil, Printer, X } from 'lucide-react';
 import type { Journey, JourneyNode } from '../../types/domain';
 import { JourneyNodeComponent } from './JourneyNode';
 import { JourneyPrintSheet } from './JourneyPrintSheet';
 import { StageBackdrop } from './StageBackdrop';
 import type { CanvasViewport } from '../../lib/stageGeometry';
 import { useI18n } from '../../i18n';
+import { downloadJourneyPng, downloadJourneySvg } from '../../lib/journeyImageExport';
 
 const nodeTypes = { journey: JourneyNodeComponent };
 
-export function JourneyViewer({ journey, onClose, onEdit }: { journey: Journey; onClose: () => void; onEdit: () => void }) {
+export function JourneyViewer({ journey, initialSelectedId, onClose, onEdit }: { journey: Journey; initialSelectedId?: string; onClose: () => void; onEdit: () => void }) {
   const { t, status } = useI18n();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(initialSelectedId ?? null);
+  const [presenting, setPresenting] = useState(false);
   const [canvasViewport, setCanvasViewport] = useState<CanvasViewport>({ x: 0, y: 0, zoom: 1 });
   const selected = useMemo(() => journey.nodes.find(node => node.id === selectedId) ?? null, [journey.nodes, selectedId]);
+  const presentationOrder = useMemo(() => [...journey.nodes].sort((a,b) => a.position.x - b.position.x || a.position.y - b.position.y), [journey.nodes]);
+  const presentationIndex = selectedId ? presentationOrder.findIndex(node => node.id === selectedId) : -1;
   const nodes = useMemo(() => journey.nodes.map(node => ({
     ...node,
     draggable: false,
@@ -42,18 +46,43 @@ export function JourneyViewer({ journey, onClose, onEdit }: { journey: Journey; 
   const onNodeClick: NodeMouseHandler<JourneyNode> = (_, node) => setSelectedId(node.id);
   const nodeUrl = selected?.data.url || (selected?.data.type === 'landingPage' ? selected.data.landingPage : undefined);
 
-  return <div className="viewer-screen">
+  useEffect(() => { if (initialSelectedId) setSelectedId(initialSelectedId); }, [initialSelectedId, journey.id]);
+  useEffect(() => { const onFull = () => setPresenting(Boolean(document.fullscreenElement)); document.addEventListener('fullscreenchange', onFull); return () => document.removeEventListener('fullscreenchange', onFull); }, []);
+  async function togglePresentation() {
+    if (document.fullscreenElement) { await document.exitFullscreen(); return; }
+    if (!selectedId && presentationOrder[0]) setSelectedId(presentationOrder[0].id);
+    await document.documentElement.requestFullscreen();
+  }
+  function stepPresentation(direction: -1 | 1) {
+    if (!presentationOrder.length) return;
+    const current = presentationIndex >= 0 ? presentationIndex : 0;
+    const next = Math.max(0, Math.min(presentationOrder.length - 1, current + direction));
+    setSelectedId(presentationOrder[next].id);
+  }
+
+  return <div className={`viewer-screen ${presenting ? 'presentation-mode' : ''}` }>
     <header className="viewer-topbar no-print">
       <div className="viewer-topbar-left">
         <button className="icon-button" onClick={onClose} title={t('viewer.back')}><ArrowLeft size={18}/></button>
         <div className="editor-title"><strong>{journey.name}</strong><span>{t('viewer.readOnly')} · {status(journey.status)} · {journey.scope} · {journey.nodes.length} {t('journeys.nodes')}</span></div>
       </div>
       <div className="viewer-topbar-actions">
-        <button className="button" onClick={() => window.print()}><Printer size={15}/>{t('viewer.print')}</button>
-        <button className="button primary" onClick={onEdit}><Pencil size={15}/>{t('viewer.edit')}</button>
+        {presenting ? <>
+          <button className="button" disabled={presentationIndex <= 0} onClick={()=>stepPresentation(-1)}><ChevronLeft size={15}/>{t('viewer.previous')}</button>
+          <span className="presentation-progress">{Math.max(0,presentationIndex)+1} / {Math.max(1,presentationOrder.length)}</span>
+          <button className="button" disabled={presentationIndex < 0 || presentationIndex >= presentationOrder.length-1} onClick={()=>stepPresentation(1)}>{t('viewer.next')}<ChevronRight size={15}/></button>
+          <button className="button primary" onClick={()=>void togglePresentation()}><Minimize size={15}/>{t('viewer.exitPresentation')}</button>
+        </> : <>
+          <button className="button" onClick={()=>void togglePresentation()}><Maximize size={15}/>{t('viewer.presentation')}</button>
+          <button className="button" onClick={()=>downloadJourneySvg(journey)}><FileImage size={15}/> SVG</button>
+          <button className="button" onClick={()=>void downloadJourneyPng(journey)}><FileImage size={15}/> PNG</button>
+          <button className="button" onClick={() => window.print()}><Printer size={15}/>{t('viewer.print')}</button>
+          <button className="button primary" onClick={onEdit}><Pencil size={15}/>{t('viewer.edit')}</button>
+        </>}
       </div>
     </header>
-    <div className={`viewer-layout ${selected ? 'details-open' : ''}`}>
+    {presenting&&<div className="presentation-hint no-print">{t('viewer.presentationHint')}</div>}
+    <div className={`viewer-layout ${selected ? 'details-open' : ''}` }>
       <div className="viewer-canvas canvas-wrap no-print">
         <StageBackdrop viewport={canvasViewport}/>
         <ReactFlow

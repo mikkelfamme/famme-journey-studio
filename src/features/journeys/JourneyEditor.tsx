@@ -15,7 +15,7 @@ import {
   type OnSelectionChangeParams
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { AlignHorizontalJustifyStart, ArrowLeft, BarChart3, CheckCircle2, ChevronDown, Copy, FileText, GitCompareArrows, HeartPulse, Layers3, LayoutGrid, Maximize2, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Printer, Redo2, Save, Shapes, Trash2, Undo2, Waypoints } from 'lucide-react';
+import { AlignHorizontalJustifyStart, AlertTriangle, ArrowLeft, BarChart3, CheckCircle2, ChevronDown, Copy, FileImage, FileText, GitCompareArrows, HeartPulse, Layers3, LayoutGrid, Maximize2, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Printer, Redo2, Save, Shapes, Trash2, Undo2, Waypoints } from 'lucide-react';
 import type { ComponentDefinition, CrossJourneyLink, FunnelStage, Journey, JourneyEdge, JourneyNode, JourneyNodeData, JourneyNodeType, JourneyStatus, JourneyVersion } from '../../types/domain';
 import { makeId } from '../../lib/ids';
 import { generateJourneyPlan } from '../../lib/plan';
@@ -36,12 +36,13 @@ import { compactStageLayout, traceConnectedPath } from '../../lib/layout';
 import { useI18n } from '../../i18n';
 import { JourneyPrintSheet } from './JourneyPrintSheet';
 import { StageBackdrop } from './StageBackdrop';
-import type { CanvasViewport } from '../../lib/stageGeometry';
+import { isStageMismatch, type CanvasViewport } from '../../lib/stageGeometry';
+import { downloadJourneyPng, downloadJourneySvg } from '../../lib/journeyImageExport';
 
 const nodeTypes = { journey: JourneyNodeComponent };
 type InspectorMode = 'properties' | 'plan' | 'health' | 'versions' | 'actual';
 
-export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose: () => void }) {
+export function JourneyEditor({ journey, initialNodeId, onClose }: { journey: Journey; initialNodeId?: string; onClose: () => void }) {
   const { workspace, updateJourney, updateWorkspace } = useWorkspace();
   const { t, status, stage } = useI18n();
   const draftHistory = useHistoryState<Journey>(structuredClone(journey));
@@ -69,7 +70,8 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
     setSelectedEdgeId(null);
     setInspectorOpen(false);
     setReviewMenuOpen(false);
-  }, [journey.id]);
+    if (initialNodeId) { setSelectedIds([initialNodeId]); setInspectorOpen(true); }
+  }, [journey.id, initialNodeId]);
 
   const onNodesChange = useCallback((changes: NodeChange[]) => {
     const setter = changes.every(change => change.type === 'select') ? setDraftTransient : setDraft;
@@ -210,7 +212,7 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
     if (!workspace) return;
     const name = window.prompt('Template name', draft.name);
     if (!name) return;
-    updateWorkspace(ws => ({ ...ws, templates: [...ws.templates, { id: makeId('template'), name, description: draft.description, category: 'Custom', scope: draft.scope, system: false, nodes: structuredClone(draft.nodes.map(n => ({ ...n, selected: false }))), edges: structuredClone(draft.edges.map(e => ({ ...e, selected: false }))), planInputs: structuredClone(draft.planInputs) }] }));
+    updateWorkspace(ws => ({ ...ws, templates: [...ws.templates, { id: makeId('template'), name, description: draft.description, category: 'Custom', scope: draft.scope, system: false, version: '1.0.0', tags: [], author: ws.organization || 'Local author', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), nodes: structuredClone(draft.nodes.map(n => ({ ...n, selected: false }))), edges: structuredClone(draft.edges.map(e => ({ ...e, selected: false }))), planInputs: structuredClone(draft.planInputs) }] }));
   }
 
   function saveSelectedAsComponent() {
@@ -288,12 +290,14 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
   const actualSnapshot = workspace ? activeActualSnapshot(workspace) : undefined;
   const actualPaths = workspace ? pathsForJourney(workspace, draft.id, actualSnapshot) : [];
   const activePath = useMemo(() => selected ? traceConnectedPath(draft.nodes, draft.edges, selected.id) : null, [selected?.id, draft.nodes, draft.edges]);
+  const stageMismatchCount = useMemo(() => draft.nodes.filter(node => isStageMismatch(node.data.stage, node.position.x)).length, [draft.nodes]);
 
   const flowNodes = useMemo(() => draft.nodes.map(node => {
     const data: JourneyNodeData = {
       ...node.data,
       runtimePerformance: undefined,
       runtimeActualCount: undefined,
+      runtimeStageMismatch: isStageMismatch(node.data.stage, node.position.x),
       runtimeActions: { duplicate: () => duplicateNode(node.id), delete: () => deleteNode(node.id) }
     };
     if (showPerformance && workspace && activeSnapshot) {
@@ -342,7 +346,7 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
           <button className="icon-button panel-toggle" onClick={() => setPaletteOpen(value => !value)} title={paletteOpen ? 'Hide component palette' : 'Show component palette'}>{paletteOpen ? <PanelLeftClose size={16}/> : <PanelLeftOpen size={16}/>}</button>
           <div className="editor-title"><strong>{draft.name}</strong><span>{status(draft.status)} · {draft.scope} · {draft.nodes.length} {t('journeys.nodes')} · {draft.edges.length} {t('journeys.connections')}</span></div>
           <label className="editor-status-control" title={t('editor.status')}><select value={draft.status} onChange={event => setJourneyStatus(event.target.value as JourneyStatus)}>{(['draft','active','paused','archived'] as JourneyStatus[]).map(value => <option key={value} value={value}>{status(value)}</option>)}</select></label>
-          <span className={`editor-save-state ${draftHistory.canUndo ? 'dirty' : 'clean'}`}>{draftHistory.canUndo ? t('editor.unsaved') : <><CheckCircle2 size={12}/> {t('editor.savedLocally')}</>}</span>
+          <span className={`editor-save-state ${draftHistory.canUndo ? 'dirty' : 'clean'}`}>{draftHistory.canUndo ? t('editor.unsaved') : <><CheckCircle2 size={12}/> {t('editor.savedLocally')}</>}</span>{stageMismatchCount>0&&<button className="stage-guardrail-warning" onClick={tidyLayout} title={t('editor.stageMismatchHelp')}><AlertTriangle size={12}/>{stageMismatchCount} {t('editor.stageMismatch')}</button>}
         </div>
         <div className="editor-actions">
           <div className="editor-action-group history-actions">
@@ -363,7 +367,7 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
               <button className={showPerformance ? 'selected' : ''} onClick={() => { const next=!showPerformance; setShowPerformance(next); updateWorkspace(ws=>({...ws,settings:{...ws.settings,showPerformanceOverlay:next}})); setReviewMenuOpen(false); }}><BarChart3 size={15}/><span><strong>{t('editor.performance')}</strong><small>{showPerformance ? 'Hide metrics overlay' : 'Show metrics on nodes'}</small></span></button>
             </div>}
           </div>
-          <button className="button" onClick={() => window.print()}><Printer size={15}/>{t('editor.print')}</button>
+          <button className="icon-button" title="Export SVG" onClick={()=>downloadJourneySvg(draft)}><FileImage size={15}/></button><button className="icon-button" title="Export PNG" onClick={()=>void downloadJourneyPng(draft)}><FileImage size={15}/></button><button className="button" onClick={() => window.print()}><Printer size={15}/>{t('editor.print')}</button>
           <button className="button template-button" onClick={saveAsTemplate}><Shapes size={15} /> {t('editor.template')}</button>
           <button className="button primary" onClick={save}><Save size={15} /> {t('editor.save')}</button>
           <button className="icon-button panel-toggle" onClick={() => setInspectorOpen(value => !value)} title={inspectorOpen ? 'Hide inspector' : 'Show inspector'}>{inspectorOpen ? <PanelRightClose size={16}/> : <PanelRightOpen size={16}/>}</button>

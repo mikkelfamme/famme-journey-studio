@@ -82,6 +82,7 @@ export interface JourneyNodeData extends Record<string, unknown> {
   runtimePerformance?: RuntimePerformanceSummary;
   runtimeActualCount?: number;
   runtimeActions?: { duplicate?: () => void; delete?: () => void };
+  runtimeStageMismatch?: boolean;
 }
 
 export type JourneyNode = Node<JourneyNodeData, 'journey'>;
@@ -164,6 +165,11 @@ export interface JourneyTemplate {
   category: string;
   scope: WorkspaceScope;
   system: boolean;
+  version: string;
+  tags: string[];
+  author: string;
+  createdAt: string;
+  updatedAt: string;
   nodes: JourneyNode[];
   edges: JourneyEdge[];
   planInputs?: JourneyPlanInputs;

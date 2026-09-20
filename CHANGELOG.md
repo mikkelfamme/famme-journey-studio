@@ -1,3 +1,14 @@
+## 2.0.0-rc.12 — Template Studio, sharing & presentation
+
+- New custom templates start completely blank and are designed in a dedicated Template Editor.
+- Adds Edit and Preview actions for both system and custom templates.
+- Adds template metadata: semantic version, tags, author, created/updated timestamps.
+- Adds a Template Gallery, import preview and repository-level `/templates` contribution folder.
+- Adds portable single-journey `.jsjourney` export/import.
+- Adds SVG and PNG journey export plus fullscreen Presentation Mode with node-by-node navigation.
+- Extends the Command Palette into cross-workspace content search for nodes, tracking, creatives and URLs.
+- Adds visual stage guardrails for nodes placed outside their assigned funnel stage.
+
 ## 2.0.0-rc.11 — Journey Studio identity & portable templates
 
 - Renames the product to **Journey Studio by Famme** while the installed PWA/shortcut is simply **Journey Studio**.

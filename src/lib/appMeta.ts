@@ -1,11 +1,23 @@
 export const APP_NAME = 'Journey Studio by Famme';
 export const APP_SHORT_NAME = 'Journey Studio';
-export const APP_VERSION = '2.0.0-rc.11';
+export const APP_VERSION = '2.0.0-rc.12';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'BY FAMME';
 export const APP_RELEASE_DATE = '2026-09-20';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.12',
+    title: 'Template Studio, sharing & presentation',
+    items: [
+      'New custom templates start completely blank and open in a dedicated template editor.',
+      'System and custom templates can be previewed, edited, versioned, tagged, shared and imported individually.',
+      'Single journeys can be shared as .jsjourney files; read-only View can export SVG/PNG and run in fullscreen Presentation Mode.',
+      'Command Palette search now indexes journey nodes, tracking signals, creatives and URLs across the workspace.',
+      'Stage guardrails warn when a node is visually outside its assigned funnel stage.',
+      'The repository includes a community-ready /templates folder and documented portable template format.'
+    ]
+  },
   {
     version: '2.0.0-rc.11',
     title: 'Brand identity & portable templates',

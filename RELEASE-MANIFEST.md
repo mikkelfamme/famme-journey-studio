@@ -1,7 +1,7 @@
-# Release manifest — 2.0.0-rc.11
+# Release manifest — 2.0.0-rc.12
 
 ## Release goal
-Maintain the public GitHub Pages / installable PWA release with the Journey Studio by Famme identity and portable custom templates.
+Expand the public GitHub Pages / installable PWA release with editable blank templates, portable single journeys, presentation exports, workspace-wide search and stage guardrails.
 
 ## Included release surfaces
 - React/TypeScript application source

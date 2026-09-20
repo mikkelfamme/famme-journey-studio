@@ -1,0 +1,22 @@
+{
+  "schema": "journey-studio-template-v1",
+  "version": "1.0",
+  "exportedAt": "2026-09-20T00:00:00.000Z",
+  "product": "Journey Studio by Famme",
+  "template": {
+    "id": "community-example-empty",
+    "name": "Blank acquisition template",
+    "description": "An intentionally empty example showing the portable template format.",
+    "category": "Community",
+    "scope": "B2C",
+    "system": false,
+    "version": "1.0.0",
+    "tags": ["Blank", "Community"],
+    "author": "Journey Studio community",
+    "createdAt": "2026-09-20T00:00:00.000Z",
+    "updatedAt": "2026-09-20T00:00:00.000Z",
+    "nodes": [],
+    "edges": [],
+    "planInputs": {}
+  }
+}

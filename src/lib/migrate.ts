@@ -4,7 +4,7 @@ import { defaultMetricDictionary, ensureMetricDictionary } from './performance';
 const now = () => new Date().toISOString();
 
 function normalizeNodeData(data: JourneyNodeData): JourneyNodeData {
-  const { runtimePerformance: _runtimePerformance, runtimeActualCount: _runtimeActualCount, runtimeActions: _runtimeActions, ...persisted } = data as JourneyNodeData;
+  const { runtimePerformance: _runtimePerformance, runtimeActualCount: _runtimeActualCount, runtimeActions: _runtimeActions, runtimeStageMismatch: _runtimeStageMismatch, ...persisted } = data as JourneyNodeData;
   return {
     ...persisted,
     tracking: Array.isArray(data.tracking) ? data.tracking : [],
@@ -47,6 +47,11 @@ export function normalizeWorkspace(workspace: Workspace): Workspace {
     templates: Array.isArray(workspace.templates)
       ? workspace.templates.map(template => ({
           ...template,
+          version: template.version ?? '1.0.0',
+          tags: Array.isArray(template.tags) ? template.tags : [],
+          author: template.author ?? (template.system ? 'Journey Studio by Famme' : workspace.organization || 'Local author'),
+          createdAt: template.createdAt ?? workspace.createdAt ?? now(),
+          updatedAt: template.updatedAt ?? workspace.updatedAt ?? now(),
           nodes: (template.nodes ?? []).map(node => ({ ...node, data: normalizeNodeData(node.data) })),
           edges: template.edges ?? []
         }))
