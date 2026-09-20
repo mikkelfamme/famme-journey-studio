@@ -374,7 +374,7 @@ export function JourneyEditor({ journey, onClose }: { journey: Journey; onClose:
             nodes={flowNodes}
             edges={flowEdges}
             nodeTypes={nodeTypes}
-            onInit={instance => { setFlowInstance(instance); setCanvasViewport(instance.getViewport()); }}
+            onInit={instance => { setFlowInstance(instance as ReactFlowInstance<JourneyNode, JourneyEdge>); setCanvasViewport(instance.getViewport()); }}
             onMove={(_, viewport) => setCanvasViewport(viewport)}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
