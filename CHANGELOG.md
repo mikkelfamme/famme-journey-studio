@@ -1,3 +1,12 @@
+## 2.0.0-rc.12.6
+
+### Real Windows desktop shortcut helper
+- Replaces the browser app-manager guide with a real per-user Windows helper flow.
+- Adds a one-time `Install-Journey-Studio-Helper.vbs` installer that uses HKCU/LocalAppData only and requires no administrator rights or PowerShell.
+- Registers `journeystudio-helper://create-shortcut`, allowing Settings > Create desktop shortcut to call the helper directly.
+- The helper locates the installed Journey Studio PWA shortcut in the Windows Start menu, copies it to the desktop as `Journey Studio.lnk`, and applies the JS icon.
+- Includes a ZIP fallback for environments that block direct `.vbs` downloads.
+
 ## 2.0.0-rc.12.5
 
 ### Premium animated journey flow

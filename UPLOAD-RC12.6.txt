@@ -1,0 +1,13 @@
+Journey Studio by Famme 2.0.0-rc.12.6
+
+Upload the CONTENTS of this folder to the repository root and commit.
+Suggested commit message:
+Add real Windows desktop shortcut helper in RC12.6
+
+After GitHub Actions is green:
+1. Open the hosted app and update to RC12.6.
+2. Ensure Journey Studio is installed as a PWA/app.
+3. Open Settings > Create desktop shortcut.
+4. Download the Windows helper once and double-click it.
+5. Verify Journey Studio.lnk appears on the desktop with the JS icon.
+6. Delete that desktop shortcut and test Create shortcut now; the helper should recreate it.

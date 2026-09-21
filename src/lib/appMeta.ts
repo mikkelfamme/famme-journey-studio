@@ -1,11 +1,20 @@
 export const APP_NAME = 'Journey Studio by Famme';
 export const APP_SHORT_NAME = 'Journey Studio';
-export const APP_VERSION = '2.0.0-rc.12.5';
+export const APP_VERSION = '2.0.0-rc.12.6';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'BY FAMME';
 export const APP_RELEASE_DATE = '2026-09-21';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.12.6',
+    title: 'Real Windows desktop shortcut helper',
+    items: [
+      'Settings can call a per-user Windows helper that creates a real Journey Studio.lnk desktop shortcut instead of showing browser app-manager instructions.',
+      'The one-time helper installs under LocalAppData/HKCU, requires no administrator rights and does not use PowerShell.',
+      'The helper copies the already-installed PWA Start-menu shortcut, applies the JS icon and can recreate the desktop shortcut in one click.'
+    ]
+  },
   {
     version: '2.0.0-rc.12.5',
     title: 'Premium animated journey flow',

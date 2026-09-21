@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { CheckCircle2, Copy, Database, Download, ExternalLink, FileDown, FileUp, GraduationCap, Link2, MonitorDown, RotateCcw, ShieldCheck, Trash2, X } from 'lucide-react';
+import { CheckCircle2, Database, Download, FileDown, FileUp, GraduationCap, Link2, MonitorDown, RotateCcw, ShieldCheck, Trash2, X } from 'lucide-react';
 import { downloadActualPathMap, downloadPerformanceMap, downloadWorkspace, importPreview, parseStudioDataFile, type StudioImport, type StudioImportPreview } from '../../lib/files';
 import { clearRecoverySnapshots, listRecoverySnapshots, restoreRecoverySnapshot, type RecoverySnapshot } from '../../lib/db';
 import { ensureMetricDictionary } from '../../lib/performance';
@@ -8,7 +8,7 @@ import { useWorkspace } from '../../store/WorkspaceContext';
 import { useI18n } from '../../i18n';
 import { usePwaInstall } from '../../lib/usePwaInstall';
 import type { AppLanguage } from '../../types/domain';
-import { detectShortcutBrowser, type ShortcutBrowserProfile } from '../../lib/browserShortcut';
+import { isWindowsDesktop, launchWindowsShortcutHelper, WINDOWS_HELPER_INSTALLER, WINDOWS_HELPER_ZIP } from '../../lib/windowsHelper';
 
 interface PendingImport { imported: StudioImport; preview: StudioImportPreview }
 
@@ -19,11 +19,10 @@ export function SettingsView() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [pendingImport, setPendingImport] = useState<PendingImport | null>(null);
   const [shortcutOpen, setShortcutOpen] = useState(false);
-  const [shortcutCopied, setShortcutCopied] = useState<'browser' | 'windows' | null>(null);
-  const [shortcutBrowser, setShortcutBrowser] = useState<ShortcutBrowserProfile>({ id: 'other', name: 'Browser' });
+  const [helperLaunched, setHelperLaunched] = useState(false);
+  const windowsDesktop = isWindowsDesktop();
   const [recoveries, setRecoveries] = useState<RecoverySnapshot[]>([]);
   useEffect(() => { void listRecoverySnapshots().then(setRecoveries); }, [workspace?.updatedAt]);
-  useEffect(() => { void detectShortcutBrowser().then(setShortcutBrowser); }, []);
   if (!workspace) return null;
 
   async function readImport(file?: File) {
@@ -56,23 +55,18 @@ export function SettingsView() {
     setRecoveries([]);
   }
 
-  async function copyShortcutAddress(kind: 'browser' | 'windows') {
-    const value = kind === 'browser' ? shortcutBrowser.appsUrl : 'shell:AppsFolder';
-    if (!value) return;
-    try {
-      await navigator.clipboard.writeText(value);
-      setShortcutCopied(kind);
-      window.setTimeout(() => setShortcutCopied(null), 2500);
-    } catch {
-      window.prompt(t('settings.shortcutCopyFallback'), value);
-    }
+  function createDesktopShortcut() {
+    setHelperLaunched(true);
+    launchWindowsShortcutHelper();
+    window.setTimeout(() => setHelperLaunched(false), 7000);
   }
+
 
   return <section className="content-section settings-page">
     <div className="section-toolbar"><div><h2>{t('settings.title')}</h2><p>{t('settings.subtitle')}</p></div></div>
     <div className="settings-grid">
       <div className="settings-card"><h3>{t('settings.languageTitle')}</h3><p>{t('settings.languageText')}</p><label>{t('settings.language')}<select value={workspace.settings.language} onChange={e=>updateWorkspace(ws=>({...ws,settings:{...ws.settings,language:e.target.value as AppLanguage}}))}><option value="en">{t('settings.english')}</option><option value="da">{t('settings.danish')}</option></select></label></div>
-      <div className="settings-card install-settings-card"><h3>{t('settings.installTitle')}</h3><p>{t('settings.installText')}</p>{installed?<><div className="save-detail save-saved"><CheckCircle2 size={17}/><div><strong>{t('settings.installed')}</strong><span>{t('settings.installInstalledText')}</span></div></div><div className="stack-actions"><button className="button primary" onClick={()=>setShortcutOpen(true)}><Link2 size={16}/>{t('settings.shortcutButton')}</button></div></>:canInstall?<button className="button primary" onClick={()=>void install()}><MonitorDown size={16}/>{t('settings.installButton')}</button>:<div className="empty-mini">{t('settings.installUnavailable')}</div>}<p className="muted-small">{t('settings.installNote')}</p></div>
+      <div className="settings-card install-settings-card"><h3>{t('settings.installTitle')}</h3><p>{t('settings.installText')}</p>{installed?<><div className="save-detail save-saved"><CheckCircle2 size={17}/><div><strong>{t('settings.installed')}</strong><span>{t('settings.installInstalledText')}</span></div></div><div className="stack-actions"><button className="button primary" onClick={createDesktopShortcut}><Link2 size={16}/>{t('settings.shortcutButton')}</button><button className="button" onClick={()=>setShortcutOpen(true)}><Download size={16}/>{t('settings.helperSetupButton')}</button></div></>:canInstall?<button className="button primary" onClick={()=>void install()}><MonitorDown size={16}/>{t('settings.installButton')}</button>:<div className="empty-mini">{t('settings.installUnavailable')}</div>}<p className="muted-small">{t('settings.installNote')}</p></div>
       <div className="settings-card"><h3>{t('settings.workspace')}</h3><label>Name<input value={workspace.name} onChange={e=>updateWorkspace(ws=>({...ws,name:e.target.value}))}/></label><label>Organization<input value={workspace.organization} onChange={e=>updateWorkspace(ws=>({...ws,organization:e.target.value}))}/></label><label>Primary product<input value={workspace.product} onChange={e=>updateWorkspace(ws=>({...ws,product:e.target.value}))}/></label></div>
       <div className="settings-card"><h3>{t('settings.autosave')}</h3><div className={`save-detail save-${saveState}`}><ShieldCheck size={17}/><div><strong>{saveState === 'saving' ? 'Saving locally…' : saveState === 'error' ? 'Autosave error' : 'Local autosave active'}</strong><span>{saveError || (lastSavedAt ? `Last saved ${new Date(lastSavedAt).toLocaleString()}` : 'Changes are saved to IndexedDB in this browser.')}</span></div></div><button className="button" onClick={()=>void saveNow()}>{t('settings.saveNow')}</button></div>
       <div className="settings-card"><h3>{t('settings.editor')}</h3><label className="toggle-row"><span>{t('settings.showMinimap')}</span><input type="checkbox" checked={workspace.settings.showMiniMap} onChange={e=>updateWorkspace(ws=>({...ws,settings:{...ws.settings,showMiniMap:e.target.checked}}))}/></label><label className="toggle-row"><span>{t('settings.snapGrid')}</span><input type="checkbox" checked={workspace.settings.snapToGrid} onChange={e=>updateWorkspace(ws=>({...ws,settings:{...ws.settings,snapToGrid:e.target.checked}}))}/></label><label className="toggle-row"><span>{t('settings.keyboard')}</span><input type="checkbox" checked={workspace.settings.keyboardShortcuts} onChange={e=>updateWorkspace(ws=>({...ws,settings:{...ws.settings,keyboardShortcuts:e.target.checked}}))}/></label><label className="toggle-row"><span>{t('settings.performance')}</span><input type="checkbox" checked={workspace.settings.showPerformanceOverlay} onChange={e=>updateWorkspace(ws=>({...ws,settings:{...ws.settings,showPerformanceOverlay:e.target.checked}}))}/></label><label>Freshness threshold (hours)<input type="number" min={1} max={720} value={workspace.settings.freshnessThresholdHours} onChange={e=>updateWorkspace(ws=>({...ws,settings:{...ws.settings,freshnessThresholdHours:Math.max(1,Number(e.target.value)||48)}}))}/></label><p className="muted-small"><strong>Ctrl/⌘ K</strong> command palette · <strong>Ctrl/⌘ Z/Y</strong> undo/redo · <strong>Delete</strong> remove · <strong>?</strong> help</p></div>
@@ -84,6 +78,6 @@ export function SettingsView() {
       <div className="settings-card danger-zone"><h3>Local data</h3><p>Remove the active workspace from this browser. Recovery snapshots remain available until separately cleared.</p><button className="button danger" onClick={()=>{if(window.confirm('Remove local workspace?')) void resetWorkspace();}}><RotateCcw size={16}/> Clear local workspace</button></div>
     </div>
     {pendingImport&&<ImportPreviewDialog imported={pendingImport.imported} preview={pendingImport.preview} onCancel={()=>setPendingImport(null)} onConfirm={applyImport}/>}
-    {shortcutOpen&&<div className="modal-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setShortcutOpen(false);}}><section className="modal-card shortcut-modal" role="dialog" aria-modal="true"><div className="modal-header"><div className="modal-icon"><Link2 size={20}/></div><div><h2>{t('settings.shortcutTitle')}</h2><p>{t('settings.shortcutText')}</p></div><button className="icon-button" onClick={()=>setShortcutOpen(false)} aria-label="Close"><X size={16}/></button></div><div className="browser-detected"><strong>{t('settings.shortcutDetected')}</strong><span>{shortcutBrowser.name}</span>{shortcutBrowser.appsUrl&&<code>{shortcutBrowser.appsUrl}</code>}</div>{shortcutBrowser.appsUrl?<><div className="shortcut-steps"><div><strong>1</strong><span>{t('settings.shortcutStep1')}</span></div><div><strong>2</strong><span>{t('settings.shortcutStep2')}</span></div><div><strong>3</strong><span>{t('settings.shortcutStep3')}</span></div></div><div className="modal-actions"><button className="button primary" onClick={()=>void copyShortcutAddress('browser')}><Copy size={15}/>{shortcutCopied==='browser'?t('settings.shortcutCopied'):`${t('settings.shortcutCopy')} ${shortcutBrowser.appsUrl}`}</button></div></>:<div className="shortcut-steps"><div><strong>1</strong><span>{t('settings.shortcutGeneric1')}</span></div><div><strong>2</strong><span>{t('settings.shortcutGeneric2')}</span></div><div><strong>3</strong><span>{t('settings.shortcutGeneric3')}</span></div></div>}<div className="warning-callout"><ExternalLink size={17}/><div><strong>{t('settings.shortcutWindows')}</strong><span>{t('settings.shortcutWindowsText')}</span></div></div><div className="modal-actions"><button className="button" onClick={()=>void copyShortcutAddress('windows')}><Copy size={15}/>{shortcutCopied==='windows'?t('settings.shortcutCopied'):t('settings.shortcutCopyWindows')}</button></div></section></div>}
+    {shortcutOpen&&<div className="modal-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setShortcutOpen(false);}}><section className="modal-card shortcut-modal" role="dialog" aria-modal="true"><div className="modal-header"><div className="modal-icon"><Link2 size={20}/></div><div><h2>{t('settings.shortcutTitle')}</h2><p>{t('settings.shortcutText')}</p></div><button className="icon-button" onClick={()=>setShortcutOpen(false)} aria-label="Close"><X size={16}/></button></div>{windowsDesktop?<><div className="save-detail save-saved helper-trust"><ShieldCheck size={17}/><div><strong>{t('settings.helperNoAdmin')}</strong><span>{t('settings.helperNoAdminText')}</span></div></div><div className="shortcut-steps"><div><strong>1</strong><span>{t('settings.helperStep1')}</span></div><div><strong>2</strong><span>{t('settings.helperStep2')}</span></div><div><strong>3</strong><span>{t('settings.helperStep3')}</span></div></div><div className="modal-actions helper-actions"><a className="button" href={WINDOWS_HELPER_INSTALLER} download><Download size={15}/>{t('settings.helperDownload')}</a><a className="button ghost-button" href={WINDOWS_HELPER_ZIP} download>{t('settings.helperDownloadZip')}</a><button className="button primary" onClick={createDesktopShortcut}><Link2 size={15}/>{t('settings.helperCreateNow')}</button></div>{helperLaunched&&<div className="helper-launch-status"><CheckCircle2 size={16}/><span>{t('settings.helperLaunchStatus')}</span></div>}<p className="muted-small helper-note">{t('settings.helperNote')}</p></>:<div className="empty-mini">{t('settings.helperWindowsOnly')}</div>}</section></div>}
   </section>;
 }
