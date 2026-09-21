@@ -1,10 +1,10 @@
-## 2.0.0-rc.12.2 — Blank first journeys & desktop shortcut helper
 
-- New journey creation starts with zero nodes and zero connections by default.
-- The journey template picker defaults to a Blank journey option while existing templates remain selectable.
-- Settings exposes PWA installation and a Windows desktop shortcut helper.
-- Chromium can save `Journey Studio.url` directly to a user-selected Desktop folder; other browsers download the shortcut file.
+## 2.0.0-rc.12.2
 
+- Re-established Journey Studio as a fresh PWA identity to avoid stale F-branded Windows app shortcuts.
+- Versioned JS icon assets and a new manifest filename prevent old Chromium icon caches from being reused.
+- Added App installation guidance and a real PWA install action in Settings.
+- Clarified that downloaded `.url` / `.download` files are Internet Shortcuts, not Journey Studio installations.
 ## 2.0.0-rc.12.1 — Blank templates & JS shortcut icon
 
 - All new custom templates start completely empty: 0 nodes and 0 connections.

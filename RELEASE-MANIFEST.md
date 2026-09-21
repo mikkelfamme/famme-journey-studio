@@ -1,7 +1,7 @@
-# Release manifest — 2.0.0-rc.12
+# Release manifest — 2.0.0-rc.12.2
 
 ## Release goal
-Expand the public GitHub Pages / installable PWA release with editable blank templates, portable single journeys, presentation exports, workspace-wide search and stage guardrails.
+Correct the Windows/PWA application identity so Journey Studio installs with the JS icon and real app shortcut semantics instead of stale F-branded or Internet Shortcut behavior.
 
 ## Included release surfaces
 - React/TypeScript application source

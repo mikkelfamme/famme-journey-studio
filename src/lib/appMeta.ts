@@ -8,11 +8,11 @@ export const APP_RELEASE_DATE = '2026-09-20';
 export const APP_RELEASE_NOTES = [
   {
     version: '2.0.0-rc.12.2',
-    title: 'Blank first journeys & desktop shortcut helper',
+    title: 'PWA identity & install flow',
     items: [
-      'New journey now opens completely blank with zero nodes and zero connections by default.',
-      'The journey template picker defaults to Blank journey while existing reusable templates remain available by choice.',
-      'Settings now includes install and desktop-shortcut controls; Chromium can save a Journey Studio.url shortcut directly to a user-selected Desktop folder.'
+      'Journey Studio now uses a new stable PWA identity and a new manifest filename so Windows and Chromium do not reuse the original F app identity.',
+      'All install icons use new versioned JS asset URLs.',
+      'Settings now explains and launches the real PWA install flow instead of relying on downloaded Internet Shortcut files.'
     ]
   },
   {

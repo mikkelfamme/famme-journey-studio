@@ -7,9 +7,10 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'prompt',
-      includeAssets: ['journey-studio-js.svg', 'journey-studio-js-192.png', 'journey-studio-js-512.png', 'journey-studio-js-maskable-512.png'],
+      manifestFilename: 'journey-studio-v2.webmanifest',
+      includeAssets: ['journey-studio-app-v2.svg', 'journey-studio-app-v2-192.png', 'journey-studio-app-v2-512.png', 'journey-studio-app-v2-maskable-512.png', 'journey-studio-app-v2.ico'],
       manifest: {
-        id: './',
+        id: './?app=journey-studio',
         name: 'Journey Studio',
         short_name: 'Journey Studio',
         description: 'Visual customer journey architecture, tracking and performance mapping.',
@@ -19,10 +20,10 @@ export default defineConfig({
         scope: './',
         start_url: './',
         icons: [
-          { src: 'journey-studio-js-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
-          { src: 'journey-studio-js-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-          { src: 'journey-studio-js-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
-          { src: 'journey-studio-js.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' }
+          { src: 'journey-studio-app-v2-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'journey-studio-app-v2-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: 'journey-studio-app-v2-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: 'journey-studio-app-v2.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' }
         ]
       },
       workbox: {
