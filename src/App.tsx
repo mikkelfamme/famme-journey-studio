@@ -20,7 +20,7 @@ import { ImportPreviewDialog } from './components/ImportPreviewDialog';
 import { UpdateToast } from './components/UpdateToast';
 import { useWorkspace } from './store/WorkspaceContext';
 import { downloadWorkspace, importPreview, parseStudioDataFile, type StudioImport, type StudioImportPreview } from './lib/files';
-import { createBlankJourney } from './lib/workspace';
+import { journeyFromTemplate } from './lib/workspace';
 import { ensureMetricDictionary } from './lib/performance';
 import type { Journey, JourneyTemplate } from './types/domain';
 import { useI18n } from './i18n';
@@ -72,9 +72,11 @@ export default function App() {
 
   function newJourney() {
     if (!workspace) return;
-    const name = window.prompt(t('journeys.namePrompt'), t('journeys.blankName'));
+    const template = workspace.templates[0];
+    if (!template) return;
+    const name = window.prompt('Journey name', 'New customer journey');
     if (!name) return;
-    const journey = createBlankJourney({ name, scope: workspace.scope, organization: workspace.organization });
+    const journey = journeyFromTemplate(template, name, workspace.organization);
     updateWorkspace(ws => ({ ...ws, journeys: [...ws.journeys, journey] }));
     setOpenJourney({ journey, mode: 'edit' });
   }
@@ -140,5 +142,5 @@ export default function App() {
   }
 
   const titleMap: Record<AppView,string> = { journeys:t('nav.journeys'), master:t('nav.master'), insights:t('nav.insights'), templates:t('nav.templates'), components:t('nav.components'), share:t('nav.share'), settings:t('nav.settings'), about:t('nav.about') };
-  return <div className="app-shell"><Sidebar view={view} onView={setView}/><main className="main-shell"><Topbar title={titleMap[view]} subtitle={`${workspace.organization} · ${workspace.name}`} onNew={view==='journeys'?newJourney:undefined} onExport={()=>downloadWorkspace(workspace)} onImport={()=>inputRef.current?.click()} onCommand={()=>setCommandOpen(true)} onHelp={()=>setHelpOpen(value=>!value)} saveState={saveState} lastSavedAt={lastSavedAt} saveError={saveError}/><div className="main-content">{view==='journeys'&&<JourneysView onEdit={journey=>setOpenJourney({ journey, mode:'edit' })} onView={journey=>setOpenJourney({ journey, mode:'view' })}/>} {view==='master'&&<MasterView/>} {view==='insights'&&<InsightsView/>} {view==='templates'&&<TemplatesView onOpen={journey=>setOpenJourney({ journey, mode:'edit' })} onEditTemplate={template=>setOpenTemplate(template)}/>} {view==='components'&&<ComponentsView/>} {view==='share'&&<ShareView/>} {view==='settings'&&<SettingsView/>} {view==='about'&&<AboutView/>}</div></main><WelcomeTour/><HelpDrawer view={view} open={helpOpen} onClose={()=>setHelpOpen(false)}/><UpdateToast/>{overlays}</div>;
+  return <div className="app-shell"><Sidebar view={view} onView={setView}/><main className="main-shell"><Topbar title={titleMap[view]} subtitle={`${workspace.organization} · ${workspace.name}`} onNew={view==='journeys'?newJourney:undefined} onExport={()=>downloadWorkspace(workspace)} onImport={()=>inputRef.current?.click()} onCommand={()=>setCommandOpen(true)} onHelp={()=>setHelpOpen(value=>!value)} saveState={saveState} lastSavedAt={lastSavedAt} saveError={saveError}/><div className="main-content">{view==='journeys'&&<JourneysView onEdit={journey=>setOpenJourney({ journey, mode:'edit' })} onView={journey=>setOpenJourney({ journey, mode:'view' })}/>} {view==='master'&&<MasterView/>} {view==='insights'&&<InsightsView onImport={()=>inputRef.current?.click()}/>} {view==='templates'&&<TemplatesView onOpen={journey=>setOpenJourney({ journey, mode:'edit' })} onEditTemplate={template=>setOpenTemplate(template)}/>} {view==='components'&&<ComponentsView/>} {view==='share'&&<ShareView/>} {view==='settings'&&<SettingsView/>} {view==='about'&&<AboutView/>}</div></main><WelcomeTour/><HelpDrawer view={view} open={helpOpen} onClose={()=>setHelpOpen(false)}/><UpdateToast/>{overlays}</div>;
 }

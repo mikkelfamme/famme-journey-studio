@@ -67,12 +67,25 @@ A label-only step is valid and deliberately represents observed behavior that ha
 
 ## Mapping exports
 
-Settings can export:
+Settings and Insights & Data can export:
 
 - `famme-journey-performance-map-v1`
 - `famme-journey-actual-path-map-v1`
 
 These are read-only mapping manifests for external data preparation. They are not imported back as snapshots.
+
+
+## Local-first data connection workflow (RC12.10+)
+
+Journey Studio does not maintain a live backend connection to analytics or CRM systems. The intended workflow is:
+
+1. Export the performance map and/or actual-path map to obtain stable `journeyId` and `nodeId` values.
+2. Use those IDs in an external analytics process such as BigQuery, a script, a BI pipeline or another connector layer.
+3. Map source measurements to journey nodes and mark each mapping as `direct`, `proxy` or `unmapped`.
+4. Produce a `famme-journey-performance-v1` and/or `famme-journey-actual-paths-v1` snapshot.
+5. Import the snapshot through **Import Data**. Journey Studio previews the file before storing it locally.
+
+Typical external sources may include GA4, Google Ads, Meta, a ticket shop, CRM/booking data or warehouse tables. The source-system integration happens outside Journey Studio; Journey Studio receives the prepared snapshot.
 
 ## Portable single journey — `.jsjourney`
 

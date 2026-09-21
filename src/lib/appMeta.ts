@@ -1,11 +1,21 @@
 export const APP_NAME = 'Journey Studio by Famme';
 export const APP_SHORT_NAME = 'Journey Studio';
-export const APP_VERSION = '2.0.0-rc.12.9';
+export const APP_VERSION = '2.0.0-rc.12.10';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'BY FAMME';
 export const APP_RELEASE_DATE = '2026-09-21';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.12.10',
+    title: 'Master governance details & Insights data onboarding',
+    items: [
+      'Master View now explains HEALTH, TODO, HANDOFF and % MAPPED and makes every journey badge clickable for detailed findings.',
+      'Health details show the exact validation finding and affected component; TODO, handoff and mapping dialogs expose their underlying records.',
+      'Insights & Data now explains the local-first data model, export-map → external mapping → snapshot import workflow, and the purpose of each Insights tab.',
+      'Performance-map and actual-path-map exports plus Import Data are available directly from Insights & Data.'
+    ]
+  },
   {
     version: '2.0.0-rc.12.9',
     title: 'Readable node background colors',

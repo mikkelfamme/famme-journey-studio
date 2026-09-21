@@ -1,0 +1,7 @@
+Journey Studio by Famme 2.0.0-rc.12.10
+
+Upload the CONTENTS of the RC12.10 Update Pack into the repository root and commit.
+Suggested commit:
+Improve Master View and Insights data guidance in RC12.10
+
+Wait for the GitHub Actions workflow "Deploy PWA to GitHub Pages" to turn green before testing the live PWA.

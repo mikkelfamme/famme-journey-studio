@@ -1,3 +1,11 @@
+## 2.0.0-rc.12.10 — Master governance details & Insights data onboarding
+
+- Master View now explains HEALTH, TODO, HANDOFF and % MAPPED as governance indicators rather than unexplained badges.
+- Each Master View badge is clickable and opens its underlying findings, tasks, handoffs or mapping details.
+- Insights & Data now explains the local-first data flow from exported stable IDs through external mapping to imported snapshots.
+- Performance-map, actual-path-map and Import Data actions are available directly from Insights & Data.
+- No workspace or portable-file schema changes.
+
 ## 2.0.0-rc.12.9 — Readable node background colors
 - Added per-node background color selection: white, green, yellow, red, blue and gray.
 - Added soft, high-contrast tint styling so node text, icons, stage pills and badges remain readable.
