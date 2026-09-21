@@ -1,9 +1,5 @@
-# Journey Studio RC12.3 update
+# Journey Studio RC12.4 update
 
-Upload the contents of this folder to the root of the existing GitHub repository.
+Upload the contents of this folder to the root of the existing GitHub repository and commit to `main`.
 
-Changes:
-- Restores **Create desktop shortcut** in Settings when Journey Studio is installed as a PWA.
-- The button no longer downloads a fake `.url` / `.download` Internet Shortcut.
-- It opens the Edge installed-app management flow and copies `edge://apps` as a fallback.
-- English and Danish UI strings are included.
+This update makes Settings → Create desktop shortcut browser-aware. It detects Chrome, Edge, Brave, Opera, Vivaldi/Chromium where possible and provides a universal Windows `shell:AppsFolder` fallback. It never creates `.url` or `.download` Internet Shortcut files.

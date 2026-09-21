@@ -8,6 +8,7 @@ import { useWorkspace } from '../../store/WorkspaceContext';
 import { useI18n } from '../../i18n';
 import { usePwaInstall } from '../../lib/usePwaInstall';
 import type { AppLanguage } from '../../types/domain';
+import { detectShortcutBrowser, type ShortcutBrowserProfile } from '../../lib/browserShortcut';
 
 interface PendingImport { imported: StudioImport; preview: StudioImportPreview }
 
@@ -18,9 +19,11 @@ export function SettingsView() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [pendingImport, setPendingImport] = useState<PendingImport | null>(null);
   const [shortcutOpen, setShortcutOpen] = useState(false);
-  const [shortcutCopied, setShortcutCopied] = useState(false);
+  const [shortcutCopied, setShortcutCopied] = useState<'browser' | 'windows' | null>(null);
+  const [shortcutBrowser, setShortcutBrowser] = useState<ShortcutBrowserProfile>({ id: 'other', name: 'Browser' });
   const [recoveries, setRecoveries] = useState<RecoverySnapshot[]>([]);
   useEffect(() => { void listRecoverySnapshots().then(setRecoveries); }, [workspace?.updatedAt]);
+  useEffect(() => { void detectShortcutBrowser().then(setShortcutBrowser); }, []);
   if (!workspace) return null;
 
   async function readImport(file?: File) {
@@ -53,22 +56,15 @@ export function SettingsView() {
     setRecoveries([]);
   }
 
-  async function copyEdgeApps() {
+  async function copyShortcutAddress(kind: 'browser' | 'windows') {
+    const value = kind === 'browser' ? shortcutBrowser.appsUrl : 'shell:AppsFolder';
+    if (!value) return;
     try {
-      await navigator.clipboard.writeText('edge://apps');
-      setShortcutCopied(true);
-      window.setTimeout(() => setShortcutCopied(false), 2500);
+      await navigator.clipboard.writeText(value);
+      setShortcutCopied(kind);
+      window.setTimeout(() => setShortcutCopied(null), 2500);
     } catch {
-      window.prompt(t('settings.shortcutCopyFallback'), 'edge://apps');
-    }
-  }
-
-  async function openShortcutManager() {
-    await copyEdgeApps();
-    try {
-      window.open('microsoft-edge:edge://apps', '_blank', 'noopener,noreferrer');
-    } catch {
-      // The modal stays open with the copied edge://apps fallback.
+      window.prompt(t('settings.shortcutCopyFallback'), value);
     }
   }
 
@@ -88,6 +84,6 @@ export function SettingsView() {
       <div className="settings-card danger-zone"><h3>Local data</h3><p>Remove the active workspace from this browser. Recovery snapshots remain available until separately cleared.</p><button className="button danger" onClick={()=>{if(window.confirm('Remove local workspace?')) void resetWorkspace();}}><RotateCcw size={16}/> Clear local workspace</button></div>
     </div>
     {pendingImport&&<ImportPreviewDialog imported={pendingImport.imported} preview={pendingImport.preview} onCancel={()=>setPendingImport(null)} onConfirm={applyImport}/>}
-    {shortcutOpen&&<div className="modal-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setShortcutOpen(false);}}><section className="modal-card shortcut-modal" role="dialog" aria-modal="true"><div className="modal-header"><div className="modal-icon"><Link2 size={20}/></div><div><h2>{t('settings.shortcutTitle')}</h2><p>{t('settings.shortcutText')}</p></div><button className="icon-button" onClick={()=>setShortcutOpen(false)} aria-label="Close"><X size={16}/></button></div><div className="shortcut-steps"><div><strong>1</strong><span>{t('settings.shortcutStep1')}</span></div><div><strong>2</strong><span>{t('settings.shortcutStep2')}</span></div><div><strong>3</strong><span>{t('settings.shortcutStep3')}</span></div></div><div className="warning-callout"><ExternalLink size={17}/><div><strong>{t('settings.shortcutWhy')}</strong><span>{t('settings.shortcutWhyText')}</span></div></div><div className="modal-actions"><button className="button" onClick={()=>void copyEdgeApps()}><Copy size={15}/>{shortcutCopied?t('settings.shortcutCopied'):t('settings.shortcutCopy')}</button><button className="button primary" onClick={()=>void openShortcutManager()}><ExternalLink size={15}/>{t('settings.shortcutOpen')}</button></div></section></div>}
+    {shortcutOpen&&<div className="modal-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setShortcutOpen(false);}}><section className="modal-card shortcut-modal" role="dialog" aria-modal="true"><div className="modal-header"><div className="modal-icon"><Link2 size={20}/></div><div><h2>{t('settings.shortcutTitle')}</h2><p>{t('settings.shortcutText')}</p></div><button className="icon-button" onClick={()=>setShortcutOpen(false)} aria-label="Close"><X size={16}/></button></div><div className="browser-detected"><strong>{t('settings.shortcutDetected')}</strong><span>{shortcutBrowser.name}</span>{shortcutBrowser.appsUrl&&<code>{shortcutBrowser.appsUrl}</code>}</div>{shortcutBrowser.appsUrl?<><div className="shortcut-steps"><div><strong>1</strong><span>{t('settings.shortcutStep1')}</span></div><div><strong>2</strong><span>{t('settings.shortcutStep2')}</span></div><div><strong>3</strong><span>{t('settings.shortcutStep3')}</span></div></div><div className="modal-actions"><button className="button primary" onClick={()=>void copyShortcutAddress('browser')}><Copy size={15}/>{shortcutCopied==='browser'?t('settings.shortcutCopied'):`${t('settings.shortcutCopy')} ${shortcutBrowser.appsUrl}`}</button></div></>:<div className="shortcut-steps"><div><strong>1</strong><span>{t('settings.shortcutGeneric1')}</span></div><div><strong>2</strong><span>{t('settings.shortcutGeneric2')}</span></div><div><strong>3</strong><span>{t('settings.shortcutGeneric3')}</span></div></div>}<div className="warning-callout"><ExternalLink size={17}/><div><strong>{t('settings.shortcutWindows')}</strong><span>{t('settings.shortcutWindowsText')}</span></div></div><div className="modal-actions"><button className="button" onClick={()=>void copyShortcutAddress('windows')}><Copy size={15}/>{shortcutCopied==='windows'?t('settings.shortcutCopied'):t('settings.shortcutCopyWindows')}</button></div></section></div>}
   </section>;
 }

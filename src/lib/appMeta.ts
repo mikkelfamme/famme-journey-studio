@@ -1,11 +1,20 @@
 export const APP_NAME = 'Journey Studio by Famme';
 export const APP_SHORT_NAME = 'Journey Studio';
-export const APP_VERSION = '2.0.0-rc.12.3';
+export const APP_VERSION = '2.0.0-rc.12.4';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'BY FAMME';
 export const APP_RELEASE_DATE = '2026-09-21';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.12.4',
+    title: 'Browser-aware desktop shortcuts',
+    items: [
+      'Create desktop shortcut now detects Chrome, Edge, Brave, Opera, Vivaldi and other browsers instead of assuming Edge.',
+      'The shortcut guide copies the matching browser app-manager address and also provides a browser-independent Windows Apps fallback.',
+      'No .url or .download Internet Shortcut files are generated.'
+    ]
+  },
   {
     version: '2.0.0-rc.12.3',
     title: 'Desktop shortcut flow',

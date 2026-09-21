@@ -1,3 +1,10 @@
+## 2.0.0-rc.12.4
+
+- Desktop shortcut flow is browser-aware instead of Edge-specific.
+- Detects Chrome, Edge, Brave, Opera, Vivaldi, Chromium and generic browser fallbacks.
+- Adds a universal Windows `shell:AppsFolder` fallback independent of browser choice.
+- Removes the Edge-only launch action and never downloads fake Internet Shortcut files.
+
 
 ## 2.0.0-rc.12.2
 
