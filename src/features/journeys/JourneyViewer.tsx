@@ -34,13 +34,15 @@ export function JourneyViewer({ journey, initialSelectedId, onClose, onEdit }: {
       ...edge,
       selectable: false,
       focusable: false,
+      animated: true,
       label,
-      markerEnd: { type: MarkerType.ArrowClosed, width: 18, height: 18, color: '#7f8b98' },
-      style: { ...(edge.style ?? {}), stroke: '#7f8b98', strokeWidth: 1.7 },
-      labelStyle: { fill: '#5f6b78', fontSize: 10, fontWeight: 700 },
-      labelBgStyle: { fill: '#ffffff', fillOpacity: 0.94, stroke: '#dfe5ea', strokeWidth: 1 },
+      className: [edge.className, 'fjs-flow-edge'].filter(Boolean).join(' '),
+      markerEnd: { type: MarkerType.ArrowClosed, width: 20, height: 20, color: '#687889' },
+      style: { ...(edge.style ?? {}), stroke: '#718194', strokeWidth: 1.9 },
+      labelStyle: { fill: '#435160', fontSize: 10, fontWeight: 750 },
+      labelBgStyle: { fill: '#ffffff', fillOpacity: 0.96, stroke: '#d6dde5', strokeWidth: 1 },
       labelBgPadding: [6, 4] as [number, number],
-      labelBgBorderRadius: 7
+      labelBgBorderRadius: 8
     };
   }), [journey.edges]);
   const onNodeClick: NodeMouseHandler<JourneyNode> = (_, node) => setSelectedId(node.id);

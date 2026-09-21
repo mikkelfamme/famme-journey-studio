@@ -231,3 +231,60 @@ input,select,textarea{border-color:#d8dee7;border-radius:10px;background:#fff;mi
 .presentation-mode .viewer-topbar-left .icon-button{display:none}.presentation-mode .viewer-topbar{left:50%;right:auto;transform:translateX(-50%);width:min(920px,calc(100vw - 36px));padding:8px 10px}.presentation-mode .viewer-topbar .editor-title span{display:none}.presentation-mode .viewer-topbar-actions{margin-left:auto}.presentation-progress{min-width:42px;text-align:center;font-size:9px;font-weight:800;color:#65717e}.presentation-hint{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:45;padding:7px 11px;border:1px solid rgba(215,222,230,.9);background:rgba(255,255,255,.94);border-radius:999px;box-shadow:0 8px 22px rgba(17,24,39,.08);font-size:8px;color:#6d7885;backdrop-filter:blur(10px)}
 .shortcut-modal{width:min(560px,100%)}.shortcut-steps{display:grid;gap:8px;margin:18px 0}.shortcut-steps>div{display:grid;grid-template-columns:28px minmax(0,1fr);gap:9px;align-items:start;padding:9px 10px;border:1px solid #e3e7ec;background:#fafbfc;border-radius:10px}.shortcut-steps strong{width:24px;height:24px;border-radius:7px;background:#eef1f5;display:grid;place-items:center;font-size:9px;color:#46515e}.shortcut-steps span{font-size:10px;line-height:1.5;color:#53606e;padding-top:4px}
 .browser-detected{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:center;margin:16px 0 4px;padding:10px 12px;border:1px solid #dfe4ea;background:#f8fafc;border-radius:10px}.browser-detected strong{font-size:8px;text-transform:uppercase;letter-spacing:.06em;color:#74808d}.browser-detected span{font-size:10px;font-weight:650;color:#27313c}.browser-detected code{grid-column:1/-1;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:9px;color:#4051b5;background:#eef1ff;border-radius:6px;padding:5px 7px;overflow-wrap:anywhere}
+
+
+/* RC12.5 — premium animated journey connections */
+@keyframes fjs-edge-flow {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -36; }
+}
+.react-flow__edge.fjs-flow-edge .react-flow__edge-path {
+  stroke: #718194 !important;
+  stroke-width: 1.9 !important;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 7 9;
+  animation: fjs-edge-flow 1.35s linear infinite !important;
+  filter: drop-shadow(0 1px 1px rgba(38, 53, 68, .12));
+  transition: stroke .16s ease, stroke-width .16s ease, opacity .16s ease, filter .16s ease;
+}
+.react-flow__edge.fjs-flow-edge:hover .react-flow__edge-path,
+.react-flow__edge.fjs-flow-edge.selected .react-flow__edge-path {
+  stroke: #5368d6 !important;
+  stroke-width: 2.55 !important;
+  filter: drop-shadow(0 1px 2px rgba(70, 88, 190, .24));
+  animation-duration: .95s !important;
+}
+.react-flow__edge.fjs-flow-edge.path-active .react-flow__edge-path {
+  stroke: #5368d6 !important;
+  stroke-width: 2.45 !important;
+  animation-duration: 1s !important;
+  filter: drop-shadow(0 1px 2px rgba(70, 88, 190, .2));
+}
+.react-flow__edge.fjs-flow-edge.path-muted .react-flow__edge-path {
+  opacity: .26;
+  animation-play-state: paused !important;
+  filter: none;
+}
+.react-flow__edge.fjs-flow-edge .react-flow__edge-text {
+  fill: #435160 !important;
+  font-size: 10px !important;
+  font-weight: 750 !important;
+}
+.react-flow__edge.fjs-flow-edge .react-flow__edge-textbg {
+  fill: rgba(255,255,255,.97) !important;
+  stroke: #d6dde5 !important;
+  stroke-width: 1 !important;
+  filter: drop-shadow(0 1px 2px rgba(28,39,54,.08));
+}
+.viewer-screen .react-flow__edge.fjs-flow-edge .react-flow__edge-path {
+  stroke: #687889 !important;
+  stroke-width: 2.05 !important;
+}
+.presentation-mode .react-flow__edge.fjs-flow-edge .react-flow__edge-path {
+  stroke-width: 2.2 !important;
+  animation-duration: 1.15s !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .react-flow__edge.fjs-flow-edge .react-flow__edge-path { animation: none !important; }
+}

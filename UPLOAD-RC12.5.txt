@@ -1,0 +1,4 @@
+Journey Studio RC12.5
+
+Upload the contents of this update pack to the repository root, preserving folders, then commit the changes.
+Suggested commit: Restore premium animated journey connections in RC12.5

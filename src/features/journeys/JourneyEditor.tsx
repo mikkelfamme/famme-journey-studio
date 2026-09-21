@@ -3,6 +3,7 @@ import {
   Background,
   Controls,
   MiniMap,
+  MarkerType,
   ReactFlow,
   addEdge,
   applyEdgeChanges,
@@ -335,10 +336,22 @@ export function JourneyEditor({ journey, initialNodeId, onClose }: { journey: Jo
     return { ...node, className: [node.className, pathClass].filter(Boolean).join(' '), data };
   }), [draft.nodes, draft.id, showPerformance, workspace, activeSnapshot, actualSnapshot, actualPaths, inspectorMode, activePath]);
 
-  const flowEdges = useMemo(() => draft.edges.map(edge => ({
-    ...edge,
-    className: activePath ? (activePath.activeEdges.has(edge.id) ? 'path-active' : 'path-muted') : edge.className
-  })), [draft.edges, activePath]);
+  const flowEdges = useMemo(() => draft.edges.map(edge => {
+    const label = edge.data?.label || edge.data?.signal || edge.data?.condition || undefined;
+    const pathClass = activePath ? (activePath.activeEdges.has(edge.id) ? 'path-active' : 'path-muted') : '';
+    return {
+      ...edge,
+      animated: true,
+      label,
+      className: [edge.className, 'fjs-flow-edge', pathClass].filter(Boolean).join(' '),
+      markerEnd: { type: MarkerType.ArrowClosed, width: 20, height: 20, color: '#687889' },
+      style: { ...(edge.style ?? {}), stroke: '#718194', strokeWidth: 1.9 },
+      labelStyle: { fill: '#435160', fontSize: 10, fontWeight: 750 },
+      labelBgStyle: { fill: '#ffffff', fillOpacity: 0.96, stroke: '#d6dde5', strokeWidth: 1 },
+      labelBgPadding: [6, 4] as [number, number],
+      labelBgBorderRadius: 8
+    };
+  }), [draft.edges, activePath]);
 
   function selectHealthNode(nodeId: string) {
     setSelectedIds([nodeId]);

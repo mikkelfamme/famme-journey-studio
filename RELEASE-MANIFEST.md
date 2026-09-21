@@ -1,4 +1,4 @@
-# Release manifest — 2.0.0-rc.12.4
+# Release manifest — 2.0.0-rc.12.5
 
 ## Release goal
 Make the desktop-shortcut flow browser-aware instead of Edge-specific while preserving the real installed PWA identity.

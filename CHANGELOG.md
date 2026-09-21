@@ -1,3 +1,11 @@
+## 2.0.0-rc.12.5
+
+### Premium animated journey flow
+- Restored subtle directional animation to journey connections in Editor, Template Editor and View mode.
+- Increased line and arrowhead contrast so the journey path remains readable across stage backgrounds.
+- Added stronger hover, selected and active-path states plus clearer edge labels.
+- Respects the operating system reduced-motion preference.
+
 ## 2.0.0-rc.12.4
 
 - Desktop shortcut flow is browser-aware instead of Edge-specific.
