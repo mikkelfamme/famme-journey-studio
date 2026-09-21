@@ -1,11 +1,20 @@
 export const APP_NAME = 'Journey Studio by Famme';
 export const APP_SHORT_NAME = 'Journey Studio';
-export const APP_VERSION = '2.0.0-rc.12.2';
+export const APP_VERSION = '2.0.0-rc.12.3';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'BY FAMME';
-export const APP_RELEASE_DATE = '2026-09-20';
+export const APP_RELEASE_DATE = '2026-09-21';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.12.3',
+    title: 'Desktop shortcut flow',
+    items: [
+      'Settings restores an explicit Create desktop shortcut action for installed Journey Studio PWAs.',
+      'The shortcut action routes users to the Edge installed-app manager instead of downloading a fake Internet Shortcut file.',
+      'The flow copies edge://apps as a fallback and explains the exact Windows shortcut steps.'
+    ]
+  },
   {
     version: '2.0.0-rc.12.2',
     title: 'PWA identity & install flow',

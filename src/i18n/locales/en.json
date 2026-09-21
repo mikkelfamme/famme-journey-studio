@@ -294,5 +294,17 @@
   "settings.installed": "Journey Studio is installed",
   "settings.installInstalledText": "The app is running with the installed PWA identity.",
   "settings.installUnavailable": "The browser install prompt is not currently available. Open Journey Studio in Edge or Chrome and use the browser Install app command.",
-  "settings.installNote": "Desktop/Start-menu shortcuts are created by the browser during PWA installation. Journey Studio does not download a Windows Internet Shortcut. If you want a real desktop shortcut later, open Windows Apps with Win+R → shell:AppsFolder and drag Journey Studio to the desktop."
+  "settings.installNote": "Desktop/Start-menu shortcuts are created by the browser during PWA installation. Journey Studio does not download a Windows Internet Shortcut. If you want a real desktop shortcut later, open Windows Apps with Win+R → shell:AppsFolder and drag Journey Studio to the desktop.",
+  "settings.shortcutButton": "Create desktop shortcut",
+  "settings.shortcutTitle": "Create desktop shortcut",
+  "settings.shortcutText": "Journey Studio cannot silently write a Windows .lnk file from the web sandbox. This button opens the correct Edge app manager so Windows creates the real installed-app shortcut instead of an Internet Shortcut.",
+  "settings.shortcutStep1": "Open Edge Apps using the button below.",
+  "settings.shortcutStep2": "Find Journey Studio and open Details.",
+  "settings.shortcutStep3": "Choose Create desktop shortcut.",
+  "settings.shortcutWhy": "Why this route?",
+  "settings.shortcutWhyText": "It produces a real Windows shortcut tied to the installed PWA, with the Journey Studio app identity and icon.",
+  "settings.shortcutCopy": "Copy edge://apps",
+  "settings.shortcutCopied": "Copied",
+  "settings.shortcutOpen": "Open Edge Apps",
+  "settings.shortcutCopyFallback": "Copy this address into the Edge address bar:"
 }

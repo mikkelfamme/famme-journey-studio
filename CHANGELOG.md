@@ -162,3 +162,8 @@ A dependency-backed `npm install` could not complete in the build environment be
 - Enlarged and strengthened node typography while reducing canvas/grid noise.
 - Added selected-node quick actions for duplicate and delete.
 - Minimap now appears only on larger journeys.
+
+## 2.0.0-rc.12.3
+- Restored an explicit Create desktop shortcut action in Settings.
+- Removed fake shortcut downloads from the shortcut workflow; Windows/Edge now owns creation of the real installed-app shortcut.
+- Added a guided Edge Apps shortcut flow with clipboard fallback.

@@ -294,5 +294,17 @@
   "settings.installed": "Journey Studio er installeret",
   "settings.installInstalledText": "Appen kører med den installerede PWA-identitet.",
   "settings.installUnavailable": "Browserens installationsprompt er ikke tilgængelig lige nu. Åbn Journey Studio i Edge eller Chrome og brug browserens Installér app-funktion.",
-  "settings.installNote": "Skrivebords-/Start-genveje oprettes af browseren under PWA-installationen. Journey Studio downloader ikke en Windows Internet Shortcut. Hvis du vil have en rigtig skrivebordsgenvej bagefter, så tryk Win+R → skriv shell:AppsFolder og træk Journey Studio ud på skrivebordet."
+  "settings.installNote": "Skrivebords-/Start-genveje oprettes af browseren under PWA-installationen. Journey Studio downloader ikke en Windows Internet Shortcut. Hvis du vil have en rigtig skrivebordsgenvej bagefter, så tryk Win+R → skriv shell:AppsFolder og træk Journey Studio ud på skrivebordet.",
+  "settings.shortcutButton": "Opret skrivebordsgenvej",
+  "settings.shortcutTitle": "Opret skrivebordsgenvej",
+  "settings.shortcutText": "Journey Studio kan ikke lydløst skrive en Windows .lnk-fil fra browserens sikkerhedssandbox. Denne knap åbner derfor den korrekte Edge-appstyring, så Windows opretter en rigtig app-genvej i stedet for en Internet Shortcut.",
+  "settings.shortcutStep1": "Åbn Edge Apps med knappen nedenfor.",
+  "settings.shortcutStep2": "Find Journey Studio og åbn Detaljer.",
+  "settings.shortcutStep3": "Vælg Opret skrivebordsgenvej.",
+  "settings.shortcutWhy": "Hvorfor denne vej?",
+  "settings.shortcutWhyText": "Det giver en rigtig Windows-genvej, som er knyttet til den installerede PWA og bruger Journey Studio-navn og -ikon.",
+  "settings.shortcutCopy": "Kopiér edge://apps",
+  "settings.shortcutCopied": "Kopieret",
+  "settings.shortcutOpen": "Åbn Edge Apps",
+  "settings.shortcutCopyFallback": "Kopiér denne adresse til Edge-adresselinjen:"
 }

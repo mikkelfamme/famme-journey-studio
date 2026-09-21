@@ -1,4 +1,4 @@
-# Release manifest — 2.0.0-rc.12.2
+# Release manifest — 2.0.0-rc.12.3
 
 ## Release goal
 Correct the Windows/PWA application identity so Journey Studio installs with the JS icon and real app shortcut semantics instead of stale F-branded or Internet Shortcut behavior.
