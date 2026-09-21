@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Database, FileDown, FileUp, Gauge, GitCompareArrows, Info, RefreshCw, TriangleAlert } from 'lucide-react';
+import { Check, ClipboardCopy, Database, FileDown, FileUp, Gauge, GitCompareArrows, Info, RefreshCw, TriangleAlert } from 'lucide-react';
 import type { MappingQuality, MetricDefinition } from '../../types/domain';
 import { useWorkspace } from '../../store/WorkspaceContext';
 import { useI18n } from '../../i18n';
@@ -20,10 +20,133 @@ import {
 
 type InsightsTab = 'overview' | 'mapping' | 'kpis' | 'actual';
 
+
+const performanceAiPromptDa = [
+  'Jeg arbejder i Journey Studio by Famme.',
+  'Brug den vedhæftede Journey-Studio-performance-map.json som eneste autoritative mapping mellem kunderejser og komponenter.',
+  '',
+  'Opgave:',
+  '1. Brug mine performance-data for perioden [ANGIV PERIODE] fra de filer, jeg har vedhæftet, eller fra de datakilder du har adgang til (fx GA4, Google Ads, Meta, CRM/booking eller BigQuery).',
+  '2. Map kun målinger til journeyId og nodeId, som findes i performance-map-filen. Behold ID-værdierne præcis som de står.',
+  '3. Brug quality: "direct" kun når målingen direkte repræsenterer komponenten. Brug quality: "proxy" ved en dokumenteret indirekte indikator og forklar hvorfor i mappingNote.',
+  '4. Opfind aldrig tal, events, datakilder eller mappings. Hvis en komponent ikke kan mappes forsvarligt, så udelad den fra nodeMetrics.',
+  '5. Brug relevante numeriske metrics pr. node, fx impressions, clicks, sessions, cost, conversions, revenue, leads eller andre dokumenterede målinger fra kilden.',
+  '6. sources skal beskrive de faktiske datakilder. journeyMetrics må gerne være [].',
+  '7. Returnér KUN gyldig JSON uden markdown, kodehegn eller forklarende tekst.',
+  '',
+  'Output skal følge denne struktur:',
+  '{',
+  '  "schema": "famme-journey-performance-v1",',
+  '  "generatedAt": "<ISO-8601 timestamp>",',
+  '  "period": "<YYYY-MM-DD to YYYY-MM-DD>",',
+  '  "sources": [{ "name": "<datakilde>", "note": "<kort note>" }],',
+  '  "nodeMetrics": [',
+  '    {',
+  '      "journeyId": "<eksakt journeyId fra map>",',
+  '      "nodeId": "<eksakt nodeId fra map>",',
+  '      "source": "<datakilde>",',
+  '      "quality": "direct",',
+  '      "mappingNote": "<hvorfor mappingen er gyldig>",',
+  '      "metrics": { "impressions": 0, "clicks": 0 }',
+  '    }',
+  '  ],',
+  '  "journeyMetrics": []',
+  '}',
+  '',
+  'Gem eller returnér resultatet som Journey-Studio-performance-snapshot.json. Det er DEN fil, jeg bagefter skal importere i Journey Studio — ikke performance-map-filen.'
+].join('\n');
+
+const performanceAiPromptEn = [
+  'I work in Journey Studio by Famme.',
+  'Use the attached Journey-Studio-performance-map.json as the only authoritative mapping between journeys and components.',
+  '',
+  'Task:',
+  '1. Use my performance data for [SPECIFY PERIOD] from the files I attach or from connected data sources you can access (for example GA4, Google Ads, Meta, CRM/booking or BigQuery).',
+  '2. Map measurements only to journeyId and nodeId values that exist in the performance map. Preserve the IDs exactly.',
+  '3. Use quality: "direct" only when the measurement directly represents the component. Use quality: "proxy" for a documented indirect indicator and explain it in mappingNote.',
+  '4. Never invent numbers, events, sources or mappings. If a component cannot be mapped reliably, omit it from nodeMetrics.',
+  '5. Use relevant numeric metrics per node, for example impressions, clicks, sessions, cost, conversions, revenue, leads or other documented source metrics.',
+  '6. sources must describe the real data sources. journeyMetrics may be [].',
+  '7. Return ONLY valid JSON with no markdown, code fences or explanatory text.',
+  '',
+  'Output structure:',
+  '{',
+  '  "schema": "famme-journey-performance-v1",',
+  '  "generatedAt": "<ISO-8601 timestamp>",',
+  '  "period": "<YYYY-MM-DD to YYYY-MM-DD>",',
+  '  "sources": [{ "name": "<data source>", "note": "<short note>" }],',
+  '  "nodeMetrics": [{ "journeyId": "<exact journeyId>", "nodeId": "<exact nodeId>", "source": "<source>", "quality": "direct", "mappingNote": "<why valid>", "metrics": { "impressions": 0, "clicks": 0 } }],',
+  '  "journeyMetrics": []',
+  '}',
+  '',
+  'Save or return the result as Journey-Studio-performance-snapshot.json. This is the file I will import into Journey Studio — not the performance-map file.'
+].join('\n');
+
+const actualPathAiPromptDa = [
+  'Jeg arbejder i Journey Studio by Famme.',
+  'Brug den vedhæftede Journey-Studio-actual-path-map.json som eneste autoritative reference for journeyId, nodeId og den planlagte journey-struktur.',
+  '',
+  'Opgave:',
+  '1. Brug observerede kundesti-/eventdata for perioden [ANGIV PERIODE] fra de filer, jeg har vedhæftet, eller fra de datakilder du har adgang til (fx GA4/BigQuery eventsekvenser, shop, CRM eller andet path-data).',
+  '2. Byg faktiske observerede sekvenser. Du må IKKE antage, at brugerne følger den planlagte rækkefølge i actual-path-map-filen.',
+  '3. Map et observeret trin til nodeId kun når matchningen er dokumenterbar. Behold journeyId og nodeId præcis som i map-filen.',
+  '4. Hvis et observeret trin ikke findes i den planlagte journey, så behold det som { "label": "..." } uden nodeId. Opfind ikke et nodeId.',
+  '5. Brug count, users, sessions og/eller sharePct når de kan beregnes fra de faktiske data. Opfind aldrig volumen eller andele.',
+  '6. Returnér KUN gyldig JSON uden markdown, kodehegn eller forklarende tekst.',
+  '',
+  'Output skal følge denne struktur:',
+  '{',
+  '  "schema": "famme-journey-actual-paths-v1",',
+  '  "generatedAt": "<ISO-8601 timestamp>",',
+  '  "period": "<YYYY-MM-DD to YYYY-MM-DD>",',
+  '  "source": "<beskrivelse af datakilden>",',
+  '  "journeyPaths": [',
+  '    {',
+  '      "journeyId": "<eksakt journeyId fra map>",',
+  '      "paths": [',
+  '        {',
+  '          "label": "<kort navn på observeret sti>",',
+  '          "users": 0,',
+  '          "sharePct": 0,',
+  '          "steps": [{ "nodeId": "<eksakt nodeId>" }, { "label": "<observeret men ikke mappet trin>" }]',
+  '        }',
+  '      ]',
+  '    }',
+  '  ]',
+  '}',
+  '',
+  'Gem eller returnér resultatet som Journey-Studio-actual-path-snapshot.json. Det er DEN fil, jeg bagefter skal importere i Journey Studio — ikke actual-path-map-filen.'
+].join('\n');
+
+const actualPathAiPromptEn = [
+  'I work in Journey Studio by Famme.',
+  'Use the attached Journey-Studio-actual-path-map.json as the only authoritative reference for journeyId, nodeId and the planned journey structure.',
+  '',
+  'Task:',
+  '1. Use observed customer-path/event data for [SPECIFY PERIOD] from attached files or connected data sources you can access (for example GA4/BigQuery event sequences, shop, CRM or other path data).',
+  '2. Build real observed sequences. Do NOT assume users follow the planned order in the actual-path map.',
+  '3. Map an observed step to nodeId only when the match is supportable. Preserve journeyId and nodeId exactly as supplied.',
+  '4. If an observed step is not represented in the planned journey, keep it as { "label": "..." } without nodeId. Never invent a nodeId.',
+  '5. Use count, users, sessions and/or sharePct when they can be calculated from real data. Never invent volume or shares.',
+  '6. Return ONLY valid JSON with no markdown, code fences or explanatory text.',
+  '',
+  'Output structure:',
+  '{',
+  '  "schema": "famme-journey-actual-paths-v1",',
+  '  "generatedAt": "<ISO-8601 timestamp>",',
+  '  "period": "<YYYY-MM-DD to YYYY-MM-DD>",',
+  '  "source": "<description of data source>",',
+  '  "journeyPaths": [{ "journeyId": "<exact journeyId>", "paths": [{ "label": "<observed path>", "users": 0, "sharePct": 0, "steps": [{ "nodeId": "<exact nodeId>" }, { "label": "<observed unmapped step>" }] }] }]',
+  '}',
+  '',
+  'Save or return the result as Journey-Studio-actual-path-snapshot.json. This is the file I will import into Journey Studio — not the actual-path-map file.'
+].join('\n');
+
 export function InsightsView({ onImport }: { onImport?: () => void }) {
   const { workspace, updateWorkspace } = useWorkspace();
   const { t } = useI18n();
   const [tab, setTab] = useState<InsightsTab>('overview');
+  const [copiedPrompt, setCopiedPrompt] = useState<'performance' | 'actual' | null>(null);
   if (!workspace) return null;
   const isDa = workspace.settings.language === 'da';
   const active = activePerformanceSnapshot(workspace);
@@ -56,6 +179,16 @@ export function InsightsView({ onImport }: { onImport?: () => void }) {
   function syncDictionary() {
     updateWorkspace(ws => ({ ...ws, metricDictionary: ensureMetricDictionary(ws.metricDictionary, ws.performanceSnapshots) }));
   }
+  async function copyAiPrompt(kind: 'performance' | 'actual') {
+    const text = kind === 'performance' ? (isDa ? performanceAiPromptDa : performanceAiPromptEn) : (isDa ? actualPathAiPromptDa : actualPathAiPromptEn);
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedPrompt(kind);
+      window.setTimeout(() => setCopiedPrompt(current => current === kind ? null : current), 1800);
+    } catch {
+      setCopiedPrompt(null);
+    }
+  }
 
   return <section className="content-section insights-page">
     <div className="section-toolbar">
@@ -67,14 +200,34 @@ export function InsightsView({ onImport }: { onImport?: () => void }) {
     </div>
 
     <div className="insights-guide">
-      <div className="insights-guide-intro"><span className="eyebrow-small">{isDa ? 'DATA → KUNDEREJSE → INDSIGT' : 'DATA → JOURNEY → INSIGHT'}</span><h3>{isDa ? 'Kobl målinger til den kunderejse, du allerede har tegnet' : 'Connect measurements to the journey architecture you already designed'}</h3><p>{isDa ? 'Insights & Data ændrer ikke selve kunderejsen. Siden lægger et datalag ovenpå: performance pr. komponent, kvaliteten af mappingen, KPI-definitioner og observerede kundestier. Dermed kan du skelne mellem den planlagte rejse og det, data faktisk viser.' : 'Insights & Data does not change the journey itself. It adds a data layer: component performance, mapping quality, KPI definitions and observed customer paths, so you can compare the designed journey with what the data actually shows.'}</p></div>
-      <div className="data-connection-note"><Info size={16}/><div><strong>{isDa ? 'Sådan er dataforbindelsen bygget nu' : 'How data connection works today'}</strong><span>{isDa ? 'Journey Studio er local-first og har ikke en direkte live-forbindelse til GA4, Google Ads, Meta, BigQuery eller CRM. Eksportér stabile journey/node-ID’er, brug dem i dit eksterne dataflow, og importér derefter et performance- eller actual-path snapshot. Det gør datalaget portabelt uden backend eller login.' : 'Journey Studio is local-first and does not make a direct live connection to GA4, Google Ads, Meta, BigQuery or CRM. Export stable journey/node IDs, use them in your external data flow, then import a performance or actual-path snapshot. This keeps the data layer portable without a backend or login.'}</span></div></div>
-      <div className="insights-steps">
-        <div><b>1</b><strong>{isDa ? 'Eksportér mapping' : 'Export mapping'}</strong><span>{isDa ? 'Performance-map indeholder stabile journeyId/nodeId og tracking-signaler. Actual-path-map indeholder noder og forbindelser.' : 'The performance map contains stable journeyId/nodeId values and tracking signals. The actual-path map contains nodes and edges.'}</span><div className="step-actions"><button className="button compact" onClick={()=>downloadPerformanceMap(workspace)}><FileDown size={14}/>{isDa ? 'Performance-map' : 'Performance map'}</button><button className="button compact" onClick={()=>downloadActualPathMap(workspace)}><FileDown size={14}/>{isDa ? 'Actual-path-map' : 'Actual-path map'}</button></div></div>
-        <div><b>2</b><strong>{isDa ? 'Kobl dine datakilder' : 'Connect your data sources'}</strong><span>{isDa ? 'I fx BigQuery, et script eller andet analytics-flow mappes GA4/Ads/Meta/CRM-målinger til de eksporterede ID’er. Direct bruges ved reel node-match; Proxy ved en dokumenteret indirekte indikator.' : 'In BigQuery, a script or another analytics flow, map GA4/Ads/Meta/CRM measurements to the exported IDs. Use Direct for a true node match and Proxy for a documented indirect indicator.'}</span></div>
-        <div><b>3</b><strong>{isDa ? 'Importér snapshot' : 'Import snapshot'}</strong><span>{isDa ? 'Importér JSON som performance-snapshot eller actual-path snapshot. Importen vises altid som preview, før data gemmes lokalt.' : 'Import JSON as a performance snapshot or actual-path snapshot. Every import is previewed before it is stored locally.'}</span>{onImport && <button className="button primary compact" onClick={onImport}><FileUp size={14}/>{isDa ? 'Importér data' : 'Import data'}</button>}</div>
-        <div><b>4</b><strong>{isDa ? 'Brug de fire faner' : 'Use the four tabs'}</strong><span>{isDa ? 'Overblik viser coverage og friskhed. Mapping Center validerer Direct/Proxy/Unmapped. KPI-ordbog forklarer metric keys. Planlagt vs. faktisk sammenligner observerede stier med journey-designet.' : 'Overview shows coverage and freshness. Mapping Center validates Direct/Proxy/Unmapped. KPI Dictionary explains metric keys. Planned vs Actual compares observed paths with the journey design.'}</span></div>
+      <div className="insights-guide-intro"><span className="eyebrow-small">{isDa ? 'DATA → AI → SNAPSHOT → INDSIGT' : 'DATA → AI → SNAPSHOT → INSIGHT'}</span><h3>{isDa ? 'Fra rå data til noget Journey Studio kan læse' : 'From raw data to something Journey Studio can read'}</h3><p>{isDa ? 'Journey Studio importerer ikke rå GA4-, Google Ads-, Meta- eller CRM-filer direkte. Først downloader du en mapping-fil fra Journey Studio. Derefter giver du mapping-filen og dine måledata til din AI, som laver en færdig snapshot-JSON. Det er snapshot-filen — ikke mapping-filen — du importerer tilbage i Journey Studio.' : 'Journey Studio does not import raw GA4, Google Ads, Meta or CRM files directly. First download a mapping file from Journey Studio. Then give the mapping file plus your measurement data to your AI, which creates a finished snapshot JSON. The snapshot file — not the mapping file — is what you import back into Journey Studio.'}</p></div>
+      <div className="data-connection-note"><Info size={16}/><div><strong>{isDa ? 'Hvad skal du helt konkret uploade til din AI?' : 'What exactly should you upload to your AI?'}</strong><span>{isDa ? 'Upload 1) den relevante mapping-fil fra Journey Studio og 2) de data, du vil koble på for samme periode. Hvis din AI allerede har adgang til datakilderne via connectors/plugins, kan punkt 2 erstattes af en besked om at bruge de forbundne kilder. Brug derefter den færdige prompt nedenfor.' : 'Upload 1) the relevant mapping file from Journey Studio and 2) the data you want to connect for the same period. If your AI already has access to the sources through connectors/plugins, item 2 can be replaced by an instruction to use those connected sources. Then use the ready-made prompt below.'}</span></div></div>
+
+      <div className="insights-steps insights-steps-three">
+        <div><b>1</b><strong>{isDa ? 'Download mapping-filen' : 'Download the mapping file'}</strong><span>{isDa ? 'Vælg Performance-map til KPI’er pr. komponent eller Actual-path-map til observerede kundestier.' : 'Choose Performance map for component KPIs or Actual-path map for observed customer paths.'}</span></div>
+        <div><b>2</b><strong>{isDa ? 'Send map + data + prompt til din AI' : 'Send map + data + prompt to your AI'}</strong><span>{isDa ? 'AI’en bruger Journey Studios ID’er til at omsætte dine rå data til det korrekte snapshot-format. Brug Copy prompt nedenfor.' : 'The AI uses Journey Studio IDs to transform your raw data into the correct snapshot format. Use Copy prompt below.'}</span></div>
+        <div><b>3</b><strong>{isDa ? 'Importér AI’ens snapshot' : 'Import the AI snapshot'}</strong><span>{isDa ? 'AI’en skal returnere en JSON-snapshotfil. Importér den via Importér data. Journey Studio viser et preview, før den gemmes lokalt.' : 'The AI should return a JSON snapshot file. Import it through Import data. Journey Studio previews it before local storage.'}</span></div>
       </div>
+
+      <div className="ai-data-workflows">
+        <article className="ai-workflow-card">
+          <div className="ai-workflow-heading"><div><span className="workflow-kicker">PERFORMANCE</span><h4>{isDa ? 'Mål performance på komponenterne' : 'Measure component performance'}</h4><p>{isDa ? 'Brug denne, når du vil have fx impressions, clicks, sessions, cost, conversions, revenue eller leads ind på de enkelte komponenter.' : 'Use this when you want metrics such as impressions, clicks, sessions, cost, conversions, revenue or leads on individual components.'}</p></div><button className="button compact" onClick={()=>downloadPerformanceMap(workspace)}><FileDown size={14}/>{isDa ? 'Download Performance-map' : 'Download Performance map'}</button></div>
+          <div className="ai-upload-list"><strong>{isDa ? 'Upload/sendt til din AI' : 'Upload/send to your AI'}</strong><ol><li><code>Journey-Studio-performance-map.json</code><span>{isDa ? 'Downloades med knappen ovenfor. Indeholder journeyId, nodeId og tracking-signaler.' : 'Downloaded above. Contains journeyId, nodeId and tracking signals.'}</span></li><li><strong>{isDa ? 'Dine måledata for samme periode' : 'Your measurement data for the same period'}</strong><span>{isDa ? 'Fx CSV/JSON fra GA4, Google Ads, Meta, CRM/booking eller BigQuery — eller bed AI’en bruge de datakilder, den allerede har adgang til.' : 'For example CSV/JSON from GA4, Google Ads, Meta, CRM/booking or BigQuery — or ask the AI to use sources it already has access to.'}</span></li></ol></div>
+          <div className="ai-output-target"><span>{isDa ? 'AI’en skal returnere' : 'AI should return'}</span><code>Journey-Studio-performance-snapshot.json</code><em>schema: famme-journey-performance-v1</em></div>
+          <details className="ai-prompt-details"><summary>{isDa ? 'Vis færdig AI-prompt' : 'Show ready-made AI prompt'}</summary><div className="ai-prompt-toolbar"><span>{isDa ? 'Kopiér prompten og send den sammen med filerne ovenfor.' : 'Copy the prompt and send it together with the files above.'}</span><button className="button compact" onClick={()=>copyAiPrompt('performance')}>{copiedPrompt === 'performance' ? <Check size={14}/> : <ClipboardCopy size={14}/>} {copiedPrompt === 'performance' ? (isDa ? 'Kopieret' : 'Copied') : (isDa ? 'Kopiér prompt' : 'Copy prompt')}</button></div><pre>{isDa ? performanceAiPromptDa : performanceAiPromptEn}</pre></details>
+        </article>
+
+        <article className="ai-workflow-card">
+          <div className="ai-workflow-heading"><div><span className="workflow-kicker">ACTUAL PATH</span><h4>{isDa ? 'Sammenlign planlagt rejse med faktisk adfærd' : 'Compare planned journey with actual behavior'}</h4><p>{isDa ? 'Brug denne, når du har sekvens-/eventdata og vil se hvilke stier kunderne faktisk tager gennem rejsen.' : 'Use this when you have sequence/event data and want to see the paths customers actually take through the journey.'}</p></div><button className="button compact" onClick={()=>downloadActualPathMap(workspace)}><FileDown size={14}/>{isDa ? 'Download Actual-path-map' : 'Download Actual-path map'}</button></div>
+          <div className="ai-upload-list"><strong>{isDa ? 'Upload/sendt til din AI' : 'Upload/send to your AI'}</strong><ol><li><code>Journey-Studio-actual-path-map.json</code><span>{isDa ? 'Downloades med knappen ovenfor. Indeholder journeyId, nodeId og den planlagte forbindelsesstruktur.' : 'Downloaded above. Contains journeyId, nodeId and the planned connection structure.'}</span></li><li><strong>{isDa ? 'Observerede path-/eventdata for samme periode' : 'Observed path/event data for the same period'}</strong><span>{isDa ? 'Fx GA4/BigQuery eventsekvenser, shop-sessioner eller anden data, der faktisk kan vise rækkefølgen af handlinger. En almindelig totalsrapport er ikke nok til actual paths.' : 'For example GA4/BigQuery event sequences, shop sessions or other data that can actually show action order. A simple totals report is not enough for actual paths.'}</span></li></ol></div>
+          <div className="ai-output-target"><span>{isDa ? 'AI’en skal returnere' : 'AI should return'}</span><code>Journey-Studio-actual-path-snapshot.json</code><em>schema: famme-journey-actual-paths-v1</em></div>
+          <details className="ai-prompt-details"><summary>{isDa ? 'Vis færdig AI-prompt' : 'Show ready-made AI prompt'}</summary><div className="ai-prompt-toolbar"><span>{isDa ? 'Kopiér prompten og send den sammen med filerne ovenfor.' : 'Copy the prompt and send it together with the files above.'}</span><button className="button compact" onClick={()=>copyAiPrompt('actual')}>{copiedPrompt === 'actual' ? <Check size={14}/> : <ClipboardCopy size={14}/>} {copiedPrompt === 'actual' ? (isDa ? 'Kopieret' : 'Copied') : (isDa ? 'Kopiér prompt' : 'Copy prompt')}</button></div><pre>{isDa ? actualPathAiPromptDa : actualPathAiPromptEn}</pre></details>
+        </article>
+      </div>
+
+      <div className="snapshot-import-callout"><div><FileUp size={17}/><div><strong>{isDa ? 'Når AI’en er færdig' : 'When the AI is finished'}</strong><span>{isDa ? 'Download AI’ens JSON-snapshotfil. Du skal ikke importere Performance-map eller Actual-path-map tilbage i Journey Studio; de er kun referencefiler til AI/dataflowet.' : 'Download the JSON snapshot produced by the AI. Do not import the Performance map or Actual-path map back into Journey Studio; they are reference files only for the AI/data flow.'}</span></div></div>{onImport && <button className="button primary" onClick={onImport}><FileUp size={15}/>{isDa ? 'Importér snapshot-data' : 'Import snapshot data'}</button>}</div>
+
+      <div className="insights-use-note"><strong>{isDa ? 'Efter importen' : 'After import'}</strong><span>{isDa ? 'Overblik viser datadækning og friskhed. Mapping Center viser Direct/Proxy/Unmapped og lader dig dokumentere mappings. KPI-ordbog giver metric keys en fælles betydning. Planlagt vs. faktisk viser de observerede stier mod dit journey-design.' : 'Overview shows data coverage and freshness. Mapping Center shows Direct/Proxy/Unmapped and lets you document mappings. KPI Dictionary gives metric keys shared meaning. Planned vs Actual compares observed paths with your journey design.'}</span></div>
     </div>
 
     <div className="subnav-tabs">

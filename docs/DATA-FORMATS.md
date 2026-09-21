@@ -130,3 +130,18 @@ Journey edges may store XYFlow `sourceHandle` and `targetHandle` ids. Journey St
 A handle can be referenced by multiple edges. This is how a journey can split from one component into several branches or merge several branches into one component.
 
 Portable files from older releases may omit handle ids or contain legacy top/left source and bottom/right target handles. RC12.8 normalizes those values automatically on load/import; the portable schemas themselves are unchanged.
+
+
+## AI-assisted snapshot preparation (RC12.10.2+)
+
+Insights & Data now exposes the complete handoff explicitly:
+
+1. Download `Journey-Studio-performance-map.json` or `Journey-Studio-actual-path-map.json`.
+2. Give that mapping file to an AI together with the raw/aggregated data for the same period, or instruct the AI to use connected sources it can actually read.
+3. Use the copyable prompt shown in Journey Studio. The prompt requires exact `journeyId`/`nodeId` preservation and prohibits invented metrics or mappings.
+4. The AI returns a new snapshot file using `famme-journey-performance-v1` or `famme-journey-actual-paths-v1`.
+5. Import the generated snapshot JSON through **Import Data**.
+
+The mapping manifests themselves are never imported back into Journey Studio. They are reference files for the external/AI preparation step.
+
+For performance snapshots, components without a defensible measurement should be omitted from `nodeMetrics`; Journey Studio treats absent components as unmapped. For actual paths, an observed step that cannot be confidently matched to a planned node should use a label-only step rather than an invented `nodeId`.

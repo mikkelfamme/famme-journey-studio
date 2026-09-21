@@ -1,0 +1,7 @@
+Journey Studio by Famme 2.0.0-rc.12.10.2
+
+Upload the CONTENTS of the update ZIP to the repository root and commit.
+Suggested commit message:
+Improve AI-assisted data import guidance in RC12.10.2
+
+Then wait for Deploy PWA to GitHub Pages to pass.

@@ -1,11 +1,20 @@
 export const APP_NAME = 'Journey Studio by Famme';
 export const APP_SHORT_NAME = 'Journey Studio';
-export const APP_VERSION = '2.0.0-rc.12.10.1';
+export const APP_VERSION = '2.0.0-rc.12.10.2';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'BY FAMME';
 export const APP_RELEASE_DATE = '2026-09-21';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.12.10.2',
+    title: 'AI-ready data import instructions',
+    items: [
+      'Insights & Data now states exactly which mapping file and measurement/path data to send to an AI before import.',
+      'Performance and Actual Path each include a ready-made copyable AI prompt with the exact Journey Studio snapshot schema and no-invention mapping rules.',
+      'The UI clearly distinguishes mapping manifests from the generated snapshot JSON that must be imported back into Journey Studio.'
+    ]
+  },
   {
     version: '2.0.0-rc.12.10.1',
     title: 'Master View nullability build hotfix',

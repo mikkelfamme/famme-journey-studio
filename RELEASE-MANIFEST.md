@@ -1,36 +1,22 @@
-# Release manifest — 2.0.0-rc.12.10.1
+# Release manifest — 2.0.0-rc.12.10.2
 
 ## Release goal
-Hotfix the RC12.10 TypeScript build failure while preserving the Master View governance details and Insights & Data onboarding unchanged.
+Make the local-first data workflow operational for non-technical users by showing exactly what to download, what to give an AI, which prompt to use, and which generated file to import.
 
 ## Included release surfaces
-- React/TypeScript application source
-- Master View governance explainer
-- clickable HEALTH / TODO / HANDOFF / % MAPPED details
-- Insights & Data onboarding and local-first data-flow guide
-- direct Performance-map and Actual-path-map exports from Insights
-- direct Import Data access from Insights using the existing preview/import workflow
-- updated contextual help
-- existing RC12.9 node background colors
-- existing RC12.8 directional split/merge ports
-- existing RC12.7 component-type improvements
-- existing Windows desktop-shortcut helper
-- GitHub CI and Pages deployment workflows
+- RC12.10.1 Master View build hotfix
+- RC12.10 Master View governance details and Insights onboarding
+- explicit Performance workflow: mapping file + measurement data + copyable AI prompt + snapshot import
+- explicit Actual Path workflow: mapping file + sequence/path data + copyable AI prompt + snapshot import
+- exact snapshot schema guidance and no-invention rules
+- existing component colors, directional split/merge ports and component-type improvements
 
 ## Compatibility
 - Existing `.fjs`, `.jstemplate` and `.jsjourney` schemas are unchanged.
 - Existing IndexedDB/database keys are unchanged.
-- Existing performance and actual-path snapshot schemas are unchanged.
+- Performance and actual-path snapshot schemas are unchanged.
+- Mapping export schemas are unchanged.
 - No migration is required.
-
-## Master View definitions
-- HEALTH — automated validation findings for journey structure, tracking, paid nodes and conversion logic.
-- TODO — unfinished TODO annotations attached to journey components.
-- HANDOFF — explicit cross-journey links.
-- % MAPPED — share of journey nodes with Direct or Proxy mappings in the active performance snapshot.
-
-## Insights data model
-Journey Studio remains local-first. External analytics sources are mapped outside the app using stable journey/node IDs exported by Journey Studio, then imported as performance or actual-path snapshots.
 
 ## Required online gate
 Run the normal GitHub Actions TypeScript/test/Vite build before treating this release as deployed.

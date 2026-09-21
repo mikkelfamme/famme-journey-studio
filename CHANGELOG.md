@@ -229,3 +229,9 @@ A dependency-backed `npm install` could not complete in the build environment be
 - Restored an explicit Create desktop shortcut action in Settings.
 - Removed fake shortcut downloads from the shortcut workflow; Windows/Edge now owns creation of the real installed-app shortcut.
 - Added a guided Edge Apps shortcut flow with clipboard fallback.
+
+
+## 2.0.0-rc.12.10.2
+- Added explicit AI-assisted data preparation guidance in Insights & Data.
+- Added copyable prompts for Performance and Actual Path snapshot creation.
+- Clarified which mapping/raw-data files go to the AI and which generated snapshot file is imported back into Journey Studio.
