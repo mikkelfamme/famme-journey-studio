@@ -1,11 +1,21 @@
 export const APP_NAME = 'Journey Studio by Famme';
 export const APP_SHORT_NAME = 'Journey Studio';
-export const APP_VERSION = '2.0.0-rc.12.7';
+export const APP_VERSION = '2.0.0-rc.12.8';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'BY FAMME';
 export const APP_RELEASE_DATE = '2026-09-21';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.12.8',
+    title: 'Directional ports, split & merge flows',
+    items: [
+      'Nodes now use a clear connection grammar: incoming arrows attach only at the top or left, while outgoing arrows leave only from the bottom or right.',
+      'Each node has three incoming top ports, two incoming left ports, three outgoing bottom ports and two outgoing right ports.',
+      'Ports support multiple connections, so one flow can split into several branches and several branches can merge into one component.',
+      'Older journeys and imports are normalized automatically to the new directional ports without changing the workspace or portable-file schemas.'
+    ]
+  },
   {
     version: '2.0.0-rc.12.7',
     title: 'Clearer component types',

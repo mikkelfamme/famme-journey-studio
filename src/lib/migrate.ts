@@ -1,5 +1,6 @@
 import type { Annotation, ComponentDefinition, Journey, JourneyNodeData, Workspace } from '../types/domain';
 import { defaultMetricDictionary, ensureMetricDictionary } from './performance';
+import { normalizeJourneyEdgeHandles } from './flowHandles';
 
 const now = () => new Date().toISOString();
 
@@ -17,7 +18,7 @@ function normalizeJourney(journey: Journey): Journey {
   return {
     ...journey,
     nodes: (journey.nodes ?? []).map(node => ({ ...node, data: normalizeNodeData(node.data) })),
-    edges: journey.edges ?? [],
+    edges: normalizeJourneyEdgeHandles(journey.nodes ?? [], journey.edges ?? []),
     planInputs: journey.planInputs ?? {},
     crossJourneyLinks: Array.isArray(journey.crossJourneyLinks) ? journey.crossJourneyLinks : [],
     annotations: Array.isArray(journey.annotations) ? journey.annotations : [],
@@ -53,7 +54,7 @@ export function normalizeWorkspace(workspace: Workspace): Workspace {
           createdAt: template.createdAt ?? workspace.createdAt ?? now(),
           updatedAt: template.updatedAt ?? workspace.updatedAt ?? now(),
           nodes: (template.nodes ?? []).map(node => ({ ...node, data: normalizeNodeData(node.data) })),
-          edges: template.edges ?? []
+          edges: normalizeJourneyEdgeHandles(template.nodes ?? [], template.edges ?? [])
         }))
       : [],
     components: Array.isArray(workspace.components) ? workspace.components.map(c => normalizeComponent(c as ComponentDefinition & { node?: { data?: JourneyNodeData } })) : [],

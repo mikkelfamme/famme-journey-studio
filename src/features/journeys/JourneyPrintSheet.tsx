@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { FunnelStage, Journey, JourneyEdge, JourneyNode, JourneyNodeType } from '../../types/domain';
 import { useI18n } from '../../i18n';
+import { normalizeJourneyEdgeHandles } from '../../lib/flowHandles';
 
 const STAGES: FunnelStage[] = ['top', 'middle', 'bottom', 'lifecycle'];
 const STAGE_FILL: Record<FunnelStage, string> = {
@@ -83,12 +84,17 @@ function inferSides(source: JourneyNode, target: JourneyNode): [Side, Side] {
   return dy >= 0 ? ['bottom', 'top'] : ['top', 'bottom'];
 }
 
-function anchor(node: JourneyNode, side: Side) {
+function anchor(node: JourneyNode, side: Side, handle?: string | null) {
+  if (handle === 'target-top-left' || handle === 'source-bottom-left') return { x: node.position.x + NODE_W * 0.25, y: side === 'top' ? node.position.y : node.position.y + NODE_H };
+  if (handle === 'target-top-right' || handle === 'source-bottom-right') return { x: node.position.x + NODE_W * 0.75, y: side === 'top' ? node.position.y : node.position.y + NODE_H };
+  if (handle === 'target-top' || handle === 'source-bottom') return { x: node.position.x + NODE_W * 0.5, y: side === 'top' ? node.position.y : node.position.y + NODE_H };
+  if (handle === 'target-left-top' || handle === 'source-right-top') return { x: side === 'left' ? node.position.x : node.position.x + NODE_W, y: node.position.y + NODE_H * 0.35 };
+  if (handle === 'target-left-bottom' || handle === 'source-right-bottom') return { x: side === 'left' ? node.position.x : node.position.x + NODE_W, y: node.position.y + NODE_H * 0.65 };
   switch (side) {
-    case 'left': return { x: node.position.x, y: node.position.y + NODE_H * 0.54 };
-    case 'right': return { x: node.position.x + NODE_W, y: node.position.y + NODE_H * 0.54 };
-    case 'top': return { x: node.position.x + NODE_W * 0.54, y: node.position.y };
-    case 'bottom': return { x: node.position.x + NODE_W * 0.54, y: node.position.y + NODE_H };
+    case 'left': return { x: node.position.x, y: node.position.y + NODE_H * 0.5 };
+    case 'right': return { x: node.position.x + NODE_W, y: node.position.y + NODE_H * 0.5 };
+    case 'top': return { x: node.position.x + NODE_W * 0.5, y: node.position.y };
+    case 'bottom': return { x: node.position.x + NODE_W * 0.5, y: node.position.y + NODE_H };
   }
 }
 
@@ -96,8 +102,8 @@ function orthogonalEdgePath(edge: JourneyEdge, source: JourneyNode, target: Jour
   const inferred = inferSides(source, target);
   const sourceSide = sideFromHandle(edge.sourceHandle) ?? inferred[0];
   const targetSide = sideFromHandle(edge.targetHandle) ?? inferred[1];
-  const s = anchor(source, sourceSide);
-  const t = anchor(target, targetSide);
+  const s = anchor(source, sourceSide, edge.sourceHandle);
+  const t = anchor(target, targetSide, edge.targetHandle);
   const horizontalSource = sourceSide === 'left' || sourceSide === 'right';
   const horizontalTarget = targetSide === 'left' || targetSide === 'right';
 
@@ -135,6 +141,7 @@ function boundsForJourney(journey: Journey) {
 export function JourneyPrintSheet({ journey }: { journey: Journey }) {
   const { t, status, nodeType, stage, language } = useI18n();
   const nodeMap = useMemo(() => new Map(journey.nodes.map(node => [node.id, node])), [journey.nodes]);
+  const printEdges = useMemo(() => normalizeJourneyEdgeHandles(journey.nodes, journey.edges), [journey.nodes, journey.edges]);
   const bounds = useMemo(() => boundsForJourney(journey), [journey]);
   const stageWidth = bounds.width / STAGES.length;
   const detailNodes = journey.nodes.filter(node => {
@@ -172,7 +179,7 @@ export function JourneyPrintSheet({ journey }: { journey: Journey }) {
           </g>;
         })}
 
-        {journey.edges.map(edge => {
+        {printEdges.map(edge => {
           const source = nodeMap.get(edge.source);
           const target = nodeMap.get(edge.target);
           if (!source || !target) return null;

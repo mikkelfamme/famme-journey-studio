@@ -1,3 +1,12 @@
+## 2.0.0-rc.12.8
+
+### Directional ports, split & merge flows
+- Restricts incoming connections to three top ports and two left ports.
+- Restricts outgoing connections to three bottom ports and two right ports.
+- Keeps ports multi-connectable so journeys can fan out from one component or merge several branches into one component.
+- Automatically migrates legacy/missing handle IDs to the new directional connection grammar.
+- Improves Print/PDF anchoring so exported connections follow the same port positions as the editor.
+
 ## 2.0.0-rc.12.7
 
 ### Clearer component types

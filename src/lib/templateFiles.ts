@@ -1,5 +1,6 @@
 import type { Journey, JourneyTemplate, WorkspaceScope } from '../types/domain';
 import { makeId } from './ids';
+import { normalizeJourneyEdgeHandles } from './flowHandles';
 
 export const TEMPLATE_FILE_SCHEMA = 'journey-studio-template-v1' as const;
 
@@ -96,7 +97,10 @@ export function parseJourneyTemplateData(raw: unknown): JourneyTemplate {
     createdAt: template.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     nodes: structuredClone(template.nodes).map(node => ({ ...node, selected: false })),
-    edges: structuredClone(template.edges).map(edge => ({ ...edge, selected: false }))
+    edges: normalizeJourneyEdgeHandles(
+      structuredClone(template.nodes).map(node => ({ ...node, selected: false })),
+      structuredClone(template.edges).map(edge => ({ ...edge, selected: false }))
+    )
   };
 }
 

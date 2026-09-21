@@ -95,3 +95,25 @@ Template metadata includes:
 - reusable nodes, connections and plan inputs.
 
 Templates may be empty. This is the default for user-created templates: metadata is created first, then the journey architecture is built in the Template Editor.
+
+## Directional connection handles (RC12.8+)
+
+Journey edges may store XYFlow `sourceHandle` and `targetHandle` ids. Journey Studio uses the following visual grammar:
+
+**Incoming / target handles**
+- `target-top-left`
+- `target-top`
+- `target-top-right`
+- `target-left-top`
+- `target-left-bottom`
+
+**Outgoing / source handles**
+- `source-bottom-left`
+- `source-bottom`
+- `source-bottom-right`
+- `source-right-top`
+- `source-right-bottom`
+
+A handle can be referenced by multiple edges. This is how a journey can split from one component into several branches or merge several branches into one component.
+
+Portable files from older releases may omit handle ids or contain legacy top/left source and bottom/right target handles. RC12.8 normalizes those values automatically on load/import; the portable schemas themselves are unchanged.

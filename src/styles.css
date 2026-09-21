@@ -291,3 +291,10 @@ input,select,textarea{border-color:#d8dee7;border-radius:10px;background:#fff;mi
 
 /* RC12.6 - native Windows desktop shortcut helper */
 .helper-trust{margin:14px 0 4px}.helper-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.helper-actions .button{min-height:36px}.helper-launch-status{display:flex;align-items:flex-start;gap:8px;margin-top:12px;padding:10px 12px;border:1px solid #cfe4da;background:#f3faf7;border-radius:10px;color:#2f6452;font-size:9px;line-height:1.5}.helper-launch-status svg{flex:0 0 auto;margin-top:1px}.helper-note{margin-top:12px!important;line-height:1.55}.ghost-button{background:#fff;color:#5f6874}
+
+/* RC12.8 - directional connection ports */
+.journey-handle.target{border-color:#8793a0!important;background:#fff!important}
+.journey-handle.source{border-color:#6475d7!important;background:#fff!important}
+.journey-node:hover .journey-handle.source,.journey-node.selected .journey-handle.source{opacity:.9!important}
+.journey-node:hover .journey-handle.target,.journey-node.selected .journey-handle.target{opacity:.72!important}
+.journey-handle.source:hover,.journey-handle.target:hover{background:#4f63dc!important;border-color:#4f63dc!important;opacity:1!important}

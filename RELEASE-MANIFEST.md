@@ -1,15 +1,16 @@
-# Release manifest — 2.0.0-rc.12.7
+# Release manifest — 2.0.0-rc.12.8
 
 ## Release goal
-Make node/component types easier to understand and add the missing structural types needed for real customer-journey modelling without changing existing workspace schemas or database keys.
+Make journey flow direction unambiguous and support clean branch/merge structures without introducing artificial nodes.
 
 ## Included release surfaces
 - React/TypeScript application source
-- grouped Component type selector with contextual explanations
-- new Audience / segment, Shop / checkout and Physical visit node types
-- updated node icons, palette, print styling and legacy normalization
-- existing Windows desktop-shortcut helper from RC12.6
-- generic public core only; ZOO-specific journey files are distributed separately as portable `.jsjourney` imports
+- 10 directional connection ports per journey node
+- automatic legacy/missing-handle normalization
+- split/fan-out and merge/fan-in connection support
+- updated Print/PDF connection anchoring
+- existing RC12.7 component-type improvements
+- existing Windows desktop-shortcut helper
 - GitHub CI quality gate
 - GitHub Pages deployment workflow
 - PWA manifest and JS app icons
@@ -17,7 +18,12 @@ Make node/component types easier to understand and add the missing structural ty
 ## Compatibility
 - Existing `.fjs`, `.jstemplate` and `.jsjourney` schemas are unchanged.
 - Existing IndexedDB/database keys are unchanged.
-- Existing node types are not renamed internally.
+- Legacy handle IDs and handle-less edges are normalized at load/import time.
+
+## Connection grammar
+- Incoming: top x3, left x2.
+- Outgoing: bottom x3, right x2.
+- Multiple edges may share the same port to create visual split/merge flows.
 
 ## Required online gate
-The current generation environment could not install the project's npm dependencies before timeout, so full TypeScript typecheck/tests/Vite build could not be completed locally. GitHub Actions remains the final release gate. JSON syntax and all generated `.jsjourney` payloads were validated locally.
+Run the normal GitHub Actions TypeScript/test/Vite build before treating this release as deployed.

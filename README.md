@@ -3,7 +3,7 @@
 **Visual customer journey architecture, channel planning, measurement design and observed-path analysis.**  
 Designed & developed by **Mikkel Famme**.
 
-> Current release: `2.0.0-rc.12.7`
+> Current release: `2.0.0-rc.12.8`
 
 ### RC12 highlights
 - Blank custom templates with a dedicated Template Editor

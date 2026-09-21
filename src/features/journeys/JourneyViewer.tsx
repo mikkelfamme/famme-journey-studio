@@ -9,6 +9,7 @@ import { StageBackdrop } from './StageBackdrop';
 import type { CanvasViewport } from '../../lib/stageGeometry';
 import { useI18n } from '../../i18n';
 import { downloadJourneyPng, downloadJourneySvg } from '../../lib/journeyImageExport';
+import { normalizeJourneyEdgeHandles } from '../../lib/flowHandles';
 
 const nodeTypes = { journey: JourneyNodeComponent };
 
@@ -28,7 +29,7 @@ export function JourneyViewer({ journey, initialSelectedId, onClose, onEdit }: {
     selected: node.id === selectedId,
     data: { ...node.data, runtimeActions: undefined }
   })), [journey.nodes, selectedId]);
-  const edges = useMemo(() => journey.edges.map(edge => {
+  const edges = useMemo(() => normalizeJourneyEdgeHandles(journey.nodes, journey.edges).map(edge => {
     const label = edge.data?.label || edge.data?.signal || edge.data?.condition || undefined;
     return {
       ...edge,
@@ -44,7 +45,7 @@ export function JourneyViewer({ journey, initialSelectedId, onClose, onEdit }: {
       labelBgPadding: [6, 4] as [number, number],
       labelBgBorderRadius: 8
     };
-  }), [journey.edges]);
+  }), [journey.nodes, journey.edges]);
   const onNodeClick: NodeMouseHandler<JourneyNode> = (_, node) => setSelectedId(node.id);
   const nodeUrl = selected?.data.url || (selected?.data.type === 'landingPage' ? selected.data.landingPage : undefined);
 

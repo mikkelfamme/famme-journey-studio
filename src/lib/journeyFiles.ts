@@ -1,5 +1,6 @@
 import type { Journey } from '../types/domain';
 import { makeId } from './ids';
+import { normalizeJourneyEdgeHandles } from './flowHandles';
 
 export const JOURNEY_FILE_SCHEMA = 'journey-studio-journey-v1' as const;
 
@@ -54,7 +55,8 @@ export function parseJourneyData(raw: unknown): Journey {
     idMap.set(node.id, id);
     return { ...node, id, selected: false, data: { ...node.data, runtimePerformance: undefined, runtimeActualCount: undefined, runtimeActions: undefined, runtimeStageMismatch: undefined } };
   });
-  const edges = structuredClone(journey.edges).map(edge => ({ ...edge, id: makeId('edge'), source: idMap.get(edge.source) ?? edge.source, target: idMap.get(edge.target) ?? edge.target, selected: false }));
+  const rawEdges = structuredClone(journey.edges).map(edge => ({ ...edge, id: makeId('edge'), source: idMap.get(edge.source) ?? edge.source, target: idMap.get(edge.target) ?? edge.target, selected: false }));
+  const edges = normalizeJourneyEdgeHandles(nodes, rawEdges);
   return {
     ...structuredClone(journey),
     id: makeId('journey'),

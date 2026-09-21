@@ -1,0 +1,13 @@
+Journey Studio by Famme 2.0.0-rc.12.8
+
+Upload the CONTENTS of the RC12.8 Update Pack to the repository root and commit.
+Suggested commit message:
+Add directional split and merge flow ports in RC12.8
+
+After GitHub Actions is green:
+1. Open the hosted app and update to RC12.8.
+2. Open an existing journey.
+3. Hover/select a node and confirm: top has 3 incoming ports, left has 2 incoming ports, bottom has 3 outgoing ports, right has 2 outgoing ports.
+4. Create two connections from the same outgoing port to confirm a flow can split.
+5. Connect two source nodes to the same incoming port to confirm flows can merge.
+6. Confirm older journeys still render their arrows after the automatic handle migration.

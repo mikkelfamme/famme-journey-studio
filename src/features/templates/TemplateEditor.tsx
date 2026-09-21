@@ -16,6 +16,7 @@ import { EdgePropertiesPanel } from '../journeys/EdgePropertiesPanel';
 import { StageBackdrop } from '../journeys/StageBackdrop';
 import type { CanvasViewport } from '../../lib/stageGeometry';
 import { componentFromNode, syncedNodeData } from '../../lib/workspace';
+import { normalizeJourneyEdgeHandles } from '../../lib/flowHandles';
 
 const nodeTypes = { journey: JourneyNodeComponent };
 
@@ -34,7 +35,11 @@ function asJourney(template: JourneyTemplate): Journey {
 export function TemplateEditor({ template, onClose }: { template: JourneyTemplate; onClose: () => void }) {
   const { workspace, updateWorkspace } = useWorkspace();
   const { t } = useI18n();
-  const [draft, setDraft] = useState<JourneyTemplate>(() => structuredClone(template));
+  const [draft, setDraft] = useState<JourneyTemplate>(() => {
+    const initial = structuredClone(template);
+    initial.edges = normalizeJourneyEdgeHandles(initial.nodes, initial.edges);
+    return initial;
+  });
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
   const [canvasViewport, setCanvasViewport] = useState<CanvasViewport>({ x:0,y:0,zoom:1 });

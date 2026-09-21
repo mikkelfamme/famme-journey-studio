@@ -25,10 +25,20 @@ const icons = {
 } as const;
 
 const handles = [
-  ['target-left', 'target', Position.Left, { top: '42%' }], ['source-left', 'source', Position.Left, { top: '62%' }],
-  ['target-right', 'target', Position.Right, { top: '42%' }], ['source-right', 'source', Position.Right, { top: '62%' }],
-  ['target-top', 'target', Position.Top, { left: '42%' }], ['source-top', 'source', Position.Top, { left: '62%' }],
-  ['target-bottom', 'target', Position.Bottom, { left: '42%' }], ['source-bottom', 'source', Position.Bottom, { left: '62%' }]
+  // Incoming only: three ports on top, two on left.
+  ['target-top-left', 'target', Position.Top, { left: '25%' }],
+  ['target-top', 'target', Position.Top, { left: '50%' }],
+  ['target-top-right', 'target', Position.Top, { left: '75%' }],
+  ['target-left-top', 'target', Position.Left, { top: '35%' }],
+  ['target-left-bottom', 'target', Position.Left, { top: '65%' }],
+
+  // Outgoing only: three ports on bottom, two on right. A single port may
+  // carry multiple edges, which supports both split and merge flows.
+  ['source-bottom-left', 'source', Position.Bottom, { left: '25%' }],
+  ['source-bottom', 'source', Position.Bottom, { left: '50%' }],
+  ['source-bottom-right', 'source', Position.Bottom, { left: '75%' }],
+  ['source-right-top', 'source', Position.Right, { top: '35%' }],
+  ['source-right-bottom', 'source', Position.Right, { top: '65%' }]
 ] as const;
 
 export function JourneyNodeComponent({ data, selected }: NodeProps<JourneyNode>) {

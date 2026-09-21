@@ -39,6 +39,7 @@ import { JourneyPrintSheet } from './JourneyPrintSheet';
 import { StageBackdrop } from './StageBackdrop';
 import { isStageMismatch, type CanvasViewport } from '../../lib/stageGeometry';
 import { downloadJourneyPng, downloadJourneySvg } from '../../lib/journeyImageExport';
+import { normalizeJourneyEdgeHandles } from '../../lib/flowHandles';
 
 const nodeTypes = { journey: JourneyNodeComponent };
 type InspectorMode = 'properties' | 'plan' | 'health' | 'versions' | 'actual';
@@ -46,7 +47,9 @@ type InspectorMode = 'properties' | 'plan' | 'health' | 'versions' | 'actual';
 export function JourneyEditor({ journey, initialNodeId, onClose }: { journey: Journey; initialNodeId?: string; onClose: () => void }) {
   const { workspace, updateJourney, updateWorkspace } = useWorkspace();
   const { t, status, stage } = useI18n();
-  const draftHistory = useHistoryState<Journey>(structuredClone(journey));
+  const initialDraft = structuredClone(journey);
+  initialDraft.edges = normalizeJourneyEdgeHandles(initialDraft.nodes, initialDraft.edges);
+  const draftHistory = useHistoryState<Journey>(initialDraft);
   const draft = draftHistory.value;
   const setDraft = draftHistory.set;
   const setDraftTransient = draftHistory.setTransient;
@@ -66,7 +69,9 @@ export function JourneyEditor({ journey, initialNodeId, onClose }: { journey: Jo
   const selectedEdge = selectedEdgeId ? draft.edges.find(e => e.id === selectedEdgeId) ?? null : null;
 
   useEffect(() => {
-    draftHistory.reset(structuredClone(journey));
+    const next = structuredClone(journey);
+    next.edges = normalizeJourneyEdgeHandles(next.nodes, next.edges);
+    draftHistory.reset(next);
     setSelectedIds([]);
     setSelectedEdgeId(null);
     setInspectorOpen(false);
