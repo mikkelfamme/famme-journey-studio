@@ -1,11 +1,19 @@
 export const APP_NAME = 'Journey Studio by Famme';
 export const APP_SHORT_NAME = 'Journey Studio';
-export const APP_VERSION = '2.0.0-rc.12.10';
+export const APP_VERSION = '2.0.0-rc.12.10.1';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'BY FAMME';
 export const APP_RELEASE_DATE = '2026-09-21';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.12.10.1',
+    title: 'Master View nullability build hotfix',
+    items: [
+      'Fixes the RC12.10 TypeScript build failure in Master View caused by workspace nullability inside the nested detail renderer.',
+      'Keeps the RC12.10 Master View and Insights & Data functionality unchanged.'
+    ]
+  },
   {
     version: '2.0.0-rc.12.10',
     title: 'Master governance details & Insights data onboarding',

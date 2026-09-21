@@ -1,0 +1,5 @@
+Journey Studio by Famme 2.0.0-rc.12.10.1
+
+Hotfix for RC12.10 GitHub Actions build failure.
+Upload the contents of the update pack to the repository root and commit.
+GitHub Actions remains the final build/deploy gate.

@@ -1,3 +1,9 @@
+## 2.0.0-rc.12.10.1 — Master View build hotfix
+
+- Fixes TypeScript nullability errors in `MasterView.tsx` introduced in RC12.10.
+- Narrows the workspace once and uses the non-null `currentWorkspace` reference inside nested detail rendering.
+- No behavior, schema, workspace, template or portable-file changes.
+
 ## 2.0.0-rc.12.10 — Master governance details & Insights data onboarding
 
 - Master View now explains HEALTH, TODO, HANDOFF and % MAPPED as governance indicators rather than unexplained badges.

@@ -1,7 +1,7 @@
-# Release manifest — 2.0.0-rc.12.10
+# Release manifest — 2.0.0-rc.12.10.1
 
 ## Release goal
-Make Master View self-explanatory and actionable, and make Insights & Data explain exactly how data is mapped, imported and used.
+Hotfix the RC12.10 TypeScript build failure while preserving the Master View governance details and Insights & Data onboarding unchanged.
 
 ## Included release surfaces
 - React/TypeScript application source
