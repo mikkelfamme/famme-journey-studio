@@ -46,9 +46,10 @@ export function JourneyNodeComponent({ data, selected }: NodeProps<JourneyNode>)
   const openTodos = data.annotations.filter(a => a.kind === 'todo' && !a.done).length;
   const Icon = icons[data.type as keyof typeof icons] ?? CircleDot;
   const hasSignals = data.tracking.length > 0 || data.creatives.length > 0 || openTodos > 0 || Boolean(data.componentId);
+  const backgroundTone = data.backgroundTone ?? 'white';
 
   return (
-    <div className={`journey-node node-${data.type} stage-${data.stage} ${selected ? 'selected' : ''} ${data.componentId ? 'library-linked' : ''}`}>
+    <div className={`journey-node node-${data.type} stage-${data.stage} node-tone-${backgroundTone} ${selected ? 'selected' : ''} ${data.componentId ? 'library-linked' : ''}`}>
       <NodeToolbar isVisible={selected} position={Position.Top} offset={10} className="node-quick-toolbar">
         <button type="button" title="Duplicate node" onClick={event => { event.stopPropagation(); data.runtimeActions?.duplicate?.(); }}><Copy size={13}/><span>Duplicate</span></button>
         <button type="button" className="danger" title="Delete node" onClick={event => { event.stopPropagation(); data.runtimeActions?.delete?.(); }}><Trash2 size={13}/><span>Delete</span></button>

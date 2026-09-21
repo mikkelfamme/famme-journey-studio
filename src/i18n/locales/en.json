@@ -330,5 +330,13 @@
   "nodeDesc.booking": "A confirmed booking or sale that closes a booking-led journey.",
   "nodeDesc.exclusion": "A rule that removes people from irrelevant communication, campaigns or audiences.",
   "nodeDesc.crm": "A first-party CRM or email touchpoint before or after conversion.",
-  "nodeDesc.note": "A strategic rule, explanation or context that should be visible in the journey without representing a customer action."
+  "nodeDesc.note": "A strategic rule, explanation or context that should be visible in the journey without representing a customer action.",
+  "inspector.backgroundColor": "Background color",
+  "inspector.backgroundColorHelp": "Soft tints preserve contrast and readability for text, badges and icons.",
+  "nodeColor.white": "White",
+  "nodeColor.green": "Green",
+  "nodeColor.yellow": "Yellow",
+  "nodeColor.red": "Red",
+  "nodeColor.blue": "Blue",
+  "nodeColor.gray": "Gray"
 }

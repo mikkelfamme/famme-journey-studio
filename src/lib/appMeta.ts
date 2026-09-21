@@ -1,11 +1,20 @@
 export const APP_NAME = 'Journey Studio by Famme';
 export const APP_SHORT_NAME = 'Journey Studio';
-export const APP_VERSION = '2.0.0-rc.12.8';
+export const APP_VERSION = '2.0.0-rc.12.9';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'BY FAMME';
 export const APP_RELEASE_DATE = '2026-09-21';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.12.9',
+    title: 'Readable node background colors',
+    items: [
+      'Each journey node can now use a white, green, yellow, red, blue or gray background from the General inspector.',
+      'Color choices use soft tints so node titles, descriptions, icons, stage pills and signal badges remain readable.',
+      'Background colors are stored with the node, work in templates and portable journey files, and are preserved in Print / PDF.'
+    ]
+  },
   {
     version: '2.0.0-rc.12.8',
     title: 'Directional ports, split & merge flows',

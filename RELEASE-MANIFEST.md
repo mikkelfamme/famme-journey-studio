@@ -1,14 +1,14 @@
-# Release manifest — 2.0.0-rc.12.8
+# Release manifest — 2.0.0-rc.12.9
 
 ## Release goal
-Make journey flow direction unambiguous and support clean branch/merge structures without introducing artificial nodes.
+Add purposeful, readable per-node background colors without changing the journey data model or sacrificing text/icon contrast.
 
 ## Included release surfaces
 - React/TypeScript application source
-- 10 directional connection ports per journey node
-- automatic legacy/missing-handle normalization
-- split/fan-out and merge/fan-in connection support
-- updated Print/PDF connection anchoring
+- per-node background color control in the General inspector
+- White, Green, Yellow, Red, Blue and Gray soft tint presets
+- Editor, Template Editor, View/Presentation and Print/PDF rendering support
+- existing RC12.8 directional connection ports and split/merge support
 - existing RC12.7 component-type improvements
 - existing Windows desktop-shortcut helper
 - GitHub CI quality gate
@@ -18,12 +18,16 @@ Make journey flow direction unambiguous and support clean branch/merge structure
 ## Compatibility
 - Existing `.fjs`, `.jstemplate` and `.jsjourney` schemas are unchanged.
 - Existing IndexedDB/database keys are unchanged.
-- Legacy handle IDs and handle-less edges are normalized at load/import time.
+- `backgroundTone` is optional. Existing nodes therefore remain white automatically.
+- Component Library nodes preserve the selected background tone because node data is stored with the component.
 
-## Connection grammar
-- Incoming: top x3, left x2.
-- Outgoing: bottom x3, right x2.
-- Multiple edges may share the same port to create visual split/merge flows.
+## Background presets
+- White — neutral/default
+- Green — positive/approved/desired state
+- Yellow — attention/review
+- Red — blocker/risk/problem
+- Blue — emphasis/information
+- Gray — secondary/supporting step
 
 ## Required online gate
 Run the normal GitHub Actions TypeScript/test/Vite build before treating this release as deployed.

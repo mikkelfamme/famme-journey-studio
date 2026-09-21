@@ -330,5 +330,13 @@
   "nodeDesc.booking": "En bekræftet booking eller et salg, der afslutter en bookingdrevet kunderejse.",
   "nodeDesc.exclusion": "En regel der fjerner personer fra irrelevant kommunikation, kampagner eller målgrupper.",
   "nodeDesc.crm": "Et first-party CRM- eller e-mailkontaktpunkt før eller efter konvertering.",
-  "nodeDesc.note": "En strategisk regel, forklaring eller kontekst, der skal være synlig uden at være en kundehandling."
+  "nodeDesc.note": "En strategisk regel, forklaring eller kontekst, der skal være synlig uden at være en kundehandling.",
+  "inspector.backgroundColor": "Baggrundsfarve",
+  "inspector.backgroundColorHelp": "Bløde farvetoner bevarer kontrast og læsbarhed i tekst, badges og ikoner.",
+  "nodeColor.white": "Hvid",
+  "nodeColor.green": "Grøn",
+  "nodeColor.yellow": "Gul",
+  "nodeColor.red": "Rød",
+  "nodeColor.blue": "Blå",
+  "nodeColor.gray": "Grå"
 }

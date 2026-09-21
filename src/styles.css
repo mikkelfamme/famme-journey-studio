@@ -298,3 +298,14 @@ input,select,textarea{border-color:#d8dee7;border-radius:10px;background:#fff;mi
 .journey-node:hover .journey-handle.source,.journey-node.selected .journey-handle.source{opacity:.9!important}
 .journey-node:hover .journey-handle.target,.journey-node.selected .journey-handle.target{opacity:.72!important}
 .journey-handle.source:hover,.journey-handle.target:hover{background:#4f63dc!important;border-color:#4f63dc!important;opacity:1!important}
+
+
+/* RC12.9 - readable node background colors */
+.journey-node.node-tone-white{background:rgba(255,255,255,.98)!important}
+.journey-node.node-tone-green{background:#edf8f2!important;border-color:#c8ded3!important}
+.journey-node.node-tone-yellow{background:#fff8dc!important;border-color:#e7d9a5!important}
+.journey-node.node-tone-red{background:#fff0ef!important;border-color:#e6c8c5!important}
+.journey-node.node-tone-blue{background:#eef4ff!important;border-color:#cbd8ef!important}
+.journey-node.node-tone-gray{background:#f1f3f5!important;border-color:#d1d7dd!important}
+.journey-node.node-tone-green.selected,.journey-node.node-tone-yellow.selected,.journey-node.node-tone-red.selected,.journey-node.node-tone-blue.selected,.journey-node.node-tone-gray.selected{border-color:#5367dd!important}
+.node-color-field{margin:2px 0 15px}.node-color-label{display:flex;flex-direction:column;gap:3px;margin-bottom:8px}.node-color-label>span{font-size:10.5px;font-weight:650;color:#3d4652}.node-color-label small{font-size:8px;line-height:1.4;color:#89939f}.node-color-swatches{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.node-color-swatch{min-width:0;min-height:36px;border:1px solid #dce2e8;border-radius:10px;background:#fff;padding:6px 8px;display:flex;align-items:center;gap:6px;color:#596573;font-size:8.5px;font-weight:700;cursor:pointer;text-align:left}.node-color-swatch:hover{border-color:#b9c3cf;background:#fafbfc}.node-color-swatch.selected{border-color:#5367dd;box-shadow:0 0 0 2px rgba(83,103,221,.10);color:#2f3b4b}.node-color-swatch svg{margin-left:auto;flex:0 0 auto;color:#4058c7}.swatch-dot{width:16px;height:16px;border-radius:5px;border:1px solid rgba(60,72,86,.14);flex:0 0 auto}.node-color-swatch.tone-white .swatch-dot{background:#fff}.node-color-swatch.tone-green .swatch-dot{background:#dff2e8}.node-color-swatch.tone-yellow .swatch-dot{background:#fff0b8}.node-color-swatch.tone-red .swatch-dot{background:#f9d8d5}.node-color-swatch.tone-blue .swatch-dot{background:#dce8ff}.node-color-swatch.tone-gray .swatch-dot{background:#e4e7eb}

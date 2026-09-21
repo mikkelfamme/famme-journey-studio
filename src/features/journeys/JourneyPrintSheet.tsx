@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { FunnelStage, Journey, JourneyEdge, JourneyNode, JourneyNodeType } from '../../types/domain';
+import type { FunnelStage, Journey, JourneyEdge, JourneyNode, JourneyNodeType, NodeBackgroundTone } from '../../types/domain';
 import { useI18n } from '../../i18n';
 import { normalizeJourneyEdgeHandles } from '../../lib/flowHandles';
 
@@ -15,6 +15,14 @@ const STAGE_TEXT: Record<FunnelStage, string> = {
   middle: '#557184',
   bottom: '#33705b',
   lifecycle: '#89661f'
+};
+const NODE_FILL: Record<NodeBackgroundTone, string> = {
+  white: '#ffffff',
+  green: '#edf8f2',
+  yellow: '#fff8dc',
+  red: '#fff0ef',
+  blue: '#eef4ff',
+  gray: '#f1f3f5'
 };
 const NODE_ACCENT: Partial<Record<JourneyNodeType, string>> = {
   meta: '#5865d9',
@@ -211,7 +219,7 @@ export function JourneyPrintSheet({ journey }: { journey: Journey }) {
             (node.data.url || node.data.landingPage) ? 'URL' : ''
           ].filter(Boolean).join(' · ');
           return <g key={node.id} transform={`translate(${node.position.x},${node.position.y})`}>
-            <rect width={NODE_W} height={NODE_H} rx="14" fill="#fff" stroke="#d5dce4" strokeWidth="1.2"/>
+            <rect width={NODE_W} height={NODE_H} rx="14" fill={NODE_FILL[node.data.backgroundTone ?? 'white']} stroke="#d5dce4" strokeWidth="1.2"/>
             <rect width={NODE_W} height="4" rx="2" fill={accent}/>
             <circle cx="22" cy="31" r="11" fill={accent} fillOpacity=".10" />
             <text x="40" y="25" fontSize="7.5" fill="#7b8692" fontWeight="800" letterSpacing=".75">{nodeType(node.data.type).toUpperCase()}</text>

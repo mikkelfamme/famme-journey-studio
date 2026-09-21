@@ -3,6 +3,7 @@ import type { Edge, Node } from '@xyflow/react';
 export type WorkspaceScope = 'B2C' | 'B2B' | 'Mixed';
 export type JourneyStatus = 'draft' | 'active' | 'paused' | 'archived';
 export type FunnelStage = 'top' | 'middle' | 'bottom' | 'lifecycle';
+export type NodeBackgroundTone = 'white' | 'green' | 'yellow' | 'red' | 'blue' | 'gray';
 export type AnnotationKind = 'comment' | 'decision' | 'todo' | 'hypothesis';
 export type JourneyNodeType =
   | 'trigger'
@@ -70,6 +71,7 @@ export interface JourneyNodeData extends Record<string, unknown> {
   label: string;
   type: JourneyNodeType;
   stage: FunnelStage;
+  backgroundTone?: NodeBackgroundTone;
   description?: string;
   customerNeed?: string;
   communicationTask?: string;

@@ -1,0 +1,5 @@
+Journey Studio by Famme 2.0.0-rc.12.9
+
+Upload the CONTENTS of this update pack to the repository root, commit, and wait for the GitHub Actions deployment to turn green.
+
+This release adds readable per-node background colors while keeping all existing workspace and portable-file schemas compatible.

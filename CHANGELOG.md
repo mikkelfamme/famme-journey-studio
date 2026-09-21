@@ -1,3 +1,9 @@
+## 2.0.0-rc.12.9 — Readable node background colors
+- Added per-node background color selection: white, green, yellow, red, blue and gray.
+- Added soft, high-contrast tint styling so node text, icons, stage pills and badges remain readable.
+- Node colors persist in workspaces, templates and `.jsjourney` files and are included in Print/PDF output.
+- Existing nodes remain white by default; portable file schemas remain unchanged.
+
 ## 2.0.0-rc.12.8
 
 ### Directional ports, split & merge flows

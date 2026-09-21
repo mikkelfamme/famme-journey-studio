@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Activity, Check, Image, Link2, Plus, RefreshCw, Save, Settings2, StickyNote, Trash2, Unlink, Upload, X } from 'lucide-react';
-import type { AnnotationKind, ComponentDefinition, CreativeDefinition, FunnelStage, Journey, JourneyNodeData, JourneyNodeType, TrackingDefinition, CrossJourneyLink } from '../../types/domain';
+import type { AnnotationKind, ComponentDefinition, CreativeDefinition, FunnelStage, Journey, JourneyNodeData, JourneyNodeType, NodeBackgroundTone, TrackingDefinition, CrossJourneyLink } from '../../types/domain';
 import { makeId } from '../../lib/ids';
 import { NODE_TYPE_DEFINITIONS, NODE_TYPE_GROUPS, nodeTypeDefinition } from '../../lib/nodeTypes';
 import { useI18n } from '../../i18n';
@@ -8,6 +8,7 @@ import { useI18n } from '../../i18n';
 const platforms = ['GA4', 'Meta Pixel', 'CAPI', 'Google Ads', 'GTM', 'DataLayer', 'CRM', 'BigQuery', 'Manual', 'Other'];
 const trackingStatuses: TrackingDefinition['status'][] = ['implemented', 'validate', 'missing', 'planned'];
 const annotationKinds: AnnotationKind[] = ['comment', 'decision', 'todo', 'hypothesis'];
+const nodeBackgroundTones: NodeBackgroundTone[] = ['white', 'green', 'yellow', 'red', 'blue', 'gray'];
 
 interface Props {
   data: JourneyNodeData | null;
@@ -111,6 +112,26 @@ export function PropertiesPanel(props: Props) {
       <div className="property-two-col">
         <label>{t('inspector.type')}<select value={data.type} onChange={event => onChange({ ...data, type: event.target.value as JourneyNodeType })}>{NODE_TYPE_GROUPS.map(group => <optgroup key={group.id} label={t(group.labelKey)}>{NODE_TYPE_DEFINITIONS.filter(item => item.group === group.id).map(item => <option key={item.type} value={item.type}>{nodeType(item.type)}</option>)}</optgroup>)}</select><span className="field-help">{t(currentTypeDefinition.descriptionKey)}</span></label>
         <label>{t('inspector.stage')}<select value={data.stage} onChange={event => onChange({ ...data, stage: event.target.value as FunnelStage })}>{(['top','middle','bottom','lifecycle'] as FunnelStage[]).map(item => <option key={item} value={item}>{stage(item)}</option>)}</select></label>
+      </div>
+      <div className="node-color-field">
+        <div className="node-color-label">
+          <span>{t('inspector.backgroundColor')}</span>
+          <small>{t('inspector.backgroundColorHelp')}</small>
+        </div>
+        <div className="node-color-swatches" role="radiogroup" aria-label={t('inspector.backgroundColor')}>
+          {nodeBackgroundTones.map(tone => {
+            const selectedTone = (data.backgroundTone ?? 'white') === tone;
+            return <button
+              type="button"
+              key={tone}
+              className={`node-color-swatch tone-${tone} ${selectedTone ? 'selected' : ''}`}
+              role="radio"
+              aria-checked={selectedTone}
+              title={t(`nodeColor.${tone}`)}
+              onClick={() => onChange({ ...data, backgroundTone: tone })}
+            ><span className="swatch-dot"/><span>{t(`nodeColor.${tone}`)}</span>{selectedTone && <Check size={12}/>}</button>;
+          })}
+        </div>
       </div>
       <label>{t('inspector.description')}<textarea rows={4} value={data.description ?? ''} onChange={event => onChange({ ...data, description: event.target.value })} /></label>
       {showNodeUrl && <label>{t('inspector.url')}<input type="url" placeholder="https://…" value={data.url ?? ''} onChange={event => onChange({ ...data, url: event.target.value })}/><span className="field-help">{t('inspector.urlHelp')}</span></label>}
