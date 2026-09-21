@@ -1,11 +1,20 @@
 export const APP_NAME = 'Journey Studio by Famme';
 export const APP_SHORT_NAME = 'Journey Studio';
-export const APP_VERSION = '2.0.0-rc.12.6';
+export const APP_VERSION = '2.0.0-rc.12.7';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'BY FAMME';
 export const APP_RELEASE_DATE = '2026-09-21';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.12.7',
+    title: 'Clearer component types',
+    items: [
+      'Node Type is renamed Component type and grouped by Customer, Channels, Experience, Outcomes and Lifecycle.',
+      'The inspector explains the selected component type directly below the dropdown.',
+      'New Audience / segment, Shop / checkout and Physical visit component types cover common journey states without overloading generic Customer step nodes.'
+    ]
+  },
   {
     version: '2.0.0-rc.12.6',
     title: 'Real Windows desktop shortcut helper',

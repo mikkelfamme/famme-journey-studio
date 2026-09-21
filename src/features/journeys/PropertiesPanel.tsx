@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Activity, Check, Image, Link2, Plus, RefreshCw, Save, Settings2, StickyNote, Trash2, Unlink, Upload, X } from 'lucide-react';
 import type { AnnotationKind, ComponentDefinition, CreativeDefinition, FunnelStage, Journey, JourneyNodeData, JourneyNodeType, TrackingDefinition, CrossJourneyLink } from '../../types/domain';
 import { makeId } from '../../lib/ids';
+import { NODE_TYPE_DEFINITIONS, NODE_TYPE_GROUPS, nodeTypeDefinition } from '../../lib/nodeTypes';
 import { useI18n } from '../../i18n';
 
 const platforms = ['GA4', 'Meta Pixel', 'CAPI', 'Google Ads', 'GTM', 'DataLayer', 'CRM', 'BigQuery', 'Manual', 'Other'];
@@ -98,7 +99,8 @@ export function PropertiesPanel(props: Props) {
     { id: 'notes', label: t('inspector.notes'), icon: StickyNote, count: openTodos || data.annotations.length },
     { id: 'links', label: t('inspector.links'), icon: Link2, count: ownLinks.length }
   ];
-  const showNodeUrl = ['landingPage','cta','meta','googleAds'].includes(data.type);
+  const showNodeUrl = ['landingPage','shopCheckout','cta','meta','googleAds'].includes(data.type);
+  const currentTypeDefinition = nodeTypeDefinition(data.type);
 
   return <aside className="editor-panel properties-panel">
     <div className="inspector-node-header"><div className={`inspector-type-mark node-${data.type}`} /><div><span className="panel-heading">{t('inspector.title')}</span><strong>{data.label || 'Untitled node'}</strong><small>{nodeType(data.type)} · {stage(data.stage)}</small></div></div>
@@ -107,7 +109,7 @@ export function PropertiesPanel(props: Props) {
     {tab === 'general' && <>
       <label>{t('inspector.label')}<input value={data.label} onChange={event => onChange({ ...data, label: event.target.value })} /></label>
       <div className="property-two-col">
-        <label>{t('inspector.type')}<select value={data.type} onChange={event => onChange({ ...data, type: event.target.value as JourneyNodeType })}>{(['trigger','need','customerStep','decision','meta','googleAds','landingPage','cta','tracking','conversion','lead','booking','exclusion','crm','note'] as JourneyNodeType[]).map(item => <option key={item} value={item}>{nodeType(item)}</option>)}</select></label>
+        <label>{t('inspector.type')}<select value={data.type} onChange={event => onChange({ ...data, type: event.target.value as JourneyNodeType })}>{NODE_TYPE_GROUPS.map(group => <optgroup key={group.id} label={t(group.labelKey)}>{NODE_TYPE_DEFINITIONS.filter(item => item.group === group.id).map(item => <option key={item.type} value={item.type}>{nodeType(item.type)}</option>)}</optgroup>)}</select><span className="field-help">{t(currentTypeDefinition.descriptionKey)}</span></label>
         <label>{t('inspector.stage')}<select value={data.stage} onChange={event => onChange({ ...data, stage: event.target.value as FunnelStage })}>{(['top','middle','bottom','lifecycle'] as FunnelStage[]).map(item => <option key={item} value={item}>{stage(item)}</option>)}</select></label>
       </div>
       <label>{t('inspector.description')}<textarea rows={4} value={data.description ?? ''} onChange={event => onChange({ ...data, description: event.target.value })} /></label>

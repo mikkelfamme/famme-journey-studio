@@ -1,0 +1,12 @@
+Journey Studio by Famme 2.0.0-rc.12.7
+
+Upload the CONTENTS of the RC12.7 Update Pack to the repository root and commit.
+Suggested commit message:
+Improve component types in RC12.7
+
+After GitHub Actions is green:
+1. Open the hosted app and update to RC12.7.
+2. Open any journey and select a node.
+3. Confirm “Komponenttype” / “Component type” is grouped and shows a short explanation.
+4. Confirm the new types are available: Målgruppe / segment, Shop / checkout, Fysisk besøg.
+5. Import the separate ZOO .jsjourney files and review/edit their content.

@@ -18,7 +18,10 @@ const STAGE_TEXT: Record<FunnelStage, string> = {
 const NODE_ACCENT: Partial<Record<JourneyNodeType, string>> = {
   meta: '#5865d9',
   googleAds: '#4d77cc',
+  audienceSegment: '#6d7f93',
   landingPage: '#4c8796',
+  shopCheckout: '#4c8796',
+  physicalVisit: '#4c8796',
   cta: '#4c8796',
   tracking: '#4c8796',
   conversion: '#2d8067',

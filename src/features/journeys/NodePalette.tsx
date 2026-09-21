@@ -1,36 +1,29 @@
 import { useMemo, useState } from 'react';
 import { Boxes, ChevronDown, ChevronRight, Flag, Layers3, LifeBuoy, Megaphone, Search, ShoppingCart, UserRound } from 'lucide-react';
 import type { ComponentDefinition, FunnelStage, JourneyNodeType } from '../../types/domain';
+import { NODE_TYPE_DEFINITIONS, NODE_TYPE_GROUPS, type NodeTypeGroup } from '../../lib/nodeTypes';
 import { useI18n } from '../../i18n';
 
-type PaletteGroup = 'customer' | 'channels' | 'experience' | 'outcomes' | 'lifecycle';
-type PaletteItem = { type: JourneyNodeType; key: string; stage: FunnelStage; group: PaletteGroup };
+type PaletteGroup = NodeTypeGroup;
+type PaletteItem = { type: JourneyNodeType; key: string; descriptionKey: string; stage: FunnelStage; group: PaletteGroup };
 
-const items: PaletteItem[] = [
-  { type: 'trigger', key: 'node.trigger', stage: 'top', group: 'customer' },
-  { type: 'need', key: 'node.need', stage: 'top', group: 'customer' },
-  { type: 'customerStep', key: 'node.customerStep', stage: 'middle', group: 'customer' },
-  { type: 'decision', key: 'node.decision', stage: 'middle', group: 'customer' },
-  { type: 'meta', key: 'node.meta', stage: 'top', group: 'channels' },
-  { type: 'googleAds', key: 'node.googleAds', stage: 'top', group: 'channels' },
-  { type: 'landingPage', key: 'node.landingPage', stage: 'middle', group: 'experience' },
-  { type: 'cta', key: 'node.cta', stage: 'bottom', group: 'experience' },
-  { type: 'tracking', key: 'node.tracking', stage: 'bottom', group: 'experience' },
-  { type: 'conversion', key: 'node.conversion', stage: 'bottom', group: 'outcomes' },
-  { type: 'lead', key: 'node.lead', stage: 'bottom', group: 'outcomes' },
-  { type: 'booking', key: 'node.booking', stage: 'bottom', group: 'outcomes' },
-  { type: 'exclusion', key: 'node.exclusion', stage: 'lifecycle', group: 'lifecycle' },
-  { type: 'crm', key: 'node.crm', stage: 'lifecycle', group: 'lifecycle' },
-  { type: 'note', key: 'node.note', stage: 'middle', group: 'lifecycle' }
-];
+const items: PaletteItem[] = NODE_TYPE_DEFINITIONS.map(item => ({
+  type: item.type,
+  key: item.labelKey,
+  descriptionKey: item.descriptionKey,
+  stage: item.defaultStage,
+  group: item.group
+}));
 
-const groups: Array<{ id: PaletteGroup; key: string; icon: typeof UserRound }> = [
-  { id: 'customer', key: 'palette.customer', icon: UserRound },
-  { id: 'channels', key: 'palette.channels', icon: Megaphone },
-  { id: 'experience', key: 'palette.experience', icon: Layers3 },
-  { id: 'outcomes', key: 'palette.outcomes', icon: ShoppingCart },
-  { id: 'lifecycle', key: 'palette.lifecycle', icon: LifeBuoy }
-];
+const groupIcons: Record<PaletteGroup, typeof UserRound> = {
+  customer: UserRound,
+  channels: Megaphone,
+  experience: Layers3,
+  outcomes: ShoppingCart,
+  lifecycle: LifeBuoy
+};
+
+const groups = NODE_TYPE_GROUPS.map(group => ({ ...group, key: group.labelKey, icon: groupIcons[group.id] }));
 
 export function NodePalette({ onAdd, components, onAddComponent }: { onAdd: (type: JourneyNodeType, label: string, stage: FunnelStage) => void; components: ComponentDefinition[]; onAddComponent: (component: ComponentDefinition) => void }) {
   const { t, stage } = useI18n();
@@ -58,7 +51,7 @@ export function NodePalette({ onAdd, components, onAddComponent }: { onAdd: (typ
           const isCollapsed = !needle && collapsed.has(group.id);
           return <section className={`palette-group ${isCollapsed ? 'collapsed' : ''}`} key={group.id}>
             <button type="button" className="palette-group-title" onClick={() => toggle(group.id)} aria-expanded={!isCollapsed}><Icon size={13}/><span>{t(group.key)}</span><small>{groupItems.length}</small>{isCollapsed ? <ChevronRight size={12}/> : <ChevronDown size={12}/>}</button>
-            {!isCollapsed && <div className="palette-list">{groupItems.map(item => <button key={item.type} onClick={() => onAdd(item.type, t(item.key), item.stage)}><span>{t(item.key)}</span><small>{stage(item.stage)}</small></button>)}</div>}
+            {!isCollapsed && <div className="palette-list">{groupItems.map(item => <button key={item.type} title={t(item.descriptionKey)} onClick={() => onAdd(item.type, t(item.key), item.stage)}><span>{t(item.key)}</span><small>{stage(item.stage)}</small></button>)}</div>}
           </section>;
         })}
       </div>

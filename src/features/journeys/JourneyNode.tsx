@@ -1,16 +1,19 @@
 import { Handle, NodeToolbar, Position, type NodeProps } from '@xyflow/react';
-import { AlertTriangle, BarChart3, BellRing, Bot, CheckCircle2, CircleDot, Copy, FileText, Flag, GitBranch, Goal, Mail, Megaphone, MousePointerClick, Search, ShieldCheck, Sparkles, StickyNote, Tag, Trash2, UserRound, Workflow } from 'lucide-react';
+import { AlertTriangle, BarChart3, BellRing, Bot, CheckCircle2, CircleDot, Copy, FileText, Flag, GitBranch, Goal, Mail, Megaphone, MousePointerClick, Search, ShieldCheck, ShoppingCart, MapPin, Sparkles, StickyNote, Tag, Trash2, UserRound, Workflow } from 'lucide-react';
 import type { JourneyNode } from '../../types/domain';
 import { useI18n } from '../../i18n';
 
 const icons = {
   trigger: BellRing,
   need: UserRound,
+  audienceSegment: UserRound,
   customerStep: Workflow,
   decision: GitBranch,
   meta: Megaphone,
   googleAds: Search,
   landingPage: FileText,
+  shopCheckout: ShoppingCart,
+  physicalVisit: MapPin,
   cta: MousePointerClick,
   tracking: BarChart3,
   conversion: Goal,

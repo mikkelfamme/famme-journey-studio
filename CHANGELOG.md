@@ -1,3 +1,12 @@
+## 2.0.0-rc.12.7
+
+### Clearer component types
+- Renames the node inspector field from **Type** to **Component type**.
+- Groups component types by Customer, Channels, Experience, Outcomes and Lifecycle.
+- Adds contextual help explaining what the selected component type means.
+- Adds Audience / segment, Shop / checkout and Physical visit as new backwards-compatible node types.
+- Adds icons, palette support, print styling and legacy normalization for the new types.
+
 ## 2.0.0-rc.12.6
 
 ### Real Windows desktop shortcut helper
