@@ -3,7 +3,14 @@
 **Visual customer journey architecture, channel planning, measurement design and observed-path analysis.**  
 Designed & developed by **Mikkel Famme**.
 
-> Current release: `2.0.0-rc.12.12`
+> Current release: `2.0.0-rc.12.13`
+
+
+### RC12.13 highlight
+- Switch each journey between horizontal stage columns and vertical stage rows
+- The same nodes, connections, tracking, creatives and metadata are preserved when the funnel is rotated
+- Tidy, stage guardrails, View, Presentation, SVG/PNG and Print/PDF follow the selected orientation
+- Orientation is stored in workspaces, `.jsjourney` files, templates and saved versions
 
 ### RC12 highlights
 - Blank custom templates with a dedicated Template Editor

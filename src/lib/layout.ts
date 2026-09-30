@@ -1,5 +1,5 @@
-import type { Journey, JourneyEdge, JourneyNode, FunnelStage } from '../types/domain';
-import { STAGE_NODE_X, STAGE_ORDER } from './stageGeometry';
+import type { Journey, JourneyEdge, JourneyNode, FunnelOrientation, FunnelStage } from '../types/domain';
+import { STAGE_NODE_X, STAGE_NODE_Y, STAGE_ORDER } from './stageGeometry';
 import { redistributeJourneyEdgeHandles } from './flowHandles';
 import { nodeSize } from './graphGeometry';
 
@@ -38,17 +38,16 @@ function depthMap(nodes: JourneyNode[], edges: JourneyEdge[]) {
 
 export function compactStageLayout(journey: Journey): Journey {
   if (journey.nodes.length === 0) return journey;
+  const orientation: FunnelOrientation = journey.layoutOrientation ?? 'horizontal';
   const depth = depthMap(journey.nodes, journey.edges);
   const stageGroups = new Map<FunnelStage, JourneyNode[]>();
 
-  // Preserve the user's visual reading order. Tidy should clean spacing and
-  // stage alignment, not redesign a journey that was deliberately arranged.
   for (const stage of STAGES) {
     const group = journey.nodes
       .filter(node => node.data.stage === stage)
       .sort((a, b) => {
-        const yDelta = a.position.y - b.position.y;
-        if (Math.abs(yDelta) > 8) return yDelta;
+        const primaryDelta = orientation === 'vertical' ? a.position.x - b.position.x : a.position.y - b.position.y;
+        if (Math.abs(primaryDelta) > 8) return primaryDelta;
         const depthDelta = (depth.get(a.id) ?? 0) - (depth.get(b.id) ?? 0);
         if (depthDelta) return depthDelta;
         return a.data.label.localeCompare(b.data.label);
@@ -59,20 +58,50 @@ export function compactStageLayout(journey: Journey): Journey {
   const positions = new Map<string, { x: number; y: number }>();
   for (const stage of STAGES) {
     const group = stageGroups.get(stage) ?? [];
-    const firstDesired = group.length ? Math.max(TOP_OFFSET, Math.round(group[0].position.y / 10) * 10) : TOP_OFFSET;
-    let cursorY = firstDesired;
-    for (const node of group) {
-      const size = nodeSize(node);
-      const desiredY = Math.max(TOP_OFFSET, Math.round(node.position.y / 10) * 10);
-      const y = Math.max(desiredY, cursorY);
-      positions.set(node.id, { x: STAGE_X[stage], y });
-      cursorY = y + Math.max(size.height, 96) + 70;
+    if (orientation === 'horizontal') {
+      const firstDesired = group.length ? Math.max(TOP_OFFSET, Math.round(group[0].position.y / 10) * 10) : TOP_OFFSET;
+      let cursorY = firstDesired;
+      for (const node of group) {
+        const size = nodeSize(node);
+        const desiredY = Math.max(TOP_OFFSET, Math.round(node.position.y / 10) * 10);
+        const y = Math.max(desiredY, cursorY);
+        positions.set(node.id, { x: STAGE_X[stage], y });
+        cursorY = y + Math.max(size.height, 96) + 70;
+      }
+    } else {
+      const firstDesired = group.length ? Math.max(TOP_OFFSET, Math.round(group[0].position.x / 10) * 10) : TOP_OFFSET;
+      let cursorX = firstDesired;
+      for (const node of group) {
+        const size = nodeSize(node);
+        const desiredX = Math.max(TOP_OFFSET, Math.round(node.position.x / 10) * 10);
+        const x = Math.max(desiredX, cursorX);
+        positions.set(node.id, { x, y: STAGE_NODE_Y[stage] });
+        cursorX = x + Math.max(size.width, 138) + 70;
+      }
     }
   }
 
   const nextNodes = journey.nodes.map(node => ({ ...node, position: positions.get(node.id) ?? node.position }));
   const nextEdges = redistributeJourneyEdgeHandles(nextNodes, journey.edges);
   return { ...journey, nodes: nextNodes, edges: nextEdges };
+}
+
+export function changeFunnelOrientation(journey: Journey, orientation: FunnelOrientation): Journey {
+  const current: FunnelOrientation = journey.layoutOrientation ?? 'horizontal';
+  if (current === orientation) return journey;
+  const groups = new Map<FunnelStage, JourneyNode[]>();
+  for (const stage of STAGES) groups.set(stage, journey.nodes.filter(node => node.data.stage === stage));
+  const nextNodes = journey.nodes.map(node => {
+    const group = groups.get(node.data.stage) ?? [];
+    if (orientation === 'vertical') {
+      const minY = group.length ? Math.min(...group.map(n => n.position.y)) : node.position.y;
+      return { ...node, position: { x: TOP_OFFSET + Math.max(0, node.position.y - minY), y: STAGE_NODE_Y[node.data.stage] } };
+    }
+    const minX = group.length ? Math.min(...group.map(n => n.position.x)) : node.position.x;
+    return { ...node, position: { x: STAGE_NODE_X[node.data.stage], y: TOP_OFFSET + Math.max(0, node.position.x - minX) } };
+  });
+  const next: Journey = { ...journey, layoutOrientation: orientation, nodes: nextNodes };
+  return compactStageLayout({ ...next, edges: redistributeJourneyEdgeHandles(nextNodes, journey.edges) });
 }
 
 export function traceConnectedPath(nodes: JourneyNode[], edges: JourneyEdge[], startId: string) {

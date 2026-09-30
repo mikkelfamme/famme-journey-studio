@@ -348,5 +348,9 @@
   "components.editorTitle": "Component editor",
   "components.editorHelp": "Build your own component from scratch and save it to the Library. It can then be inserted and synchronized across journeys.",
   "components.save": "Save component",
-  "components.cancel": "Cancel"
+  "components.cancel": "Cancel",
+  "editor.orientation": "Funnel",
+  "editor.horizontal": "Horizontal",
+  "editor.vertical": "Vertical",
+  "editor.orientationHelp": "Choose whether funnel stages are shown as columns from left to right or rows from top to bottom."
 }

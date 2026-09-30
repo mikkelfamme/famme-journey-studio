@@ -11,6 +11,7 @@ export function snapshotJourney(journey: Journey): JourneyVersionSnapshot {
     status: journey.status,
     primaryConversion: journey.primaryConversion,
     owner: journey.owner,
+    layoutOrientation: journey.layoutOrientation ?? 'horizontal',
     nodes: journey.nodes,
     edges: journey.edges,
     planInputs: journey.planInputs,

@@ -22,7 +22,7 @@ export function JourneyViewer({ journey, initialSelectedId, onClose, onEdit }: {
   const [presenting, setPresenting] = useState(false);
   const [canvasViewport, setCanvasViewport] = useState<CanvasViewport>({ x: 0, y: 0, zoom: 1 });
   const selected = useMemo(() => journey.nodes.find(node => node.id === selectedId) ?? null, [journey.nodes, selectedId]);
-  const presentationOrder = useMemo(() => [...journey.nodes].sort((a,b) => a.position.x - b.position.x || a.position.y - b.position.y), [journey.nodes]);
+  const presentationOrder = useMemo(() => [...journey.nodes].sort((a,b) => (journey.layoutOrientation ?? 'horizontal') === 'vertical' ? (a.position.y - b.position.y || a.position.x - b.position.x) : (a.position.x - b.position.x || a.position.y - b.position.y)), [journey.nodes, journey.layoutOrientation]);
   const presentationIndex = selectedId ? presentationOrder.findIndex(node => node.id === selectedId) : -1;
   const nodes = useMemo(() => journey.nodes.map(node => ({
     ...node,
@@ -91,7 +91,7 @@ export function JourneyViewer({ journey, initialSelectedId, onClose, onEdit }: {
     {presenting&&<div className="presentation-hint no-print">{t('viewer.presentationHint')}</div>}
     <div className={`viewer-layout ${selected ? 'details-open' : ''}` }>
       <div className="viewer-canvas canvas-wrap no-print">
-        <StageBackdrop viewport={canvasViewport}/>
+        <StageBackdrop viewport={canvasViewport} orientation={journey.layoutOrientation ?? 'horizontal'}/>
         <ReactFlow
           nodes={nodes}
           edges={edges}

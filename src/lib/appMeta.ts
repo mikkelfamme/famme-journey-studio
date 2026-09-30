@@ -1,11 +1,21 @@
 export const APP_NAME = 'Journey Studio by Famme';
 export const APP_SHORT_NAME = 'Journey Studio';
-export const APP_VERSION = '2.0.0-rc.12.12';
+export const APP_VERSION = '2.0.0-rc.12.13';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'BY FAMME';
 export const APP_RELEASE_DATE = '2026-09-30';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.12.13',
+    title: 'Switchable horizontal / vertical funnel',
+    items: [
+      'Each journey can switch between a horizontal funnel (stage columns) and a vertical funnel (stage rows).',
+      'Switching orientation reflows the same nodes and connections; it does not create a copy or lose journey data.',
+      'Tidy, stage guardrails, View, Presentation Mode, SVG/PNG and Print/PDF all follow the selected funnel orientation.',
+      'Templates and portable journey files preserve the selected orientation, while existing workspaces default safely to horizontal.'
+    ]
+  },
   {
     version: '2.0.0-rc.12.12',
     title: 'Correct arrow entry & collision-aware lanes',

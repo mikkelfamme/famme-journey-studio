@@ -42,6 +42,7 @@ export function templateFromJourney(
     author: 'Local author',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    layoutOrientation: journey.layoutOrientation ?? 'horizontal',
     nodes: structuredClone(journey.nodes).map(node => ({ ...node, selected: false })),
     edges: structuredClone(journey.edges).map(edge => ({ ...edge, selected: false })),
     planInputs: structuredClone(journey.planInputs)

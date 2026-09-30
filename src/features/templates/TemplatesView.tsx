@@ -19,7 +19,7 @@ interface CreateTemplateDraft {
 
 function TemplateMiniPreview({ template }: { template: JourneyTemplate }) {
   const counts = ['top','middle','bottom','lifecycle'].map(stage => template.nodes.filter(node => node.data.stage === stage).length);
-  return <div className="template-mini-preview" aria-hidden="true">{counts.map((count,index)=><div key={index}><span>{['TOP','MIDDLE','BOTTOM','LIFECYCLE'][index]}</span><div>{Array.from({length:Math.min(count,7)}).map((_,i)=><i key={i}/>)}</div></div>)}</div>;
+  return <div className={`template-mini-preview ${template.layoutOrientation === 'vertical' ? 'vertical' : 'horizontal'}`} aria-hidden="true">{counts.map((count,index)=><div key={index}><span>{['TOP','MIDDLE','BOTTOM','LIFECYCLE'][index]}</span><div>{Array.from({length:Math.min(count,7)}).map((_,i)=><i key={i}/>)}</div></div>)}</div>;
 }
 
 export function TemplatesView({ onOpen, onEditTemplate }: { onOpen: (journey: Journey) => void; onEditTemplate: (template: JourneyTemplate) => void }) {

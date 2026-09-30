@@ -1,5 +1,5 @@
 import type { FunnelStage, Journey, JourneyNodeType, NodeBackgroundTone } from '../types/domain';
-import { STAGE_WORLD_BOUNDARIES } from './stageGeometry';
+import { STAGE_WORLD_BOUNDARIES, STAGE_WORLD_BOUNDARIES_VERTICAL } from './stageGeometry';
 import { edgeLaneMap, journeyBounds, nodeSize, orthogonalEdgeRoute } from './graphGeometry';
 import { redistributeJourneyEdgeHandles } from './flowHandles';
 
@@ -34,8 +34,9 @@ export function journeySvg(journey: Journey) {
     if (compact) return `<g transform="translate(${node.position.x},${node.position.y})"><rect width="${size.width}" height="${size.height}" rx="13" fill="${fill}" stroke="#cfd7df"/><rect width="4" height="${size.height}" rx="2" fill="${accent}"/><circle cx="19" cy="${size.height/2}" r="8" fill="${accent}" fill-opacity=".10"/><text x="34" y="${size.height/2+4}" font-size="11" font-weight="750" fill="#26313d">${esc(lines[0] ?? 'Tracking')}</text></g>`;
     return `<g transform="translate(${node.position.x},${node.position.y})"><rect width="${size.width}" height="${size.height}" rx="16" fill="${fill}" stroke="#d5dce4"/><rect width="${size.width}" height="4" rx="2" fill="${accent}"/><text x="18" y="27" font-size="9" font-weight="800" fill="#75808e">${esc(node.data.type.toUpperCase())}</text>${lines.map((line,i)=>`<text x="18" y="${54+i*18}" font-size="15" font-weight="750" fill="#18212e">${esc(line)}</text>`).join('')}<text x="${size.width-18}" y="27" text-anchor="end" font-size="9" font-weight="800" fill="#6b7582">${esc(node.data.stage.toUpperCase())}</text></g>`;
   }).join('');
-  const boundaries=[b.minX,...STAGE_WORLD_BOUNDARIES,b.maxX];
-  const stageRects=STAGES.map((stage,index)=>{const left=Math.max(b.minX,boundaries[index]);const right=Math.min(b.maxX,boundaries[index+1]);if(right<=left)return'';return `<g><rect x="${left}" y="${b.minY}" width="${right-left}" height="${b.height}" fill="${STAGE_FILL[stage]}"/><text x="${left+18}" y="${b.minY+28}" font-size="11" font-weight="800" fill="#52606d">${STAGE_LABEL[stage]}</text></g>`;}).join('');
+  const vertical=(journey.layoutOrientation ?? 'horizontal')==='vertical';
+  const boundaries=vertical?[b.minY,...STAGE_WORLD_BOUNDARIES_VERTICAL,b.maxY]:[b.minX,...STAGE_WORLD_BOUNDARIES,b.maxX];
+  const stageRects=STAGES.map((stage,index)=>{if(vertical){const top=Math.max(b.minY,boundaries[index]);const bottom=Math.min(b.maxY,boundaries[index+1]);if(bottom<=top)return'';return `<g><rect x="${b.minX}" y="${top}" width="${b.width}" height="${bottom-top}" fill="${STAGE_FILL[stage]}"/><text x="${b.minX+18}" y="${top+28}" font-size="11" font-weight="800" fill="#52606d">${STAGE_LABEL[stage]}</text></g>`;}const left=Math.max(b.minX,boundaries[index]);const right=Math.min(b.maxX,boundaries[index+1]);if(right<=left)return'';return `<g><rect x="${left}" y="${b.minY}" width="${right-left}" height="${b.height}" fill="${STAGE_FILL[stage]}"/><text x="${left+18}" y="${b.minY+28}" font-size="11" font-weight="800" fill="#52606d">${STAGE_LABEL[stage]}</text></g>`;}).join('');
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${b.minX} ${b.minY} ${b.width} ${b.height}" width="${Math.round(b.width)}" height="${Math.round(b.height)}"><defs><marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#718096"/></marker></defs>${stageRects}${edgeSvg}${nodes}</svg>`;
 }
 function safeName(value:string){return value.trim().replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'')||'journey';}

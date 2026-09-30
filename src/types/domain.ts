@@ -3,6 +3,7 @@ import type { Edge, Node } from '@xyflow/react';
 export type WorkspaceScope = 'B2C' | 'B2B' | 'Mixed';
 export type JourneyStatus = 'draft' | 'active' | 'paused' | 'archived';
 export type FunnelStage = 'top' | 'middle' | 'bottom' | 'lifecycle';
+export type FunnelOrientation = 'horizontal' | 'vertical';
 export type NodeBackgroundTone = 'white' | 'green' | 'yellow' | 'red' | 'blue' | 'gray';
 export type AnnotationKind = 'comment' | 'decision' | 'todo' | 'hypothesis';
 export type JourneyNodeType =
@@ -132,6 +133,7 @@ export interface JourneyVersionSnapshot {
   status: JourneyStatus;
   primaryConversion: string;
   owner: string;
+  layoutOrientation?: FunnelOrientation;
   nodes: JourneyNode[];
   edges: JourneyEdge[];
   planInputs: JourneyPlanInputs;
@@ -157,6 +159,7 @@ export interface Journey {
   status: JourneyStatus;
   primaryConversion: string;
   owner: string;
+  layoutOrientation?: FunnelOrientation;
   createdAt: string;
   updatedAt: string;
   nodes: JourneyNode[];
@@ -179,6 +182,7 @@ export interface JourneyTemplate {
   author: string;
   createdAt: string;
   updatedAt: string;
+  layoutOrientation?: FunnelOrientation;
   nodes: JourneyNode[];
   edges: JourneyEdge[];
   planInputs?: JourneyPlanInputs;

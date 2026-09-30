@@ -1,3 +1,7 @@
+
+## RC12.13
+Switchable horizontal/vertical funnel layout with orientation-aware tidy, stage backgrounds and exports.
+
 ## 2.0.0-rc.12.10.1 — Master View build hotfix
 
 - Fixes TypeScript nullability errors in `MasterView.tsx` introduced in RC12.10.

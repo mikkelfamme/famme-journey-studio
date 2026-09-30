@@ -3,7 +3,7 @@ import type { FunnelStage, Journey, JourneyEdge, JourneyNode, JourneyNodeType, N
 import { useI18n } from '../../i18n';
 import { redistributeJourneyEdgeHandles } from '../../lib/flowHandles';
 import { edgeLaneMap, journeyBounds, nodeSize, orthogonalEdgeRoute } from '../../lib/graphGeometry';
-import { STAGE_WORLD_BOUNDARIES } from '../../lib/stageGeometry';
+import { STAGE_WORLD_BOUNDARIES, STAGE_WORLD_BOUNDARIES_VERTICAL } from '../../lib/stageGeometry';
 
 const STAGES: FunnelStage[] = ['top', 'middle', 'bottom', 'lifecycle'];
 const STAGE_FILL: Record<FunnelStage, string> = {
@@ -90,19 +90,21 @@ export function JourneyPrintSheet({ journey }: { journey: Journey }) {
         </defs>
 
         {STAGES.map((stageId, index) => {
+          const vertical = (journey.layoutOrientation ?? 'horizontal') === 'vertical';
+          if (vertical) {
+            const boundaries = [bounds.y, ...STAGE_WORLD_BOUNDARIES_VERTICAL, bounds.y + bounds.height];
+            const y = Math.max(bounds.y, boundaries[index]);
+            const bottom = Math.min(bounds.y + bounds.height, boundaries[index + 1]);
+            const height = Math.max(0, bottom - y);
+            if (!height) return null;
+            return <g key={stageId}><rect x={bounds.x} y={y} width={bounds.width} height={height} fill={STAGE_FILL[stageId]}/>{index>0&&<line x1={bounds.x} x2={bounds.x+bounds.width} y1={y} y2={y} stroke="#d8e0e7" strokeWidth="1"/>}<g transform={`translate(${bounds.x+16},${y+16})`}><rect x="0" y="0" width="124" height="23" rx="11.5" fill="#ffffff" fillOpacity=".9" stroke="#dfe5ea"/><text x="10" y="15" fill={STAGE_TEXT[stageId]} fontSize="9" fontWeight="800" letterSpacing=".7">{t(`stage.${stageId}Long`)}</text></g></g>;
+          }
           const boundaries = [bounds.x, ...STAGE_WORLD_BOUNDARIES, bounds.x + bounds.width];
           const x = Math.max(bounds.x, boundaries[index]);
           const right = Math.min(bounds.x + bounds.width, boundaries[index + 1]);
           const width = Math.max(0, right - x);
           if (!width) return null;
-          return <g key={stageId}>
-            <rect x={x} y={bounds.y} width={width} height={bounds.height} fill={STAGE_FILL[stageId]} />
-            {index > 0 && <line x1={x} x2={x} y1={bounds.y} y2={bounds.y + bounds.height} stroke="#d8e0e7" strokeWidth="1" />}
-            <g transform={`translate(${x + 16},${bounds.y + 16})`}>
-              <rect x="0" y="0" width="124" height="23" rx="11.5" fill="#ffffff" fillOpacity=".9" stroke="#dfe5ea" />
-              <text x="10" y="15" fill={STAGE_TEXT[stageId]} fontSize="9" fontWeight="800" letterSpacing=".7">{t(`stage.${stageId}Long`)}</text>
-            </g>
-          </g>;
+          return <g key={stageId}><rect x={x} y={bounds.y} width={width} height={bounds.height} fill={STAGE_FILL[stageId]}/>{index>0&&<line x1={x} x2={x} y1={bounds.y} y2={bounds.y+bounds.height} stroke="#d8e0e7" strokeWidth="1"/>}<g transform={`translate(${x+16},${bounds.y+16})`}><rect x="0" y="0" width="124" height="23" rx="11.5" fill="#ffffff" fillOpacity=".9" stroke="#dfe5ea"/><text x="10" y="15" fill={STAGE_TEXT[stageId]} fontSize="9" fontWeight="800" letterSpacing=".7">{t(`stage.${stageId}Long`)}</text></g></g>;
         })}
 
         {printEdges.map(edge => {

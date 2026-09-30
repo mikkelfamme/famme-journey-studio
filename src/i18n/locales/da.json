@@ -348,5 +348,9 @@
   "components.editorTitle": "Komponent-editor",
   "components.editorHelp": "Byg din egen komponent fra bunden og gem den i biblioteket. Du kan senere indsætte og synkronisere den i alle kunderejser.",
   "components.save": "Gem komponent",
-  "components.cancel": "Annullér"
+  "components.cancel": "Annullér",
+  "editor.orientation": "Funnel",
+  "editor.horizontal": "Vandret",
+  "editor.vertical": "Lodret",
+  "editor.orientationHelp": "Vælg om funnel-faserne vises som kolonner fra venstre mod højre eller som rækker fra top mod bund."
 }

@@ -17,7 +17,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { AlignHorizontalJustifyStart, AlertTriangle, ArrowLeft, BarChart3, CheckCircle2, ChevronDown, Copy, FileImage, FileText, GitCompareArrows, HeartPulse, Layers3, LayoutGrid, Maximize2, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Printer, Redo2, Save, Shapes, Trash2, Undo2, Waypoints } from 'lucide-react';
-import type { ComponentDefinition, CrossJourneyLink, FunnelStage, Journey, JourneyEdge, JourneyNode, JourneyNodeData, JourneyNodeType, JourneyStatus, JourneyVersion } from '../../types/domain';
+import type { ComponentDefinition, CrossJourneyLink, FunnelOrientation, FunnelStage, Journey, JourneyEdge, JourneyNode, JourneyNodeData, JourneyNodeType, JourneyStatus, JourneyVersion } from '../../types/domain';
 import { makeId } from '../../lib/ids';
 import { generateJourneyPlan } from '../../lib/plan';
 import { createJourneyVersion, restoreVersion } from '../../lib/versions';
@@ -34,11 +34,11 @@ import { ActualPanel } from './ActualPanel';
 import { activeActualSnapshot, pathsForJourney } from '../../lib/actual';
 import { activePerformanceSnapshot, mappingQuality, preferredMetrics, recordsForNode } from '../../lib/performance';
 import { useHistoryState } from '../../lib/useHistory';
-import { compactStageLayout, traceConnectedPath } from '../../lib/layout';
+import { changeFunnelOrientation, compactStageLayout, traceConnectedPath } from '../../lib/layout';
 import { useI18n } from '../../i18n';
 import { JourneyPrintSheet } from './JourneyPrintSheet';
 import { StageBackdrop } from './StageBackdrop';
-import { isStageMismatch, type CanvasViewport } from '../../lib/stageGeometry';
+import { isStageMismatch, STAGE_NODE_X, STAGE_NODE_Y, type CanvasViewport } from '../../lib/stageGeometry';
 import { downloadJourneyPng, downloadJourneySvg } from '../../lib/journeyImageExport';
 import { normalizeJourneyEdgeHandles } from '../../lib/flowHandles';
 import { areNodesAdjacent, edgeLaneMap } from '../../lib/graphGeometry';
@@ -103,9 +103,13 @@ export function JourneyEditor({ journey, initialNodeId, onClose }: { journey: Jo
   }, []);
 
   function addNode(type: JourneyNodeType, label: string, stage: FunnelStage) {
-    const count = draft.nodes.length;
+    const count = draft.nodes.filter(node => node.data.stage === stage).length;
+    const orientation = draft.layoutOrientation ?? 'horizontal';
+    const position = orientation === 'vertical'
+      ? { x: 110 + count * 322, y: STAGE_NODE_Y[stage] }
+      : { x: STAGE_NODE_X[stage], y: 110 + count * 166 };
     const id = makeId('node');
-    setDraft(d => ({ ...d, nodes: [...d.nodes, { id, type: 'journey', position: { x: 140 + (count % 4) * 220, y: 100 + Math.floor(count / 4) * 150 }, data: { label, type, stage, description: '', tracking: [], creatives: [], annotations: [] } }] }));
+    setDraft(d => ({ ...d, nodes: [...d.nodes, { id, type: 'journey', position, data: { label, type, stage, description: '', tracking: [], creatives: [], annotations: [] } }] }));
     setSelectedIds([id]);
     setSelectedEdgeId(null);
     setInspectorMode('properties');
@@ -113,9 +117,14 @@ export function JourneyEditor({ journey, initialNodeId, onClose }: { journey: Jo
   }
 
   function addComponent(component: ComponentDefinition) {
-    const count = draft.nodes.length;
+    const stage = component.nodeData.stage;
+    const count = draft.nodes.filter(node => node.data.stage === stage).length;
+    const orientation = draft.layoutOrientation ?? 'horizontal';
+    const position = orientation === 'vertical'
+      ? { x: 110 + count * 322, y: STAGE_NODE_Y[stage] }
+      : { x: STAGE_NODE_X[stage], y: 110 + count * 166 };
     const id = makeId('node');
-    setDraft(d => ({ ...d, nodes: [...d.nodes, { id, type: 'journey', position: { x: 160 + (count % 4) * 220, y: 120 + Math.floor(count / 4) * 150 }, data: syncedNodeData(component) }] }));
+    setDraft(d => ({ ...d, nodes: [...d.nodes, { id, type: 'journey', position, data: syncedNodeData(component) }] }));
     setSelectedIds([id]);
     setSelectedEdgeId(null);
     setInspectorMode('properties');
@@ -216,6 +225,12 @@ export function JourneyEditor({ journey, initialNodeId, onClose }: { journey: Jo
   function tidyLayout() {
     setDraft(current => compactStageLayout(current));
     window.setTimeout(() => flowInstance?.fitView({ padding: 0.16, duration: 380, minZoom: 0.45, maxZoom: 1.08 }), 40);
+  }
+
+
+  function setFunnelOrientation(orientation: FunnelOrientation) {
+    setDraft(current => changeFunnelOrientation(current, orientation));
+    window.setTimeout(() => flowInstance?.fitView({ padding: 0.16, duration: 380, minZoom: 0.35, maxZoom: 1.08 }), 40);
   }
 
   function save() { updateJourney(draft); draftHistory.reset(structuredClone(draft)); }
@@ -319,7 +334,7 @@ export function JourneyEditor({ journey, initialNodeId, onClose }: { journey: Jo
   const actualSnapshot = workspace ? activeActualSnapshot(workspace) : undefined;
   const actualPaths = workspace ? pathsForJourney(workspace, draft.id, actualSnapshot) : [];
   const activePath = useMemo(() => selected ? traceConnectedPath(draft.nodes, draft.edges, selected.id) : null, [selected?.id, draft.nodes, draft.edges]);
-  const stageMismatchCount = useMemo(() => draft.nodes.filter(node => isStageMismatch(node.data.stage, node.position.x)).length, [draft.nodes]);
+  const stageMismatchCount = useMemo(() => draft.nodes.filter(node => isStageMismatch(node.data.stage, node.position, draft.layoutOrientation ?? 'horizontal')).length, [draft.nodes, draft.layoutOrientation]);
   const edgeLanes = useMemo(() => edgeLaneMap(draft.edges, draft.nodes), [draft.edges, draft.nodes]);
 
   const flowNodes = useMemo(() => draft.nodes.map(node => {
@@ -327,7 +342,7 @@ export function JourneyEditor({ journey, initialNodeId, onClose }: { journey: Jo
       ...node.data,
       runtimePerformance: undefined,
       runtimeActualCount: undefined,
-      runtimeStageMismatch: isStageMismatch(node.data.stage, node.position.x),
+      runtimeStageMismatch: isStageMismatch(node.data.stage, node.position, draft.layoutOrientation ?? 'horizontal'),
       runtimeActions: { duplicate: () => duplicateNode(node.id), delete: () => deleteNode(node.id) }
     };
     if (showPerformance && workspace && activeSnapshot) {
@@ -348,7 +363,7 @@ export function JourneyEditor({ journey, initialNodeId, onClose }: { journey: Jo
     }
     const pathClass = activePath ? (activePath.activeNodes.has(node.id) ? 'path-active' : 'path-muted') : '';
     return { ...node, className: [node.className, pathClass].filter(Boolean).join(' '), data };
-  }), [draft.nodes, draft.id, showPerformance, workspace, activeSnapshot, actualSnapshot, actualPaths, inspectorMode, activePath]);
+  }), [draft.nodes, draft.id, draft.layoutOrientation, showPerformance, workspace, activeSnapshot, actualSnapshot, actualPaths, inspectorMode, activePath]);
 
   const flowEdges = useMemo(() => draft.edges.map(edge => {
     const label = edge.data?.label || edge.data?.signal || edge.data?.condition || undefined;
@@ -401,6 +416,7 @@ export function JourneyEditor({ journey, initialNodeId, onClose }: { journey: Jo
           <div className="editor-action-group canvas-actions">
             <button className="button" onClick={fitJourney} title="Fit the whole journey in view"><Maximize2 size={15}/> {t('editor.fit')}</button>
             <button className="button" onClick={tidyLayout} title="Compact nodes into funnel stages"><LayoutGrid size={15}/> {t('editor.tidy')}</button>
+            <label className="funnel-orientation-control" title={t('editor.orientationHelp')}><span>{t('editor.orientation')}</span><select value={draft.layoutOrientation ?? 'horizontal'} onChange={event => setFunnelOrientation(event.target.value as FunnelOrientation)}><option value="horizontal">{t('editor.horizontal')}</option><option value="vertical">{t('editor.vertical')}</option></select></label>
           </div>
           <div className="review-menu-wrap">
             <button className={`button review-button ${inspectorMode !== 'properties' || showPerformance ? 'active-button' : ''}`} onClick={() => setReviewMenuOpen(value => !value)}><HeartPulse size={15}/> {t('editor.review')} <ChevronDown size={13}/></button>
@@ -453,7 +469,7 @@ export function JourneyEditor({ journey, initialNodeId, onClose }: { journey: Jo
             <Controls />
             {workspace?.settings.showMiniMap && draft.nodes.length >= 10 && <MiniMap pannable zoomable />}
           </ReactFlow>
-          <StageBackdrop viewport={canvasViewport}/>
+          <StageBackdrop viewport={canvasViewport} orientation={draft.layoutOrientation ?? 'horizontal'}/>
           <div className="canvas-pan-hint no-print">{t('editor.panHint')}</div>
           {selectedIds.length > 1 && <div className="bulk-toolbar">
             <strong>{selectedIds.length} {t('editor.selected')}</strong>

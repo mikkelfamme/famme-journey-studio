@@ -1,13 +1,14 @@
-# Release manifest — 2.0.0-rc.12.12
+# Release manifest — 2.0.0-rc.12.13
 
-Source baseline: Journey Studio by Famme 2.0.0-rc.12.11.
+Source baseline: Journey Studio by Famme 2.0.0-rc.12.12.
 
 Primary changes:
-- correct target/source side resolution for compound connection handles
-- correct arrow approach direction for mixed orthogonal routes
-- geometry-aware Tidy port redistribution
-- collision-aware parallel lane separation
-- corrected SVG/PNG and Print/PDF routing
+- per-journey horizontal / vertical funnel orientation
+- orientation-aware Tidy and stage guardrails
+- vertical stage bands in editor, View and Presentation Mode
+- orientation-aware SVG/PNG and Print/PDF output
+- orientation persistence in workspace, `.jsjourney`, templates and version snapshots
+
 
 Schemas preserved:
 - famme-journey-studio-workspace-v2

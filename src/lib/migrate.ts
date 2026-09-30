@@ -17,6 +17,7 @@ function normalizeNodeData(data: JourneyNodeData): JourneyNodeData {
 function normalizeJourney(journey: Journey): Journey {
   return {
     ...journey,
+    layoutOrientation: journey.layoutOrientation === 'vertical' ? 'vertical' : 'horizontal',
     nodes: (journey.nodes ?? []).map(node => ({ ...node, data: normalizeNodeData(node.data) })),
     edges: normalizeJourneyEdgeHandles(journey.nodes ?? [], journey.edges ?? []),
     planInputs: journey.planInputs ?? {},
@@ -49,6 +50,7 @@ export function normalizeWorkspace(workspace: Workspace): Workspace {
       ? workspace.templates.map(template => ({
           ...template,
           version: template.version ?? '1.0.0',
+          layoutOrientation: template.layoutOrientation === 'vertical' ? 'vertical' : 'horizontal',
           tags: Array.isArray(template.tags) ? template.tags : [],
           author: template.author ?? (template.system ? 'Journey Studio by Famme' : workspace.organization || 'Local author'),
           createdAt: template.createdAt ?? workspace.createdAt ?? now(),

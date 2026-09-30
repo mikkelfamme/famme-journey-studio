@@ -156,3 +156,9 @@ RC12.11 does not change the portable file schemas. It adds optional values that 
 - edge data `routeLane` is runtime-only routing metadata and does not need to be supplied by imported files
 
 Existing node and edge IDs, workspace schemas and portable journey/template schemas remain unchanged.
+
+
+## Funnel orientation (RC12.13+)
+
+Journeys and templates may contain the optional field `layoutOrientation` with the value `horizontal` or `vertical`.
+Older workspaces and portable files without the field continue to load as `horizontal`. The field changes only the visual stage layout; node IDs, edge IDs, tracking, creatives, annotations and mapping semantics are unchanged.
