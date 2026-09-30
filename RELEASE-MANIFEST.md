@@ -1,8 +1,11 @@
-# Release manifest — 2.0.0-rc.12.13
+# Release manifest — 2.0.0-rc.12.13.1
 
-Source baseline: Journey Studio by Famme 2.0.0-rc.12.12.
+Source baseline: Journey Studio by Famme 2.0.0-rc.12.13.
 
-Primary changes:
+Hotfix change:
+- restore the backward-compatible `createBlankJourney` workspace export required by Journeys dashboard variants
+
+Primary RC12.13 changes:
 - per-journey horizontal / vertical funnel orientation
 - orientation-aware Tidy and stage guardrails
 - vertical stage bands in editor, View and Presentation Mode
@@ -16,3 +19,5 @@ Schemas preserved:
 - journey-studio-template-v1
 - famme-journey-performance-v1
 - famme-journey-actual-paths-v1
+
+- Hotfix: restores `createBlankJourney` export required by JourneysView variants.

@@ -1,11 +1,20 @@
 export const APP_NAME = 'Journey Studio by Famme';
 export const APP_SHORT_NAME = 'Journey Studio';
-export const APP_VERSION = '2.0.0-rc.12.13';
+export const APP_VERSION = '2.0.0-rc.12.13.1';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'BY FAMME';
 export const APP_RELEASE_DATE = '2026-09-30';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.12.13.1',
+    title: 'Blank journey build hotfix',
+    items: [
+      'Restores the createBlankJourney workspace helper expected by the journeys dashboard.',
+      'Keeps RC12.13 horizontal / vertical funnel functionality unchanged.',
+      'The helper accepts both object-based and positional calls so older dashboard variants remain compatible.'
+    ]
+  },
   {
     version: '2.0.0-rc.12.13',
     title: 'Switchable horizontal / vertical funnel',

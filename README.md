@@ -3,8 +3,12 @@
 **Visual customer journey architecture, channel planning, measurement design and observed-path analysis.**  
 Designed & developed by **Mikkel Famme**.
 
-> Current release: `2.0.0-rc.12.13`
+> Current release: `2.0.0-rc.12.13.1`
 
+
+### RC12.13.1 hotfix
+- Restores the blank-journey factory expected by some Journeys dashboard variants
+- Fixes the GitHub Actions TypeScript build error without changing funnel orientation behaviour
 
 ### RC12.13 highlight
 - Switch each journey between horizontal stage columns and vertical stage rows

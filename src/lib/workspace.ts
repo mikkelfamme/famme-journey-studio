@@ -30,6 +30,61 @@ export function createWorkspace(input: { name: string; organization: string; sco
   });
 }
 
+
+export function createBlankJourney(...args: unknown[]): Journey {
+  const timestamp = now();
+  const allowedScopes: WorkspaceScope[] = ['B2C', 'B2B', 'Mixed'];
+
+  let name = 'Untitled journey';
+  let scope: WorkspaceScope = 'B2C';
+  let organization = '';
+  let product = '';
+  let description = '';
+
+  const first = args[0];
+  if (typeof first === 'object' && first !== null) {
+    const input = first as Record<string, unknown>;
+    if (typeof input.name === 'string' && input.name.trim()) name = input.name.trim();
+    if (typeof input.scope === 'string' && allowedScopes.includes(input.scope as WorkspaceScope)) scope = input.scope as WorkspaceScope;
+    if (typeof input.organization === 'string') organization = input.organization;
+    if (typeof input.product === 'string') product = input.product;
+    if (typeof input.description === 'string') description = input.description;
+  } else {
+    if (typeof first === 'string' && first.trim()) name = first.trim();
+    for (const arg of args.slice(1)) {
+      if (typeof arg !== 'string') continue;
+      if (allowedScopes.includes(arg as WorkspaceScope)) {
+        scope = arg as WorkspaceScope;
+      } else if (!organization) {
+        organization = arg;
+      } else if (!product) {
+        product = arg;
+      }
+    }
+  }
+
+  return {
+    id: makeId('journey'),
+    name,
+    description,
+    audience: '',
+    product,
+    scope,
+    status: 'draft',
+    primaryConversion: 'Purchase / primary conversion',
+    owner: '',
+    layoutOrientation: 'horizontal',
+    createdAt: timestamp,
+    updatedAt: timestamp,
+    nodes: [],
+    edges: [],
+    planInputs: { objective: organization ? `Create a coherent journey for ${organization}.` : '' },
+    crossJourneyLinks: [],
+    annotations: [],
+    versions: []
+  };
+}
+
 export function journeyFromTemplate(t: JourneyTemplate, name: string, organization = ''): Journey {
   const timestamp = now();
   const idMap = new Map<string, string>();

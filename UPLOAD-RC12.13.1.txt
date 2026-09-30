@@ -1,0 +1,6 @@
+RC12.13.1 BUILD HOTFIX
+
+Upload the CONTENTS of this ZIP to the repository root and overwrite matching files.
+
+This hotfix restores the createBlankJourney export expected by the current JourneysView in GitHub.
+It does not change the RC12.13 funnel orientation feature.

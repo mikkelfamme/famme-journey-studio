@@ -1,4 +1,11 @@
 
+
+## 2.0.0-rc.12.13.1 - 2026-09-30
+
+- Fixed GitHub Actions build failure caused by a missing `createBlankJourney` export.
+- Restored a backward-compatible blank-journey factory in `src/lib/workspace.ts`.
+- RC12.13 funnel orientation functionality is otherwise unchanged.
+
 ## RC12.13
 Switchable horizontal/vertical funnel layout with orientation-aware tidy, stage backgrounds and exports.
 
