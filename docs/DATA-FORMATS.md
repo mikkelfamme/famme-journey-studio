@@ -145,3 +145,14 @@ Insights & Data now exposes the complete handoff explicitly:
 The mapping manifests themselves are never imported back into Journey Studio. They are reference files for the external/AI preparation step.
 
 For performance snapshots, components without a defensible measurement should be omitted from `nodeMetrics`; Journey Studio treats absent components as unmapped. For actual paths, an observed step that cannot be confidently matched to a planned node should use a label-only step rather than an invented `nodeId`.
+
+## RC12.11 additive journey fields
+
+RC12.11 does not change the portable file schemas. It adds optional values that older RC12 workspaces can ignore safely:
+
+- node type `chatgpt` for ChatGPT as a journey channel
+- node type `trackingPoint` for compact inline tracking markers
+- edge data `connectionStyle: "arrow" | "attached"`; `attached` renders a direct connection without an arrowhead
+- edge data `routeLane` is runtime-only routing metadata and does not need to be supplied by imported files
+
+Existing node and edge IDs, workspace schemas and portable journey/template schemas remain unchanged.

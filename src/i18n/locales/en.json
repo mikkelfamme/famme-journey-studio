@@ -338,5 +338,15 @@
   "nodeColor.yellow": "Yellow",
   "nodeColor.red": "Red",
   "nodeColor.blue": "Blue",
-  "nodeColor.gray": "Gray"
+  "nodeColor.gray": "Gray",
+  "node.chatgpt": "ChatGPT",
+  "node.trackingPoint": "Tracking point",
+  "nodeDesc.chatgpt": "A ChatGPT touchpoint, for example organic AI visibility, recommendation or paid ChatGPT advertising.",
+  "nodeDesc.trackingPoint": "A compact tracking marker between journey steps. Use it for events such as ViewContent, AddToCart, BeginCheckout or Purchase without a full-sized node.",
+  "components.create": "Create component",
+  "components.edit": "Edit",
+  "components.editorTitle": "Component editor",
+  "components.editorHelp": "Build your own component from scratch and save it to the Library. It can then be inserted and synchronized across journeys.",
+  "components.save": "Save component",
+  "components.cancel": "Cancel"
 }

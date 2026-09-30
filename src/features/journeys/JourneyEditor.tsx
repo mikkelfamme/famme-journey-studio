@@ -26,6 +26,7 @@ import { useWorkspace } from '../../store/WorkspaceContext';
 import { EdgePropertiesPanel } from './EdgePropertiesPanel';
 import { HealthPanel } from './HealthPanel';
 import { JourneyNodeComponent } from './JourneyNode';
+import { JourneyEdgeComponent } from './JourneyEdge';
 import { NodePalette } from './NodePalette';
 import { PropertiesPanel } from './PropertiesPanel';
 import { VersionsPanel } from './VersionsPanel';
@@ -40,8 +41,10 @@ import { StageBackdrop } from './StageBackdrop';
 import { isStageMismatch, type CanvasViewport } from '../../lib/stageGeometry';
 import { downloadJourneyPng, downloadJourneySvg } from '../../lib/journeyImageExport';
 import { normalizeJourneyEdgeHandles } from '../../lib/flowHandles';
+import { areNodesAdjacent, edgeLaneMap } from '../../lib/graphGeometry';
 
 const nodeTypes = { journey: JourneyNodeComponent };
+const edgeTypes = { journeyEdge: JourneyEdgeComponent };
 type InspectorMode = 'properties' | 'plan' | 'health' | 'versions' | 'actual';
 
 export function JourneyEditor({ journey, initialNodeId, onClose }: { journey: Journey; initialNodeId?: string; onClose: () => void }) {
@@ -87,7 +90,12 @@ export function JourneyEditor({ journey, initialNodeId, onClose }: { journey: Jo
     const setter = changes.every(change => change.type === 'select') ? setDraftTransient : setDraft;
     setter(d => ({ ...d, edges: applyEdgeChanges(changes, d.edges) }));
   }, [setDraft, setDraftTransient]);
-  const onConnect = useCallback((connection: Connection) => setDraft(d => ({ ...d, edges: addEdge({ ...connection, id: makeId('edge'), type: 'smoothstep', data: { label: '', condition: '', signal: '', timing: '', comment: '' } }, d.edges) })), []);
+  const onConnect = useCallback((connection: Connection) => setDraft(d => {
+    const source = d.nodes.find(node => node.id === connection.source);
+    const target = d.nodes.find(node => node.id === connection.target);
+    const connectionStyle = source && target && areNodesAdjacent(source, target) ? 'attached' : 'arrow';
+    return { ...d, edges: addEdge({ ...connection, id: makeId('edge'), type: 'journeyEdge', data: { label: '', condition: '', signal: '', timing: '', comment: '', connectionStyle } }, d.edges) };
+  }), []);
   const onReconnect = useCallback((oldEdge: Edge, connection: Connection) => setDraft(d => ({ ...d, edges: reconnectEdge(oldEdge, connection, d.edges) })), []);
   const onSelectionChange = useCallback((selection: OnSelectionChangeParams) => {
     setSelectedIds(selection.nodes.map(node => node.id));
@@ -312,6 +320,7 @@ export function JourneyEditor({ journey, initialNodeId, onClose }: { journey: Jo
   const actualPaths = workspace ? pathsForJourney(workspace, draft.id, actualSnapshot) : [];
   const activePath = useMemo(() => selected ? traceConnectedPath(draft.nodes, draft.edges, selected.id) : null, [selected?.id, draft.nodes, draft.edges]);
   const stageMismatchCount = useMemo(() => draft.nodes.filter(node => isStageMismatch(node.data.stage, node.position.x)).length, [draft.nodes]);
+  const edgeLanes = useMemo(() => edgeLaneMap(draft.edges), [draft.edges]);
 
   const flowNodes = useMemo(() => draft.nodes.map(node => {
     const data: JourneyNodeData = {
@@ -344,19 +353,22 @@ export function JourneyEditor({ journey, initialNodeId, onClose }: { journey: Jo
   const flowEdges = useMemo(() => draft.edges.map(edge => {
     const label = edge.data?.label || edge.data?.signal || edge.data?.condition || undefined;
     const pathClass = activePath ? (activePath.activeEdges.has(edge.id) ? 'path-active' : 'path-muted') : '';
+    const attached = edge.data?.connectionStyle === 'attached';
     return {
       ...edge,
-      animated: true,
+      type: 'journeyEdge',
+      data: { ...(edge.data ?? {}), routeLane: edgeLanes.get(edge.id) ?? 0 },
+      animated: !attached,
       label,
-      className: [edge.className, 'fjs-flow-edge', pathClass].filter(Boolean).join(' '),
-      markerEnd: { type: MarkerType.ArrowClosed, width: 20, height: 20, color: '#687889' },
-      style: { ...(edge.style ?? {}), stroke: '#718194', strokeWidth: 1.9 },
+      className: [edge.className, 'fjs-flow-edge', attached ? 'fjs-attached-edge' : '', pathClass].filter(Boolean).join(' '),
+      markerEnd: attached ? undefined : { type: MarkerType.ArrowClosed, width: 20, height: 20, color: '#687889' },
+      style: { ...(edge.style ?? {}), stroke: '#718194', strokeWidth: attached ? 2.6 : 1.9 },
       labelStyle: { fill: '#435160', fontSize: 10, fontWeight: 750 },
       labelBgStyle: { fill: '#ffffff', fillOpacity: 0.96, stroke: '#d6dde5', strokeWidth: 1 },
       labelBgPadding: [6, 4] as [number, number],
       labelBgBorderRadius: 8
     };
-  }), [draft.edges, activePath]);
+  }), [draft.edges, activePath, edgeLanes]);
 
   function selectHealthNode(nodeId: string) {
     setSelectedIds([nodeId]);
@@ -413,6 +425,7 @@ export function JourneyEditor({ journey, initialNodeId, onClose }: { journey: Jo
             nodes={flowNodes}
             edges={flowEdges}
             nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
             onInit={instance => {
               setFlowInstance({ fitView: options => { void instance.fitView(options); } });
               setCanvasViewport(instance.getViewport());

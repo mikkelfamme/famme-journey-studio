@@ -338,5 +338,15 @@
   "nodeColor.yellow": "Gul",
   "nodeColor.red": "Rød",
   "nodeColor.blue": "Blå",
-  "nodeColor.gray": "Grå"
+  "nodeColor.gray": "Grå",
+  "node.chatgpt": "ChatGPT",
+  "node.trackingPoint": "Trackingpunkt",
+  "nodeDesc.chatgpt": "Et ChatGPT-kontaktpunkt, fx organisk AI-synlighed, anbefaling eller betalt ChatGPT-annoncering.",
+  "nodeDesc.trackingPoint": "Et lille trackingpunkt mellem to trin. Brug det til at vise fx ViewContent, AddToCart, BeginCheckout eller Purchase uden en stor komponent.",
+  "components.create": "Opret komponent",
+  "components.edit": "Redigér",
+  "components.editorTitle": "Komponent-editor",
+  "components.editorHelp": "Byg din egen komponent fra bunden og gem den i biblioteket. Du kan senere indsætte og synkronisere den i alle kunderejser.",
+  "components.save": "Gem komponent",
+  "components.cancel": "Annullér"
 }

@@ -52,8 +52,8 @@ function sanitizeNode(node: JourneyNode, options: PortfolioOptions): JourneyNode
       note: ''
     }));
   }
-  if (options.generalizePaidMedia && (data.type === 'meta' || data.type === 'googleAds')) {
-    data.label = data.type === 'meta' ? 'Paid social' : 'Paid search';
+  if (options.generalizePaidMedia && (['meta', 'googleAds', 'chatgpt'] as string[]).includes(data.type)) {
+    data.label = data.type === 'meta' ? 'Paid social' : data.type === 'chatgpt' ? 'AI assistant' : 'Paid search';
     data.description = data.description ? 'Paid media activation step.' : '';
     data.creatives = data.creatives.map(genericCreative);
   }

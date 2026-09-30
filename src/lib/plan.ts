@@ -4,7 +4,7 @@ import { activePerformanceSnapshot, coverageForJourney } from './performance';
 
 export function generateJourneyPlan(journey: Journey, allJourneys: Journey[] = [], workspace?: Workspace): string {
   const ordered = [...journey.nodes].sort((a, b) => a.position.x - b.position.x || a.position.y - b.position.y);
-  const channels = [...new Set(ordered.filter(n => ['meta', 'googleAds'].includes(n.data.type)).map(n => n.data.type === 'meta' ? 'Meta' : 'Google Ads'))];
+  const channels = [...new Set(ordered.filter(n => ['meta', 'googleAds', 'chatgpt'].includes(n.data.type)).map(n => n.data.type === 'meta' ? 'Meta' : n.data.type === 'chatgpt' ? 'ChatGPT' : 'Google Ads'))];
   const tracked = ordered.filter(n => n.data.tracking.length > 0).length;
   const creativeCount = ordered.reduce((sum, n) => sum + n.data.creatives.length, 0);
   const todoCount = ordered.reduce((sum, n) => sum + n.data.annotations.filter(a => a.kind === 'todo' && !a.done).length, 0);

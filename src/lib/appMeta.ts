@@ -1,11 +1,23 @@
 export const APP_NAME = 'Journey Studio by Famme';
 export const APP_SHORT_NAME = 'Journey Studio';
-export const APP_VERSION = '2.0.0-rc.12.10.2';
+export const APP_VERSION = '2.0.0-rc.12.11';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'BY FAMME';
-export const APP_RELEASE_DATE = '2026-09-21';
+export const APP_RELEASE_DATE = '2026-09-30';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.12.11',
+    title: 'Clean routing, compact tracking & custom components',
+    items: [
+      'Tidy now preserves journey order more conservatively, adds more vertical clearance and redistributes connection ports to reduce overlapping routes.',
+      'Canvas, SVG/PNG and Print/PDF use shared orthogonal routing with separate lanes for split paths and saved node dimensions for higher export fidelity.',
+      'ChatGPT is available as a first-class channel component.',
+      'New compact Tracking point components can sit between larger steps to show sales/measurement events without dominating the canvas.',
+      'Adjacent components can use a direct attached connection without an arrow; new adjacent connections choose this style automatically and it can be changed in Connection properties.',
+      'Component Library now includes a full create/edit workflow for custom reusable components, including type, stage, color, copy, URL, tracking, creatives and notes.'
+    ]
+  },
   {
     version: '2.0.0-rc.12.10.2',
     title: 'AI-ready data import instructions',

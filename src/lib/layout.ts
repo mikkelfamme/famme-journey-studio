@@ -1,9 +1,11 @@
 import type { Journey, JourneyEdge, JourneyNode, FunnelStage } from '../types/domain';
 import { STAGE_NODE_X, STAGE_ORDER } from './stageGeometry';
+import { redistributeJourneyEdgeHandles } from './flowHandles';
+import { nodeSize } from './graphGeometry';
 
 const STAGES: FunnelStage[] = STAGE_ORDER;
 const STAGE_X = STAGE_NODE_X;
-const ROW_GAP = 136;
+const ROW_GAP = 176;
 const TOP_OFFSET = 110;
 
 function edgeMaps(edges: JourneyEdge[]) {
@@ -37,53 +39,40 @@ function depthMap(nodes: JourneyNode[], edges: JourneyEdge[]) {
 export function compactStageLayout(journey: Journey): Journey {
   if (journey.nodes.length === 0) return journey;
   const depth = depthMap(journey.nodes, journey.edges);
-  const { incoming } = edgeMaps(journey.edges);
-  const nodeById = new Map(journey.nodes.map(node => [node.id, node]));
   const stageGroups = new Map<FunnelStage, JourneyNode[]>();
 
+  // Preserve the user's visual reading order. Tidy should clean spacing and
+  // stage alignment, not redesign a journey that was deliberately arranged.
   for (const stage of STAGES) {
-    stageGroups.set(stage, journey.nodes.filter(node => node.data.stage === stage));
+    const group = journey.nodes
+      .filter(node => node.data.stage === stage)
+      .sort((a, b) => {
+        const yDelta = a.position.y - b.position.y;
+        if (Math.abs(yDelta) > 8) return yDelta;
+        const depthDelta = (depth.get(a.id) ?? 0) - (depth.get(b.id) ?? 0);
+        if (depthDelta) return depthDelta;
+        return a.data.label.localeCompare(b.data.label);
+      });
+    stageGroups.set(stage, group);
   }
 
   const positions = new Map<string, { x: number; y: number }>();
-  const maxRows = Math.max(1, ...STAGES.map(stage => stageGroups.get(stage)?.length ?? 0));
-
   for (const stage of STAGES) {
-    const group = [...(stageGroups.get(stage) ?? [])];
-    group.sort((a, b) => {
-      const aParents = incoming.get(a.id) ?? [];
-      const bParents = incoming.get(b.id) ?? [];
-      const parentScore = (parents: string[]) => {
-        if (!parents.length) return Number.POSITIVE_INFINITY;
-        const ys = parents.map(id => positions.get(id)?.y).filter((value): value is number => typeof value === 'number');
-        return ys.length ? ys.reduce((sum, value) => sum + value, 0) / ys.length : Number.POSITIVE_INFINITY;
-      };
-      const aParent = parentScore(aParents);
-      const bParent = parentScore(bParents);
-      if (aParent !== bParent) return aParent - bParent;
-      const depthDelta = (depth.get(a.id) ?? 0) - (depth.get(b.id) ?? 0);
-      if (depthDelta) return depthDelta;
-      const yDelta = a.position.y - b.position.y;
-      if (Math.abs(yDelta) > 1) return yDelta;
-      return a.data.label.localeCompare(b.data.label);
-    });
-
-    const offset = TOP_OFFSET + Math.max(0, (maxRows - group.length) * ROW_GAP * 0.28);
-    let previousY = Number.NEGATIVE_INFINITY;
-    group.forEach((node, index) => {
-      const relatedParents = (incoming.get(node.id) ?? []).map(id => positions.get(id)?.y).filter((value): value is number => typeof value === 'number');
-      const naturalY = offset + index * ROW_GAP;
-      const parentY = relatedParents.length ? relatedParents.reduce((sum, value) => sum + value, 0) / relatedParents.length : naturalY;
-      const blendedY = relatedParents.length ? naturalY * 0.7 + parentY * 0.3 : naturalY;
-      const spacedY = index === 0 ? blendedY : Math.max(blendedY, previousY + ROW_GAP);
-      const y = Math.round(spacedY / 10) * 10;
-      previousY = y;
+    const group = stageGroups.get(stage) ?? [];
+    const firstDesired = group.length ? Math.max(TOP_OFFSET, Math.round(group[0].position.y / 10) * 10) : TOP_OFFSET;
+    let cursorY = firstDesired;
+    for (const node of group) {
+      const size = nodeSize(node);
+      const desiredY = Math.max(TOP_OFFSET, Math.round(node.position.y / 10) * 10);
+      const y = Math.max(desiredY, cursorY);
       positions.set(node.id, { x: STAGE_X[stage], y });
-    });
+      cursorY = y + Math.max(size.height, 96) + 70;
+    }
   }
 
   const nextNodes = journey.nodes.map(node => ({ ...node, position: positions.get(node.id) ?? node.position }));
-  return { ...journey, nodes: nextNodes };
+  const nextEdges = redistributeJourneyEdgeHandles(nextNodes, journey.edges);
+  return { ...journey, nodes: nextNodes, edges: nextEdges };
 }
 
 export function traceConnectedPath(nodes: JourneyNode[], edges: JourneyEdge[], startId: string) {

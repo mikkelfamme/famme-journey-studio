@@ -1,4 +1,5 @@
 import type { JourneyEdge, JourneyNode } from '../types/domain';
+import { nodeCenter, nodeSize } from './graphGeometry';
 
 /**
  * Journey Studio connection grammar (RC12.8+)
@@ -33,12 +34,7 @@ export const SOURCE_HANDLE_IDS = [
 const targetHandles = new Set<string>(TARGET_HANDLE_IDS);
 const sourceHandles = new Set<string>(SOURCE_HANDLE_IDS);
 
-const NODE_W = 226;
-const NODE_H = 88;
-
-function center(node: JourneyNode) {
-  return { x: node.position.x + NODE_W / 2, y: node.position.y + NODE_H / 2 };
-}
+function center(node: JourneyNode) { return nodeCenter(node); }
 
 function nearestSourceHandle(source: JourneyNode, target: JourneyNode) {
   const s = center(source);
@@ -48,8 +44,8 @@ function nearestSourceHandle(source: JourneyNode, target: JourneyNode) {
   const horizontal = Math.abs(dx) >= Math.abs(dy) * 0.8;
 
   if (horizontal) return dy < 0 ? 'source-right-top' : 'source-right-bottom';
-  if (dx < -NODE_W * 0.16) return 'source-bottom-left';
-  if (dx > NODE_W * 0.16) return 'source-bottom-right';
+  if (dx < -nodeSize(source).width * 0.16) return 'source-bottom-left';
+  if (dx > nodeSize(source).width * 0.16) return 'source-bottom-right';
   return 'source-bottom';
 }
 
@@ -61,8 +57,8 @@ function nearestTargetHandle(source: JourneyNode, target: JourneyNode) {
   const horizontal = Math.abs(dx) >= Math.abs(dy) * 0.8;
 
   if (horizontal) return dy < 0 ? 'target-left-top' : 'target-left-bottom';
-  if (dx < -NODE_W * 0.16) return 'target-top-left';
-  if (dx > NODE_W * 0.16) return 'target-top-right';
+  if (dx < -nodeSize(target).width * 0.16) return 'target-top-left';
+  if (dx > nodeSize(target).width * 0.16) return 'target-top-right';
   return 'target-top';
 }
 
@@ -100,4 +96,45 @@ export function normalizeJourneyEdgeHandles(nodes: JourneyNode[], edges: Journey
       targetHandle: normalizeLegacyTargetHandle(edge.targetHandle, source, target)
     };
   });
+}
+
+/**
+ * Reassign handles after an automatic tidy operation so sibling routes do not
+ * all leave/enter through the same port. Manual layouts keep their saved ports;
+ * this function is intentionally only used by Tidy.
+ */
+export function redistributeJourneyEdgeHandles(nodes: JourneyNode[], edges: JourneyEdge[]): JourneyEdge[] {
+  const normalized = normalizeJourneyEdgeHandles(nodes, edges);
+  const nodeMap = new Map(nodes.map(node => [node.id, node]));
+  const next = normalized.map(edge => ({ ...edge }));
+
+  const outgoing = new Map<string, JourneyEdge[]>();
+  const incoming = new Map<string, JourneyEdge[]>();
+  for (const edge of next) {
+    outgoing.set(edge.source, [...(outgoing.get(edge.source) ?? []), edge]);
+    incoming.set(edge.target, [...(incoming.get(edge.target) ?? []), edge]);
+  }
+
+  for (const [sourceId, group] of outgoing) {
+    const source = nodeMap.get(sourceId); if (!source) continue;
+    const s = center(source);
+    const ordered = [...group].sort((a, b) => (center(nodeMap.get(a.target) ?? source).y - center(nodeMap.get(b.target) ?? source).y));
+    const mostlyRight = ordered.filter(edge => center(nodeMap.get(edge.target) ?? source).x >= s.x).length >= Math.ceil(ordered.length / 2);
+    ordered.forEach((edge, index) => {
+      if (mostlyRight) edge.sourceHandle = index % 2 === 0 ? 'source-right-top' : 'source-right-bottom';
+      else edge.sourceHandle = ['source-bottom-left','source-bottom','source-bottom-right'][index % 3];
+    });
+  }
+
+  for (const [targetId, group] of incoming) {
+    const target = nodeMap.get(targetId); if (!target) continue;
+    const t = center(target);
+    const ordered = [...group].sort((a, b) => (center(nodeMap.get(a.source) ?? target).y - center(nodeMap.get(b.source) ?? target).y));
+    const mostlyLeft = ordered.filter(edge => center(nodeMap.get(edge.source) ?? target).x <= t.x).length >= Math.ceil(ordered.length / 2);
+    ordered.forEach((edge, index) => {
+      if (mostlyLeft) edge.targetHandle = index % 2 === 0 ? 'target-left-top' : 'target-left-bottom';
+      else edge.targetHandle = ['target-top-left','target-top','target-top-right'][index % 3];
+    });
+  }
+  return next;
 }

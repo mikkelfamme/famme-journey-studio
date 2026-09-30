@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 import type { FunnelStage, Journey, JourneyEdge, JourneyNode, JourneyNodeType, NodeBackgroundTone } from '../../types/domain';
 import { useI18n } from '../../i18n';
 import { normalizeJourneyEdgeHandles } from '../../lib/flowHandles';
+import { edgeLaneMap, journeyBounds, nodeSize, orthogonalEdgeRoute } from '../../lib/graphGeometry';
+import { STAGE_WORLD_BOUNDARIES } from '../../lib/stageGeometry';
 
 const STAGES: FunnelStage[] = ['top', 'middle', 'bottom', 'lifecycle'];
 const STAGE_FILL: Record<FunnelStage, string> = {
@@ -27,12 +29,14 @@ const NODE_FILL: Record<NodeBackgroundTone, string> = {
 const NODE_ACCENT: Partial<Record<JourneyNodeType, string>> = {
   meta: '#5865d9',
   googleAds: '#4d77cc',
+  chatgpt: '#7357c7',
   audienceSegment: '#6d7f93',
   landingPage: '#4c8796',
   shopCheckout: '#4c8796',
   physicalVisit: '#4c8796',
   cta: '#4c8796',
   tracking: '#4c8796',
+  trackingPoint: '#4c8796',
   conversion: '#2d8067',
   lead: '#2d8067',
   booking: '#2d8067',
@@ -41,15 +45,7 @@ const NODE_ACCENT: Partial<Record<JourneyNodeType, string>> = {
   note: '#a98332'
 };
 
-// Keep these close to the on-screen RC7/RC8 node footprint. The print SVG uses
-// the journey's saved XYFlow positions directly, so relative spacing is preserved.
-const NODE_W = 226;
-const NODE_H = 88;
-const GRAPH_PAD_X = 90;
-const GRAPH_PAD_TOP = 72;
-const GRAPH_PAD_BOTTOM = 72;
-
-type Side = 'left' | 'right' | 'top' | 'bottom';
+// Print uses the exact saved node positions and the same routing geometry as the canvas/export layer.
 
 function wrapLabel(label: string, max = 27): string[] {
   const words = label.trim().split(/\s+/).filter(Boolean);
@@ -58,100 +54,18 @@ function wrapLabel(label: string, max = 27): string[] {
   let line = '';
   for (const word of words) {
     const next = line ? `${line} ${word}` : word;
-    if (next.length > max && line) {
-      lines.push(line);
-      line = word;
-    } else {
-      line = next;
-    }
+    if (next.length > max && line) { lines.push(line); line = word; } else line = next;
   }
   if (line) lines.push(line);
   return lines.slice(0, 2);
-}
-
-function sideFromHandle(handle?: string | null): Side | null {
-  if (!handle) return null;
-  if (handle.includes('left')) return 'left';
-  if (handle.includes('right')) return 'right';
-  if (handle.includes('top')) return 'top';
-  if (handle.includes('bottom')) return 'bottom';
-  return null;
-}
-
-function inferSides(source: JourneyNode, target: JourneyNode): [Side, Side] {
-  const sx = source.position.x + NODE_W / 2;
-  const sy = source.position.y + NODE_H / 2;
-  const tx = target.position.x + NODE_W / 2;
-  const ty = target.position.y + NODE_H / 2;
-  const dx = tx - sx;
-  const dy = ty - sy;
-
-  if (Math.abs(dx) >= Math.abs(dy) * 0.8) {
-    return dx >= 0 ? ['right', 'left'] : ['left', 'right'];
-  }
-  return dy >= 0 ? ['bottom', 'top'] : ['top', 'bottom'];
-}
-
-function anchor(node: JourneyNode, side: Side, handle?: string | null) {
-  if (handle === 'target-top-left' || handle === 'source-bottom-left') return { x: node.position.x + NODE_W * 0.25, y: side === 'top' ? node.position.y : node.position.y + NODE_H };
-  if (handle === 'target-top-right' || handle === 'source-bottom-right') return { x: node.position.x + NODE_W * 0.75, y: side === 'top' ? node.position.y : node.position.y + NODE_H };
-  if (handle === 'target-top' || handle === 'source-bottom') return { x: node.position.x + NODE_W * 0.5, y: side === 'top' ? node.position.y : node.position.y + NODE_H };
-  if (handle === 'target-left-top' || handle === 'source-right-top') return { x: side === 'left' ? node.position.x : node.position.x + NODE_W, y: node.position.y + NODE_H * 0.35 };
-  if (handle === 'target-left-bottom' || handle === 'source-right-bottom') return { x: side === 'left' ? node.position.x : node.position.x + NODE_W, y: node.position.y + NODE_H * 0.65 };
-  switch (side) {
-    case 'left': return { x: node.position.x, y: node.position.y + NODE_H * 0.5 };
-    case 'right': return { x: node.position.x + NODE_W, y: node.position.y + NODE_H * 0.5 };
-    case 'top': return { x: node.position.x + NODE_W * 0.5, y: node.position.y };
-    case 'bottom': return { x: node.position.x + NODE_W * 0.5, y: node.position.y + NODE_H };
-  }
-}
-
-function orthogonalEdgePath(edge: JourneyEdge, source: JourneyNode, target: JourneyNode) {
-  const inferred = inferSides(source, target);
-  const sourceSide = sideFromHandle(edge.sourceHandle) ?? inferred[0];
-  const targetSide = sideFromHandle(edge.targetHandle) ?? inferred[1];
-  const s = anchor(source, sourceSide, edge.sourceHandle);
-  const t = anchor(target, targetSide, edge.targetHandle);
-  const horizontalSource = sourceSide === 'left' || sourceSide === 'right';
-  const horizontalTarget = targetSide === 'left' || targetSide === 'right';
-
-  if (horizontalSource && horizontalTarget) {
-    const midX = (s.x + t.x) / 2;
-    return { d: `M ${s.x} ${s.y} L ${midX} ${s.y} L ${midX} ${t.y} L ${t.x} ${t.y}`, mx: midX, my: (s.y + t.y) / 2 };
-  }
-  if (!horizontalSource && !horizontalTarget) {
-    const midY = (s.y + t.y) / 2;
-    return { d: `M ${s.x} ${s.y} L ${s.x} ${midY} L ${t.x} ${midY} L ${t.x} ${t.y}`, mx: (s.x + t.x) / 2, my: midY };
-  }
-
-  // Mixed-side links keep a single elbow. This mirrors the visual grammar of
-  // XYFlow's smooth-step routing without recalculating the journey layout.
-  if (horizontalSource) {
-    return { d: `M ${s.x} ${s.y} L ${t.x} ${s.y} L ${t.x} ${t.y}`, mx: t.x, my: s.y };
-  }
-  return { d: `M ${s.x} ${s.y} L ${s.x} ${t.y} L ${t.x} ${t.y}`, mx: s.x, my: t.y };
-}
-
-function boundsForJourney(journey: Journey) {
-  if (!journey.nodes.length) return { x: 0, y: 0, width: 1200, height: 520 };
-  const minX = Math.min(...journey.nodes.map(node => node.position.x));
-  const minY = Math.min(...journey.nodes.map(node => node.position.y));
-  const maxX = Math.max(...journey.nodes.map(node => node.position.x + NODE_W));
-  const maxY = Math.max(...journey.nodes.map(node => node.position.y + NODE_H));
-  return {
-    x: minX - GRAPH_PAD_X,
-    y: minY - GRAPH_PAD_TOP,
-    width: Math.max(980, maxX - minX + GRAPH_PAD_X * 2),
-    height: Math.max(430, maxY - minY + GRAPH_PAD_TOP + GRAPH_PAD_BOTTOM)
-  };
 }
 
 export function JourneyPrintSheet({ journey }: { journey: Journey }) {
   const { t, status, nodeType, stage, language } = useI18n();
   const nodeMap = useMemo(() => new Map(journey.nodes.map(node => [node.id, node])), [journey.nodes]);
   const printEdges = useMemo(() => normalizeJourneyEdgeHandles(journey.nodes, journey.edges), [journey.nodes, journey.edges]);
-  const bounds = useMemo(() => boundsForJourney(journey), [journey]);
-  const stageWidth = bounds.width / STAGES.length;
+  const bounds = useMemo(() => journeyBounds(journey.nodes), [journey.nodes]);
+  const edgeLanes = useMemo(() => edgeLaneMap(printEdges), [printEdges]);
   const detailNodes = journey.nodes.filter(node => {
     const url = node.data.url || node.data.landingPage;
     return Boolean(url || node.data.tracking.length || node.data.creatives.length || node.data.description);
@@ -176,9 +90,13 @@ export function JourneyPrintSheet({ journey }: { journey: Journey }) {
         </defs>
 
         {STAGES.map((stageId, index) => {
-          const x = bounds.x + stageWidth * index;
+          const boundaries = [bounds.x, ...STAGE_WORLD_BOUNDARIES, bounds.x + bounds.width];
+          const x = Math.max(bounds.x, boundaries[index]);
+          const right = Math.min(bounds.x + bounds.width, boundaries[index + 1]);
+          const width = Math.max(0, right - x);
+          if (!width) return null;
           return <g key={stageId}>
-            <rect x={x} y={bounds.y} width={stageWidth} height={bounds.height} fill={STAGE_FILL[stageId]} />
+            <rect x={x} y={bounds.y} width={width} height={bounds.height} fill={STAGE_FILL[stageId]} />
             {index > 0 && <line x1={x} x2={x} y1={bounds.y} y2={bounds.y + bounds.height} stroke="#d8e0e7" strokeWidth="1" />}
             <g transform={`translate(${x + 16},${bounds.y + 16})`}>
               <rect x="0" y="0" width="124" height="23" rx="11.5" fill="#ffffff" fillOpacity=".9" stroke="#dfe5ea" />
@@ -191,17 +109,17 @@ export function JourneyPrintSheet({ journey }: { journey: Journey }) {
           const source = nodeMap.get(edge.source);
           const target = nodeMap.get(edge.target);
           if (!source || !target) return null;
-          const route = orthogonalEdgePath(edge, source, target);
+          const route = orthogonalEdgeRoute(edge, source, target, edgeLanes.get(edge.id) ?? 0);
           const label = edge.data?.label || edge.data?.signal || edge.data?.condition || '';
           return <g key={edge.id}>
             <path
               d={route.d}
               fill="none"
               stroke="#718096"
-              strokeWidth="2"
+              strokeWidth={edge.data?.connectionStyle === 'attached' ? 2.6 : 2}
               strokeLinecap="round"
               strokeLinejoin="round"
-              markerEnd="url(#fjs-print-arrow)"
+              markerEnd={edge.data?.connectionStyle === 'attached' ? undefined : 'url(#fjs-print-arrow)'}
             />
             {label && <g>
               <rect x={route.mx - 54} y={route.my - 11} width="108" height="20" rx="8" fill="#fff" stroke="#e1e6eb"/>
@@ -212,20 +130,28 @@ export function JourneyPrintSheet({ journey }: { journey: Journey }) {
 
         {journey.nodes.map(node => {
           const accent = NODE_ACCENT[node.data.type] ?? '#6d7f93';
-          const lines = wrapLabel(node.data.label);
+          const size = nodeSize(node);
+          const compactTracking = node.data.type === 'trackingPoint';
+          const lines = wrapLabel(node.data.label, compactTracking ? 18 : 27);
           const signalBits = [
             node.data.tracking.length ? `${node.data.tracking.length} tracking` : '',
             node.data.creatives.length ? `${node.data.creatives.length} creative` : '',
             (node.data.url || node.data.landingPage) ? 'URL' : ''
           ].filter(Boolean).join(' · ');
+          if (compactTracking) return <g key={node.id} transform={`translate(${node.position.x},${node.position.y})`}>
+            <rect width={size.width} height={size.height} rx="13" fill={NODE_FILL[node.data.backgroundTone ?? 'white']} stroke="#cfd7df" strokeWidth="1.2"/>
+            <rect width="4" height={size.height} rx="2" fill={accent}/>
+            <circle cx="19" cy={size.height / 2} r="8" fill={accent} fillOpacity=".10" />
+            <text x="34" y={size.height / 2 + 4} fontSize="10.5" fill="#26313d" fontWeight="760">{lines[0]}</text>
+          </g>;
           return <g key={node.id} transform={`translate(${node.position.x},${node.position.y})`}>
-            <rect width={NODE_W} height={NODE_H} rx="14" fill={NODE_FILL[node.data.backgroundTone ?? 'white']} stroke="#d5dce4" strokeWidth="1.2"/>
-            <rect width={NODE_W} height="4" rx="2" fill={accent}/>
+            <rect width={size.width} height={size.height} rx="14" fill={NODE_FILL[node.data.backgroundTone ?? 'white']} stroke="#d5dce4" strokeWidth="1.2"/>
+            <rect width={size.width} height="4" rx="2" fill={accent}/>
             <circle cx="22" cy="31" r="11" fill={accent} fillOpacity=".10" />
             <text x="40" y="25" fontSize="7.5" fill="#7b8692" fontWeight="800" letterSpacing=".75">{nodeType(node.data.type).toUpperCase()}</text>
-            <text x={NODE_W - 13} y="25" textAnchor="end" fontSize="7.5" fill={STAGE_TEXT[node.data.stage]} fontWeight="800">{stage(node.data.stage).toUpperCase()}</text>
+            <text x={size.width - 13} y="25" textAnchor="end" fontSize="7.5" fill={STAGE_TEXT[node.data.stage]} fontWeight="800">{stage(node.data.stage).toUpperCase()}</text>
             {lines.map((line, index) => <text key={line + index} x="40" y={44 + index * 15} fontSize="13" fill="#1f2937" fontWeight="760">{line}</text>)}
-            {signalBits && <text x="14" y={NODE_H - 9} fontSize="8" fill="#778391">{signalBits}</text>}
+            {signalBits && <text x="14" y={size.height - 9} fontSize="8" fill="#778391">{signalBits}</text>}
           </g>;
         })}
       </svg>

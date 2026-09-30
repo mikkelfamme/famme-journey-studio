@@ -1,0 +1,6 @@
+Journey Studio by Famme 2.0.0-rc.12.11
+
+Upload all files in the RC12.11 Update Pack to the repository root and commit.
+Suggested commit: Improve journey routing, tracking markers and component library in RC12.11
+
+Wait for Deploy PWA to GitHub Pages to complete successfully before testing the live PWA.

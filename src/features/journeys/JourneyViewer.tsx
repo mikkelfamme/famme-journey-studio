@@ -4,14 +4,17 @@ import '@xyflow/react/dist/style.css';
 import { ArrowLeft, ChevronLeft, ChevronRight, ExternalLink, FileImage, Maximize, Minimize, Pencil, Printer, X } from 'lucide-react';
 import type { Journey, JourneyNode } from '../../types/domain';
 import { JourneyNodeComponent } from './JourneyNode';
+import { JourneyEdgeComponent } from './JourneyEdge';
 import { JourneyPrintSheet } from './JourneyPrintSheet';
 import { StageBackdrop } from './StageBackdrop';
 import type { CanvasViewport } from '../../lib/stageGeometry';
 import { useI18n } from '../../i18n';
 import { downloadJourneyPng, downloadJourneySvg } from '../../lib/journeyImageExport';
 import { normalizeJourneyEdgeHandles } from '../../lib/flowHandles';
+import { edgeLaneMap } from '../../lib/graphGeometry';
 
 const nodeTypes = { journey: JourneyNodeComponent };
+const edgeTypes = { journeyEdge: JourneyEdgeComponent };
 
 export function JourneyViewer({ journey, initialSelectedId, onClose, onEdit }: { journey: Journey; initialSelectedId?: string; onClose: () => void; onEdit: () => void }) {
   const { t, status } = useI18n();
@@ -29,23 +32,24 @@ export function JourneyViewer({ journey, initialSelectedId, onClose, onEdit }: {
     selected: node.id === selectedId,
     data: { ...node.data, runtimeActions: undefined }
   })), [journey.nodes, selectedId]);
-  const edges = useMemo(() => normalizeJourneyEdgeHandles(journey.nodes, journey.edges).map(edge => {
-    const label = edge.data?.label || edge.data?.signal || edge.data?.condition || undefined;
-    return {
-      ...edge,
-      selectable: false,
-      focusable: false,
-      animated: true,
-      label,
-      className: [edge.className, 'fjs-flow-edge'].filter(Boolean).join(' '),
-      markerEnd: { type: MarkerType.ArrowClosed, width: 20, height: 20, color: '#687889' },
-      style: { ...(edge.style ?? {}), stroke: '#718194', strokeWidth: 1.9 },
-      labelStyle: { fill: '#435160', fontSize: 10, fontWeight: 750 },
-      labelBgStyle: { fill: '#ffffff', fillOpacity: 0.96, stroke: '#d6dde5', strokeWidth: 1 },
-      labelBgPadding: [6, 4] as [number, number],
-      labelBgBorderRadius: 8
-    };
-  }), [journey.nodes, journey.edges]);
+  const edges = useMemo(() => {
+    const normalized = normalizeJourneyEdgeHandles(journey.nodes, journey.edges);
+    const lanes = edgeLaneMap(normalized);
+    return normalized.map(edge => {
+      const attached = edge.data?.connectionStyle === 'attached';
+      return {
+        ...edge,
+        type: 'journeyEdge',
+        selectable: false,
+        focusable: false,
+        animated: !attached,
+        data: { ...(edge.data ?? {}), routeLane: lanes.get(edge.id) ?? 0 },
+        className: [edge.className, 'fjs-flow-edge', attached ? 'fjs-attached-edge' : ''].filter(Boolean).join(' '),
+        markerEnd: attached ? undefined : { type: MarkerType.ArrowClosed, width: 20, height: 20, color: '#687889' },
+        style: { ...(edge.style ?? {}), stroke: '#718194', strokeWidth: attached ? 2.6 : 1.9 }
+      };
+    });
+  }, [journey.nodes, journey.edges]);
   const onNodeClick: NodeMouseHandler<JourneyNode> = (_, node) => setSelectedId(node.id);
   const nodeUrl = selected?.data.url || (selected?.data.type === 'landingPage' ? selected.data.landingPage : undefined);
 
@@ -94,6 +98,7 @@ export function JourneyViewer({ journey, initialSelectedId, onClose, onEdit }: {
           onInit={instance => setCanvasViewport(instance.getViewport())}
           onMove={(_, viewport) => setCanvasViewport(viewport)}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           onNodeClick={onNodeClick}
           onPaneClick={() => setSelectedId(null)}
           nodesDraggable={false}

@@ -13,11 +13,13 @@ export type JourneyNodeType =
   | 'decision'
   | 'meta'
   | 'googleAds'
+  | 'chatgpt'
   | 'landingPage'
   | 'shopCheckout'
   | 'physicalVisit'
   | 'cta'
   | 'tracking'
+  | 'trackingPoint'
   | 'conversion'
   | 'lead'
   | 'booking'
@@ -97,6 +99,8 @@ export interface JourneyEdgeData extends Record<string, unknown> {
   signal?: string;
   timing?: string;
   comment?: string;
+  connectionStyle?: 'arrow' | 'attached';
+  routeLane?: number;
 }
 export type JourneyEdge = Edge<JourneyEdgeData>;
 

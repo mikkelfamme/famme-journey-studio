@@ -235,3 +235,12 @@ A dependency-backed `npm install` could not complete in the build environment be
 - Added explicit AI-assisted data preparation guidance in Insights & Data.
 - Added copyable prompts for Performance and Actual Path snapshot creation.
 - Clarified which mapping/raw-data files go to the AI and which generated snapshot file is imported back into Journey Studio.
+
+
+## 2.0.0-rc.12.11
+- Improved Tidy routing and spacing to reduce overlapping connections.
+- Unified Editor/View/export/print routing with lane separation and saved node dimensions.
+- Added ChatGPT channel nodes.
+- Added compact Tracking point nodes for inline journey measurement.
+- Added direct attached/no-arrow connections for adjacent components.
+- Added full custom Component Library create/edit workflow.

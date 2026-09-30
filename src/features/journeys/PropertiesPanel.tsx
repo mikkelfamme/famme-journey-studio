@@ -5,7 +5,7 @@ import { makeId } from '../../lib/ids';
 import { NODE_TYPE_DEFINITIONS, NODE_TYPE_GROUPS, nodeTypeDefinition } from '../../lib/nodeTypes';
 import { useI18n } from '../../i18n';
 
-const platforms = ['GA4', 'Meta Pixel', 'CAPI', 'Google Ads', 'GTM', 'DataLayer', 'CRM', 'BigQuery', 'Manual', 'Other'];
+const platforms = ['GA4', 'Meta Pixel', 'CAPI', 'Google Ads', 'ChatGPT Ads', 'GTM', 'DataLayer', 'CRM', 'BigQuery', 'Manual', 'Other'];
 const trackingStatuses: TrackingDefinition['status'][] = ['implemented', 'validate', 'missing', 'planned'];
 const annotationKinds: AnnotationKind[] = ['comment', 'decision', 'todo', 'hypothesis'];
 const nodeBackgroundTones: NodeBackgroundTone[] = ['white', 'green', 'yellow', 'red', 'blue', 'gray'];
@@ -100,7 +100,7 @@ export function PropertiesPanel(props: Props) {
     { id: 'notes', label: t('inspector.notes'), icon: StickyNote, count: openTodos || data.annotations.length },
     { id: 'links', label: t('inspector.links'), icon: Link2, count: ownLinks.length }
   ];
-  const showNodeUrl = ['landingPage','shopCheckout','cta','meta','googleAds'].includes(data.type);
+  const showNodeUrl = ['landingPage','shopCheckout','cta','meta','googleAds','chatgpt'].includes(data.type);
   const currentTypeDefinition = nodeTypeDefinition(data.type);
 
   return <aside className="editor-panel properties-panel">
