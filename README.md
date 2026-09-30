@@ -3,7 +3,13 @@
 **Visual customer journey architecture, channel planning, measurement design and observed-path analysis.**  
 Designed & developed by **Mikkel Famme**.
 
-> Current release: `2.0.0-rc.12.13.1`
+> Current release: `2.0.0-rc.12.14`
+
+### RC12.14 highlight
+- Every connection point on every component can both send and receive arrows
+- The existing 3 top, 2 left, 3 bottom and 2 right points remain in the same positions
+- Manual port choices are preserved even when a historically incoming point is used for an outgoing arrow, or vice versa
+- Tidy and export can use all ten points at both ends of a connection
 
 
 ### RC12.13.1 hotfix

@@ -360,3 +360,8 @@ input,select,textarea{border-color:#d8dee7;border-radius:10px;background:#fff;mi
 .template-mini-preview.vertical>div{display:flex;align-items:center;gap:10px;padding:5px 8px;border-right:0;border-bottom:1px solid rgba(110,123,139,.10)}
 .template-mini-preview.vertical>div:last-child{border-bottom:0}
 .template-mini-preview.vertical div div{margin-top:0}
+
+/* RC12.14: all ten physical connection ports are bidirectional. */
+.journey-handle.bidirectional{border-color:#6f7fd4!important;background:#fff!important;opacity:0!important}
+.journey-node:hover .journey-handle.bidirectional,.journey-node.selected .journey-handle.bidirectional{opacity:.86!important}
+.journey-handle.bidirectional:hover{opacity:1!important;background:#4f63dc!important;border-color:#4f63dc!important;transform:scale(1.35)!important}

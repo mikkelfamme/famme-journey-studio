@@ -1,0 +1,11 @@
+RC12.14 - BIDIRECTIONAL CONNECTION PORTS
+
+Upload the contents of this ZIP to the root of the GitHub repository and overwrite matching files.
+Suggested commit:
+Make all component connection ports bidirectional in RC12.14
+
+After GitHub Actions is green, test:
+1. Start an arrow from a top or left port.
+2. End an arrow on a bottom or right port.
+3. Reconnect an existing edge to an opposite-role port.
+4. Run Tidy and export/print to confirm the chosen physical sides are retained/routed correctly.

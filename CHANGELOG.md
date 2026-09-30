@@ -1,3 +1,8 @@
+## 2.0.0-rc.12.14 - 2026-09-30
+- Makes all ten connection points on every component bidirectional for both sending and receiving arrows.
+- Preserves manual port selection even when a historically target-prefixed port is used as a source, or vice versa.
+- Lets Tidy/export routing use all four component sides at either endpoint while retaining old file compatibility.
+
 
 
 ## 2.0.0-rc.12.13.1 - 2026-09-30

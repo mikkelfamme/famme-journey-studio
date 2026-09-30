@@ -1,11 +1,21 @@
 export const APP_NAME = 'Journey Studio by Famme';
 export const APP_SHORT_NAME = 'Journey Studio';
-export const APP_VERSION = '2.0.0-rc.12.13.1';
+export const APP_VERSION = '2.0.0-rc.12.14';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'BY FAMME';
 export const APP_RELEASE_DATE = '2026-09-30';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.12.14',
+    title: 'Bidirectional connection ports',
+    items: [
+      'All ten connection points on every component can now both send and receive arrows.',
+      'Top, left, bottom and right ports keep their exact physical position even when used in the opposite historical direction.',
+      'Tidy and static export can use all ten ports at either end of a connection, improving route choice and reducing congestion.',
+      'Existing workspace, journey and template files remain compatible because the historical handle IDs are preserved.'
+    ]
+  },
   {
     version: '2.0.0-rc.12.13.1',
     title: 'Blank journey build hotfix',

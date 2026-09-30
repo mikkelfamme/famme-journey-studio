@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { JourneyEdge, JourneyNode } from '../types/domain';
-import { normalizeJourneyEdgeHandles, redistributeJourneyEdgeHandles, SOURCE_HANDLE_IDS, TARGET_HANDLE_IDS } from './flowHandles';
+import { ALL_HANDLE_IDS, normalizeJourneyEdgeHandles, redistributeJourneyEdgeHandles } from './flowHandles';
 
 function node(id: string, x: number, y: number): JourneyNode {
   return { id, type: 'journey', position: { x, y }, data: { label: id, type: 'customerStep', stage: 'middle', tracking: [], creatives: [], annotations: [] } };
@@ -10,23 +10,37 @@ function edge(id: string, source: string, target: string, sourceHandle?: string,
   return { id, source, target, sourceHandle, targetHandle };
 }
 
-describe('directional journey handles', () => {
-  it('assigns only allowed outgoing and incoming handles', () => {
+describe('bidirectional journey handles', () => {
+  it('assigns valid physical handles to both edge ends', () => {
     const nodes = [node('a', 0, 0), node('b', 420, 20), node('c', 10, 320)];
     const edges = normalizeJourneyEdgeHandles(nodes, [edge('ab', 'a', 'b'), edge('ac', 'a', 'c')]);
     for (const item of edges) {
-      expect(SOURCE_HANDLE_IDS).toContain(item.sourceHandle);
-      expect(TARGET_HANDLE_IDS).toContain(item.targetHandle);
+      expect(ALL_HANDLE_IDS).toContain(item.sourceHandle);
+      expect(ALL_HANDLE_IDS).toContain(item.targetHandle);
     }
   });
 
-  it('migrates legacy source-left/top and target-right/bottom handles', () => {
+  it('preserves opposite-role physical handles and migrates generic legacy side handles', () => {
     const nodes = [node('a', 0, 0), node('b', 420, 20)];
-    const [item] = normalizeJourneyEdgeHandles(nodes, [edge('ab', 'a', 'b', 'source-left', 'target-right')]);
-    expect(SOURCE_HANDLE_IDS).toContain(item.sourceHandle);
-    expect(TARGET_HANDLE_IDS).toContain(item.targetHandle);
-    expect(item.sourceHandle).not.toBe('source-left');
-    expect(item.targetHandle).not.toBe('target-right');
+    const [manual] = normalizeJourneyEdgeHandles(nodes, [edge('manual', 'a', 'b', 'target-top-left', 'source-bottom-right')]);
+    expect(manual.sourceHandle).toBe('target-top-left');
+    expect(manual.targetHandle).toBe('source-bottom-right');
+
+    const [legacy] = normalizeJourneyEdgeHandles(nodes, [edge('legacy', 'a', 'b', 'source-left', 'target-right')]);
+    expect(ALL_HANDLE_IDS).toContain(legacy.sourceHandle);
+    expect(ALL_HANDLE_IDS).toContain(legacy.targetHandle);
+    expect(legacy.sourceHandle).not.toBe('source-left');
+    expect(legacy.targetHandle).not.toBe('target-right');
+  });
+
+  it('allows every historical physical port to act as either source or target', () => {
+    const nodes = [node('a', 0, 0), node('b', 420, 20)];
+    for (const handle of ALL_HANDLE_IDS) {
+      const [asSource] = normalizeJourneyEdgeHandles(nodes, [edge(`s-${handle}`, 'a', 'b', handle, 'target-left-top')]);
+      expect(asSource.sourceHandle).toBe(handle);
+      const [asTarget] = normalizeJourneyEdgeHandles(nodes, [edge(`t-${handle}`, 'a', 'b', 'source-right-top', handle)]);
+      expect(asTarget.targetHandle).toBe(handle);
+    }
   });
 
   it('permits split and merge by assigning every edge independently', () => {
@@ -41,7 +55,7 @@ describe('directional journey handles', () => {
     expect(edges.filter(item => item.target === 'd')).toHaveLength(2);
   });
 
-  it('uses distinct target ports before reusing one during Tidy/export routing', () => {
+  it('uses distinct physical target ports before reusing one during Tidy/export routing', () => {
     const nodes = [
       node('a', 0, 0), node('b', 0, 120), node('c', 0, 240), node('d', 0, 360), node('target', 480, 220)
     ];

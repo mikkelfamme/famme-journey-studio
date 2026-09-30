@@ -1,19 +1,19 @@
 import type { JourneyEdge, JourneyNode } from '../types/domain';
-import { nodeAnchor, nodeCenter, nodeSize, type FlowSide } from './graphGeometry';
+import { nodeAnchor, nodeCenter, nodeSize, sideFromHandle, type FlowSide } from './graphGeometry';
 
 /**
- * Journey Studio connection grammar (RC12.8+)
+ * Journey Studio connection grammar (RC12.14+)
  *
- * Incoming connections:
- * - 3 ports on the top
- * - 2 ports on the left
+ * Every visible connection point is bidirectional:
+ * - 3 ports on top
+ * - 2 ports on left
+ * - 3 ports on bottom
+ * - 2 ports on right
  *
- * Outgoing connections:
- * - 3 ports on the bottom
- * - 2 ports on the right
- *
- * A port may be used by more than one edge. That makes fan-out (1 -> many)
- * and fan-in (many -> 1) possible without introducing artificial journey nodes.
+ * The historical target-/source-prefixed IDs are intentionally retained so old
+ * .fjs/.jsjourney/.jstemplate files keep working. In the editor,
+ * ConnectionMode.Loose lets every one of these physical ports both start and
+ * receive a connection. A port may also carry multiple edges for split/merge.
  */
 export const TARGET_HANDLE_IDS = [
   'target-top-left',
@@ -31,57 +31,66 @@ export const SOURCE_HANDLE_IDS = [
   'source-right-bottom'
 ] as const;
 
-const targetHandles = new Set<string>(TARGET_HANDLE_IDS);
-const sourceHandles = new Set<string>(SOURCE_HANDLE_IDS);
+export const ALL_HANDLE_IDS = [...TARGET_HANDLE_IDS, ...SOURCE_HANDLE_IDS] as const;
+const allHandles = new Set<string>(ALL_HANDLE_IDS);
 
 function center(node: JourneyNode) { return nodeCenter(node); }
 
-function nearestSourceHandle(source: JourneyNode, target: JourneyNode) {
-  const s = center(source);
-  const t = center(target);
-  const dx = t.x - s.x;
-  const dy = t.y - s.y;
-  const horizontal = Math.abs(dx) >= Math.abs(dy) * 0.8;
-
-  if (horizontal) return dy < 0 ? 'source-right-top' : 'source-right-bottom';
-  if (dx < -nodeSize(source).width * 0.16) return 'source-bottom-left';
-  if (dx > nodeSize(source).width * 0.16) return 'source-bottom-right';
-  return 'source-bottom';
+function handleSide(handle: string): FlowSide {
+  return sideFromHandle(handle) ?? 'right';
 }
 
-function nearestTargetHandle(source: JourneyNode, target: JourneyNode) {
-  const s = center(source);
-  const t = center(target);
-  const dx = s.x - t.x;
-  const dy = s.y - t.y;
-  const horizontal = Math.abs(dx) >= Math.abs(dy) * 0.8;
-
-  if (horizontal) return dy < 0 ? 'target-left-top' : 'target-left-bottom';
-  if (dx < -nodeSize(target).width * 0.16) return 'target-top-left';
-  if (dx > nodeSize(target).width * 0.16) return 'target-top-right';
-  return 'target-top';
+function distanceSquared(a: { x: number; y: number }, b: { x: number; y: number }) {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+  return dx * dx + dy * dy;
 }
 
-function normalizeLegacySourceHandle(handle: string | null | undefined, source: JourneyNode, target: JourneyNode) {
-  if (handle && sourceHandles.has(handle)) return handle;
-
-  // RC12.7 and earlier exposed source handles on all four sides. Preserve old
-  // journey files by translating them into the new directional grammar.
-  if (handle === 'source-right') return center(target).y < center(source).y ? 'source-right-top' : 'source-right-bottom';
-  if (handle === 'source-bottom') return nearestSourceHandle(source, target).startsWith('source-bottom') ? nearestSourceHandle(source, target) : 'source-bottom';
-  if (handle === 'source-left' || handle === 'source-top') return nearestSourceHandle(source, target);
-
-  return nearestSourceHandle(source, target);
+function facingSide(node: JourneyNode, other: JourneyNode): FlowSide {
+  const here = center(node);
+  const there = center(other);
+  const dx = there.x - here.x;
+  const dy = there.y - here.y;
+  if (Math.abs(dx) >= Math.abs(dy) * 0.8) return dx >= 0 ? 'right' : 'left';
+  return dy >= 0 ? 'bottom' : 'top';
 }
 
-function normalizeLegacyTargetHandle(handle: string | null | undefined, source: JourneyNode, target: JourneyNode) {
-  if (handle && targetHandles.has(handle)) return handle;
+function nearestHandle(node: JourneyNode, other: JourneyNode) {
+  const otherCenter = center(other);
+  const preferredSide = facingSide(node, other);
+  return [...ALL_HANDLE_IDS].sort((a, b) => {
+    const sidePenaltyA = handleSide(a) === preferredSide ? 0 : 1;
+    const sidePenaltyB = handleSide(b) === preferredSide ? 0 : 1;
+    if (sidePenaltyA !== sidePenaltyB) return sidePenaltyA - sidePenaltyB;
+    const anchorA = nodeAnchor(node, handleSide(a), a);
+    const anchorB = nodeAnchor(node, handleSide(b), b);
+    return distanceSquared(anchorA, otherCenter) - distanceSquared(anchorB, otherCenter);
+  })[0];
+}
 
-  if (handle === 'target-left') return center(source).y < center(target).y ? 'target-left-top' : 'target-left-bottom';
-  if (handle === 'target-top') return nearestTargetHandle(source, target).startsWith('target-top') ? nearestTargetHandle(source, target) : 'target-top';
-  if (handle === 'target-right' || handle === 'target-bottom') return nearestTargetHandle(source, target);
+function normalizeLegacyHandle(handle: string | null | undefined, node: JourneyNode, other: JourneyNode) {
+  // RC12.14 accepts all ten historical physical ports for either end of an edge.
+  if (handle && allHandles.has(handle)) return handle;
 
-  return nearestTargetHandle(source, target);
+  // Very old files used one generic handle per side. Translate those to the
+  // nearest current physical port on the requested side when possible.
+  const requestedSide: FlowSide | null = handle?.includes('top') ? 'top'
+    : handle?.includes('bottom') ? 'bottom'
+    : handle?.includes('left') ? 'left'
+    : handle?.includes('right') ? 'right'
+    : null;
+
+  if (requestedSide) {
+    const candidates = ALL_HANDLE_IDS.filter(id => handleSide(id) === requestedSide);
+    const otherCenter = center(other);
+    return [...candidates].sort((a, b) => {
+      const anchorA = nodeAnchor(node, requestedSide, a);
+      const anchorB = nodeAnchor(node, requestedSide, b);
+      return distanceSquared(anchorA, otherCenter) - distanceSquared(anchorB, otherCenter);
+    })[0] ?? nearestHandle(node, other);
+  }
+
+  return nearestHandle(node, other);
 }
 
 export function normalizeJourneyEdgeHandles(nodes: JourneyNode[], edges: JourneyEdge[]): JourneyEdge[] {
@@ -92,72 +101,34 @@ export function normalizeJourneyEdgeHandles(nodes: JourneyNode[], edges: Journey
     if (!source || !target) return edge;
     return {
       ...edge,
-      sourceHandle: normalizeLegacySourceHandle(edge.sourceHandle, source, target),
-      targetHandle: normalizeLegacyTargetHandle(edge.targetHandle, source, target)
+      sourceHandle: normalizeLegacyHandle(edge.sourceHandle, source, target),
+      targetHandle: normalizeLegacyHandle(edge.targetHandle, target, source)
     };
   });
 }
 
-function sourceHandleSide(handle: string): FlowSide {
-  return handle.includes('right') ? 'right' : 'bottom';
-}
-
-function targetHandleSide(handle: string): FlowSide {
-  return handle.includes('left') ? 'left' : 'top';
-}
-
-function distanceSquared(a: { x: number; y: number }, b: { x: number; y: number }) {
-  const dx = a.x - b.x;
-  const dy = a.y - b.y;
-  return dx * dx + dy * dy;
-}
-
-function chooseSourceHandle(source: JourneyNode, target: JourneyNode, usage: Map<string, number>) {
-  const sourceBounds = nodeSize(source);
-  const targetCenter = center(target);
-  const preferredSide: FlowSide = targetCenter.x >= source.position.x + sourceBounds.width * 0.7 ? 'right' : 'bottom';
-  return [...SOURCE_HANDLE_IDS].sort((a, b) => {
+function chooseHandle(node: JourneyNode, other: JourneyNode, usage: Map<string, number>) {
+  const preferredSide = facingSide(node, other);
+  const otherCenter = center(other);
+  return [...ALL_HANDLE_IDS].sort((a, b) => {
     const useA = usage.get(a) ?? 0;
     const useB = usage.get(b) ?? 0;
+    // Prefer unused physical ports before reusing one, so parallel routes get
+    // visually separate entry/exit points during Tidy and static export.
     if (useA !== useB) return useA - useB;
-    const sidePenaltyA = sourceHandleSide(a) === preferredSide ? 0 : 1;
-    const sidePenaltyB = sourceHandleSide(b) === preferredSide ? 0 : 1;
+    const sidePenaltyA = handleSide(a) === preferredSide ? 0 : 1;
+    const sidePenaltyB = handleSide(b) === preferredSide ? 0 : 1;
     if (sidePenaltyA !== sidePenaltyB) return sidePenaltyA - sidePenaltyB;
-    const anchorA = nodeAnchor(source, sourceHandleSide(a), a);
-    const anchorB = nodeAnchor(source, sourceHandleSide(b), b);
-    return distanceSquared(anchorA, targetCenter) - distanceSquared(anchorB, targetCenter);
-  })[0];
-}
-
-function chooseTargetHandle(source: JourneyNode, target: JourneyNode, usage: Map<string, number>) {
-  const sourceCenter = center(source);
-  const targetBounds = nodeSize(target);
-  const sourceClearlyAbove = sourceCenter.y < target.position.y - 18;
-  const preferredSide: FlowSide = sourceClearlyAbove ? 'top' : 'left';
-  return [...TARGET_HANDLE_IDS].sort((a, b) => {
-    const useA = usage.get(a) ?? 0;
-    const useB = usage.get(b) ?? 0;
-    if (useA !== useB) return useA - useB;
-    const sidePenaltyA = targetHandleSide(a) === preferredSide ? 0 : 1;
-    const sidePenaltyB = targetHandleSide(b) === preferredSide ? 0 : 1;
-    if (sidePenaltyA !== sidePenaltyB) return sidePenaltyA - sidePenaltyB;
-    const anchorA = nodeAnchor(target, targetHandleSide(a), a);
-    const anchorB = nodeAnchor(target, targetHandleSide(b), b);
-    const verticalPenaltyA = sourceCenter.y > target.position.y + targetBounds.height && targetHandleSide(a) === 'top' ? 25000 : 0;
-    const verticalPenaltyB = sourceCenter.y > target.position.y + targetBounds.height && targetHandleSide(b) === 'top' ? 25000 : 0;
-    return distanceSquared(anchorA, sourceCenter) + verticalPenaltyA - distanceSquared(anchorB, sourceCenter) - verticalPenaltyB;
+    const anchorA = nodeAnchor(node, handleSide(a), a);
+    const anchorB = nodeAnchor(node, handleSide(b), b);
+    return distanceSquared(anchorA, otherCenter) - distanceSquared(anchorB, otherCenter);
   })[0];
 }
 
 /**
- * Reassign handles after an automatic tidy operation so sibling routes do not
- * all leave/enter through the same port. Manual layouts keep their saved ports;
- * this function is intentionally used by Tidy and by static exports where
- * overlapping arrows are more damaging than preserving a duplicated port.
- *
- * RC12.12 uses all five available ports before reusing one. Ports are selected
- * by geometric proximity, so an upper-left source naturally favours a top port
- * while a source level with the target favours a left port.
+ * Reassign handles after automatic layout/static export to spread sibling
+ * routes over the ten available physical ports. Because every port is now
+ * bidirectional, both source and target endpoints may use any side.
  */
 export function redistributeJourneyEdgeHandles(nodes: JourneyNode[], edges: JourneyEdge[]): JourneyEdge[] {
   const normalized = normalizeJourneyEdgeHandles(nodes, edges);
@@ -184,7 +155,7 @@ export function redistributeJourneyEdgeHandles(nodes: JourneyNode[], edges: Jour
     for (const edge of ordered) {
       const target = nodeMap.get(edge.target);
       if (!target) continue;
-      const handle = chooseSourceHandle(source, target, usage);
+      const handle = chooseHandle(source, target, usage);
       edge.sourceHandle = handle;
       usage.set(handle, (usage.get(handle) ?? 0) + 1);
     }
@@ -203,7 +174,7 @@ export function redistributeJourneyEdgeHandles(nodes: JourneyNode[], edges: Jour
     for (const edge of ordered) {
       const source = nodeMap.get(edge.source);
       if (!source) continue;
-      const handle = chooseTargetHandle(source, target, usage);
+      const handle = chooseHandle(target, source, usage);
       edge.targetHandle = handle;
       usage.set(handle, (usage.get(handle) ?? 0) + 1);
     }

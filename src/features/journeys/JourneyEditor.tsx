@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Background,
   Controls,
+  ConnectionMode,
   MiniMap,
   MarkerType,
   ReactFlow,
@@ -464,6 +465,7 @@ export function JourneyEditor({ journey, initialNodeId, onClose }: { journey: Jo
             selectionKeyCode="Shift"
             multiSelectionKeyCode="Shift"
             edgesReconnectable
+            connectionMode={ConnectionMode.Loose}
           >
             <Background gap={20} size={1} />
             <Controls />

@@ -27,15 +27,15 @@ const icons = {
 } as const;
 
 const handles = [
-  // Incoming only: three ports on top, two on left.
+  // RC12.14: every physical port can both start and receive a connection.
+  // React Flow still requires a nominal handle type, so the historical types/IDs
+  // are retained for file compatibility and ConnectionMode.Loose makes them bidirectional.
   ['target-top-left', 'target', Position.Top, { left: '25%' }],
   ['target-top', 'target', Position.Top, { left: '50%' }],
   ['target-top-right', 'target', Position.Top, { left: '75%' }],
   ['target-left-top', 'target', Position.Left, { top: '35%' }],
   ['target-left-bottom', 'target', Position.Left, { top: '65%' }],
 
-  // Outgoing only: three ports on bottom, two on right. A single port may
-  // carry multiple edges, which supports both split and merge flows.
   ['source-bottom-left', 'source', Position.Bottom, { left: '25%' }],
   ['source-bottom', 'source', Position.Bottom, { left: '50%' }],
   ['source-bottom-right', 'source', Position.Bottom, { left: '75%' }],
@@ -57,7 +57,7 @@ export function JourneyNodeComponent({ data, selected }: NodeProps<JourneyNode>)
         <button type="button" title="Duplicate node" onClick={event => { event.stopPropagation(); data.runtimeActions?.duplicate?.(); }}><Copy size={13}/><span>Duplicate</span></button>
         <button type="button" className="danger" title="Delete node" onClick={event => { event.stopPropagation(); data.runtimeActions?.delete?.(); }}><Trash2 size={13}/><span>Delete</span></button>
       </NodeToolbar>
-      {handles.map(([id, type, position, style]) => <Handle key={id} id={id} type={type} position={position} className={`journey-handle ${type}`} style={style}/>) }
+      {handles.map(([id, type, position, style]) => <Handle key={id} id={id} type={type} position={position} className="journey-handle bidirectional" style={style} title="Send or receive connection"/>) }
       {compactTracking ? <div className="compact-tracking-content"><BarChart3 size={13}/><span>{data.label}</span></div> : <>
         <div className="node-head">
           <div className="node-icon"><Icon size={16}/></div>

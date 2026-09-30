@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Background, MarkerType, ReactFlow, type NodeMouseHandler } from '@xyflow/react';
+import { Background, ConnectionMode, MarkerType, ReactFlow, type NodeMouseHandler } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { ArrowLeft, ChevronLeft, ChevronRight, ExternalLink, FileImage, Maximize, Minimize, Pencil, Printer, X } from 'lucide-react';
 import type { Journey, JourneyNode } from '../../types/domain';
@@ -117,6 +117,7 @@ export function JourneyViewer({ journey, initialSelectedId, onClose, onEdit }: {
           zoomOnDoubleClick={false}
           selectionOnDrag={false}
           fitView
+          connectionMode={ConnectionMode.Loose}
           fitViewOptions={{ padding: 0.18, minZoom: 0.45, maxZoom: 1.05 }}
         >
           <Background gap={20} size={1}/>
