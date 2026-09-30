@@ -1,7 +1,7 @@
 import type { FunnelStage, Journey, JourneyNodeType, NodeBackgroundTone } from '../types/domain';
 import { STAGE_WORLD_BOUNDARIES } from './stageGeometry';
 import { edgeLaneMap, journeyBounds, nodeSize, orthogonalEdgeRoute } from './graphGeometry';
-import { normalizeJourneyEdgeHandles } from './flowHandles';
+import { redistributeJourneyEdgeHandles } from './flowHandles';
 
 const PADDING = 90;
 const STAGES: FunnelStage[] = ['top','middle','bottom','lifecycle'];
@@ -20,8 +20,8 @@ function wrap(value: string, max = 28) {
 export function journeySvg(journey: Journey) {
   const b = journeyBounds(journey.nodes, PADDING, PADDING, PADDING);
   const nodeMap = new Map(journey.nodes.map(n => [n.id,n]));
-  const edges = normalizeJourneyEdgeHandles(journey.nodes, journey.edges);
-  const lanes = edgeLaneMap(edges);
+  const edges = redistributeJourneyEdgeHandles(journey.nodes, journey.edges);
+  const lanes = edgeLaneMap(edges, journey.nodes);
   const edgeSvg = edges.map(edge => {
     const s=nodeMap.get(edge.source), t=nodeMap.get(edge.target); if(!s||!t)return'';
     const route=orthogonalEdgeRoute(edge,s,t,lanes.get(edge.id) ?? 0);

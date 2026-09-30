@@ -1,11 +1,22 @@
 export const APP_NAME = 'Journey Studio by Famme';
 export const APP_SHORT_NAME = 'Journey Studio';
-export const APP_VERSION = '2.0.0-rc.12.11';
+export const APP_VERSION = '2.0.0-rc.12.12';
 export const APP_AUTHOR = 'Mikkel Famme';
 export const APP_BRAND = 'BY FAMME';
 export const APP_RELEASE_DATE = '2026-09-30';
 
 export const APP_RELEASE_NOTES = [
+  {
+    version: '2.0.0-rc.12.12',
+    title: 'Correct arrow entry & collision-aware lanes',
+    items: [
+      'Compound connection handles now resolve to their real node edge, so top ports receive vertical arrows and left ports receive horizontal arrows directly into the component.',
+      'Mixed right-to-top and bottom-to-left routes keep a short approach segment aligned with the target side instead of turning the arrowhead sideways.',
+      'Tidy redistributes incoming and outgoing ports geometrically and uses every suitable port before reusing one.',
+      'Canvas route lanes are selected against existing routes to reduce parallel overlap while still allowing clean crossings.',
+      'SVG/PNG and Print/PDF use the same corrected routing model and automatically spread duplicated ports for clearer static output.'
+    ]
+  },
   {
     version: '2.0.0-rc.12.11',
     title: 'Clean routing, compact tracking & custom components',

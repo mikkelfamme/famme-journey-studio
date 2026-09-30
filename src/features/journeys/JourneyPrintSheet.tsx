@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import type { FunnelStage, Journey, JourneyEdge, JourneyNode, JourneyNodeType, NodeBackgroundTone } from '../../types/domain';
 import { useI18n } from '../../i18n';
-import { normalizeJourneyEdgeHandles } from '../../lib/flowHandles';
+import { redistributeJourneyEdgeHandles } from '../../lib/flowHandles';
 import { edgeLaneMap, journeyBounds, nodeSize, orthogonalEdgeRoute } from '../../lib/graphGeometry';
 import { STAGE_WORLD_BOUNDARIES } from '../../lib/stageGeometry';
 
@@ -63,9 +63,9 @@ function wrapLabel(label: string, max = 27): string[] {
 export function JourneyPrintSheet({ journey }: { journey: Journey }) {
   const { t, status, nodeType, stage, language } = useI18n();
   const nodeMap = useMemo(() => new Map(journey.nodes.map(node => [node.id, node])), [journey.nodes]);
-  const printEdges = useMemo(() => normalizeJourneyEdgeHandles(journey.nodes, journey.edges), [journey.nodes, journey.edges]);
+  const printEdges = useMemo(() => redistributeJourneyEdgeHandles(journey.nodes, journey.edges), [journey.nodes, journey.edges]);
   const bounds = useMemo(() => journeyBounds(journey.nodes), [journey.nodes]);
-  const edgeLanes = useMemo(() => edgeLaneMap(printEdges), [printEdges]);
+  const edgeLanes = useMemo(() => edgeLaneMap(printEdges, journey.nodes), [printEdges, journey.nodes]);
   const detailNodes = journey.nodes.filter(node => {
     const url = node.data.url || node.data.landingPage;
     return Boolean(url || node.data.tracking.length || node.data.creatives.length || node.data.description);

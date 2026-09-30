@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { JourneyEdge, JourneyNode } from '../types/domain';
-import { normalizeJourneyEdgeHandles, SOURCE_HANDLE_IDS, TARGET_HANDLE_IDS } from './flowHandles';
+import { normalizeJourneyEdgeHandles, redistributeJourneyEdgeHandles, SOURCE_HANDLE_IDS, TARGET_HANDLE_IDS } from './flowHandles';
 
 function node(id: string, x: number, y: number): JourneyNode {
   return { id, type: 'journey', position: { x, y }, data: { label: id, type: 'customerStep', stage: 'middle', tracking: [], creatives: [], annotations: [] } };
@@ -40,4 +40,15 @@ describe('directional journey handles', () => {
     expect(edges.filter(item => item.source === 'a')).toHaveLength(2);
     expect(edges.filter(item => item.target === 'd')).toHaveLength(2);
   });
+
+  it('uses distinct target ports before reusing one during Tidy/export routing', () => {
+    const nodes = [
+      node('a', 0, 0), node('b', 0, 120), node('c', 0, 240), node('d', 0, 360), node('target', 480, 220)
+    ];
+    const edges = redistributeJourneyEdgeHandles(nodes, [
+      edge('at', 'a', 'target'), edge('bt', 'b', 'target'), edge('ct', 'c', 'target'), edge('dt', 'd', 'target')
+    ]);
+    expect(new Set(edges.map(item => item.targetHandle)).size).toBe(4);
+  });
+
 });

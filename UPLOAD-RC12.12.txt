@@ -1,0 +1,6 @@
+Journey Studio by Famme 2.0.0-rc.12.12
+
+Upload the CONTENTS of Journey-Studio-RC12.12-Arrow-Routing-Hotfix.zip to the repository root and commit.
+Suggested commit: Fix arrow entry direction and parallel route overlap in RC12.12
+
+Then wait for Deploy PWA to GitHub Pages to turn green.

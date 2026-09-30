@@ -320,7 +320,7 @@ export function JourneyEditor({ journey, initialNodeId, onClose }: { journey: Jo
   const actualPaths = workspace ? pathsForJourney(workspace, draft.id, actualSnapshot) : [];
   const activePath = useMemo(() => selected ? traceConnectedPath(draft.nodes, draft.edges, selected.id) : null, [selected?.id, draft.nodes, draft.edges]);
   const stageMismatchCount = useMemo(() => draft.nodes.filter(node => isStageMismatch(node.data.stage, node.position.x)).length, [draft.nodes]);
-  const edgeLanes = useMemo(() => edgeLaneMap(draft.edges), [draft.edges]);
+  const edgeLanes = useMemo(() => edgeLaneMap(draft.edges, draft.nodes), [draft.edges, draft.nodes]);
 
   const flowNodes = useMemo(() => draft.nodes.map(node => {
     const data: JourneyNodeData = {

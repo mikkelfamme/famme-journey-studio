@@ -244,3 +244,10 @@ A dependency-backed `npm install` could not complete in the build environment be
 - Added compact Tracking point nodes for inline journey measurement.
 - Added direct attached/no-arrow connections for adjacent components.
 - Added full custom Component Library create/edit workflow.
+
+## 2.0.0-rc.12.12
+- Fixed compound handle-side resolution (`target-top-left` is a top port, `source-bottom-left` is a bottom port, etc.).
+- Corrected mixed orthogonal routing so arrowheads always enter the target perpendicular to its top/left edge.
+- Tidy now assigns distinct incoming/outgoing ports geometrically before reusing a port.
+- Added collision-aware route lanes that penalise parallel overlap but allow ordinary crossings.
+- SVG/PNG and Print/PDF now spread duplicated ports and use the same corrected routing geometry as the canvas.

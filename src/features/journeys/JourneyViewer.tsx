@@ -34,7 +34,7 @@ export function JourneyViewer({ journey, initialSelectedId, onClose, onEdit }: {
   })), [journey.nodes, selectedId]);
   const edges = useMemo(() => {
     const normalized = normalizeJourneyEdgeHandles(journey.nodes, journey.edges);
-    const lanes = edgeLaneMap(normalized);
+    const lanes = edgeLaneMap(normalized, journey.nodes);
     return normalized.map(edge => {
       const attached = edge.data?.connectionStyle === 'attached';
       return {
